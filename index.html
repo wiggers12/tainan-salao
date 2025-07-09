@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adivinhe o Quê?</title> <style>
+    <title>Adivinhe o Quê?</title>
+    <style>
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -15,6 +16,7 @@
             color: #333;
             text-align: center;
             overflow: hidden; /* Evita scroll durante o splash */
+            position: relative; /* Para posicionar o cesto relativamente ao body */
         }
 
         /* --- SPLASH SCREEN STYLES --- */
@@ -140,6 +142,35 @@
         #next-animal-btn:hover {
             background-color: #FFA000; /* Amarelo mais escuro */
         }
+
+        /* --- CESTO E FRUTA --- */
+        #basket-area {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background-image: url('cesto.png'); /* Certifique-se de ter a imagem 'cesto.png' */
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+        }
+
+        .fruit-image {
+            position: absolute;
+            bottom: 30px; /* Ajuste a posição inicial da fruta */
+            right: 30px; /* Ajuste a posição inicial da fruta */
+            width: 60px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0; /* Começa invisível */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .fruit-image.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -157,7 +188,8 @@
         </div>
     </div>
 
-    <audio id="animal-sound" preload="auto"></audio>
+    <div id="basket-area"></div>
+    <div id="fruit-spot"></div> <audio id="animal-sound" preload="auto"></audio>
     <audio id="celebration-sound" preload="auto" src="vitoria.mp3"></audio>
 
     <script>
@@ -170,110 +202,45 @@
             const nextAnimalBtn = document.getElementById('next-animal-btn');
             const animalSoundElement = document.getElementById('animal-sound');
             const celebrationSoundElement = document.getElementById('celebration-sound');
+            const fruitSpot = document.getElementById('fruit-spot'); // Onde as frutas aparecerão
 
-            const items = [ // Renomeado de 'animals' para 'items'
-                // Animais
-                {
-                    name: "cachorro",
-                    clue: "Eu faço 'au au', sou um ótimo amigo e balanço o rabo quando estou feliz. Qual animal eu sou?",
-                    options: ["gato", "cachorro", "pássaro", "macaco"],
-                    sound: "latido.mp3"
-                },
-                {
-                    name: "gato",
-                    clue: "Eu faço 'miau', adoro caçar ratos e gosto de dormir em lugares quentinhos. Qual animal eu sou?",
-                    options: ["coelho", "cachorro", "gato", "ovelha"],
-                    sound: "miado.mp3"
-                },
-                {
-                    name: "elefante",
-                    clue: "Eu sou bem grandão, tenho orelhas enormes e um nariz comprido que chamam de tromba. Qual animal eu sou?",
-                    options: ["girafa", "cavalo", "elefante", "leão"],
-                    sound: "elefante.mp3"
-                },
-                {
-                    name: "pato",
-                    clue: "Eu faço 'quá quá', adoro nadar e tenho bico. Qual animal eu sou?",
-                    options: ["galinha", "pato", "peixe", "sapo"],
-                    sound: "quac.mp3"
-                },
-                {
-                    name: "leão",
-                    clue: "Eu sou o rei da selva, tenho uma juba grande e faço 'grrr'. Qual animal eu sou?",
-                    options: ["tigre", "urso", "leão", "zebra"],
-                    sound: "rugido.mp3"
-                },
-                {
-                    name: "macaco",
-                    clue: "Eu adoro pular de galho em galho, comer bananas e sou bem brincalhão. Qual animal eu sou?",
-                    options: ["cachorro", "macaco", "coelho", "cobra"],
-                    sound: "macaco.mp3"
-                },
-                {
-                    name: "coelho",
-                    clue: "Eu tenho orelhas compridas, gosto de cenouras e pulo bem rápido. Qual animal eu sou?",
-                    options: ["gato", "esquilo", "coelho", "rato"],
-                    sound: "coelho.mp3"
-                },
-                {
-                    name: "girafa",
-                    clue: "Eu sou muito alta, tenho um pescoço comprido e sou manchada. Qual animal eu sou?",
-                    options: ["zebra", "elefante", "girafa", "leopardo"],
-                    sound: "girafa.mp3"
-                },
-                {
-                    name: "abelha",
-                    clue: "Eu sou pequena, voo de flor em flor e faço mel. Qual animal eu sou?",
-                    options: ["mosca", "abelha", "borboleta", "formiga"],
-                    sound: "abelha.mp3"
-                },
-                {
-                    name: "tubarão",
-                    clue: "Eu vivo no oceano, tenho dentes bem afiados e sou um peixe muito grande. Qual animal eu sou?",
-                    options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"],
-                    sound: "tubarao.mp3"
-                },
-                // Frutas
-                {
-                    name: "maçã",
-                    clue: "Eu sou uma fruta redonda, posso ser vermelha ou verde e sou crocante. Qual fruta eu sou?",
-                    options: ["banana", "laranja", "maçã", "uva"]
-                },
-                {
-                    name: "banana",
-                    clue: "Eu sou uma fruta amarela, comprida e os macacos adoram me comer. Qual fruta eu sou?",
-                    options: ["limão", "banana", "abacaxi", "morango"]
-                },
-                {
-                    name: "laranja",
-                    clue: "Eu sou uma fruta redonda, laranja e cheia de vitamina C. Qual fruta eu sou?",
-                    options: ["maçã", "pêssego", "laranja", "kiwi"]
-                },
-                {
-                    name: "morango",
-                    clue: "Eu sou uma fruta pequena, vermelha, com sementinhas por fora e sou bem docinha. Qual fruta eu sou?",
-                    options: ["cereja", "framboesa", "morango", "amora"]
-                },
-                {
-                    name: "uva",
-                    clue: "Eu sou uma fruta pequena que cresce em cachos, posso ser verde ou roxa. Qual fruta eu sou?",
-                    options: ["mirtilo", "uva", "goiaba", "figo"]
-                }
+            const items = [
+                // Animais (mantendo a propriedade sound)
+                { name: "cachorro", clue: "Eu faço 'au au'...", options: ["gato", "cachorro", "pássaro", "macaco"], sound: "latido.mp3", type: "animal" },
+                { name: "gato", clue: "Eu faço 'miau'...", options: ["coelho", "cachorro", "gato", "ovelha"], sound: "miado.mp3", type: "animal" },
+                { name: "elefante", clue: "Eu sou bem grandão...", options: ["girafa", "cavalo", "elefante", "leão"], sound: "elefante.mp3", type: "animal" },
+                { name: "pato", clue: "Eu faço 'quá quá'...", options: ["galinha", "pato", "peixe", "sapo"], sound: "quac.mp3", type: "animal" },
+                { name: "leão", clue: "Eu sou o rei da selva...", options: ["tigre", "urso", "leão", "zebra"], sound: "rugido.mp3", type: "animal" },
+                { name: "macaco", clue: "Eu adoro pular...", options: ["cachorro", "macaco", "coelho", "cobra"], sound: "macaco.mp3", type: "animal" },
+                { name: "coelho", clue: "Eu tenho orelhas compridas...", options: ["gato", "esquilo", "coelho", "rato"], sound: "coelho.mp3", type: "animal" },
+                { name: "girafa", clue: "Eu sou muito alta...", options: ["zebra", "elefante", "girafa", "leopardo"], sound: "girafa.mp3", type: "animal" },
+                { name: "abelha", clue: "Eu sou pequena, voo...", options: ["mosca", "abelha", "borboleta", "formiga"], sound: "abelha.mp3", type: "animal" },
+                { name: "tubarão", clue: "Eu vivo no oceano...", options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"], sound: "tubarao.mp3", type: "animal" },
+                // Frutas (sem a propriedade sound)
+                { name: "maçã", clue: "Eu sou uma fruta redonda...", options: ["banana", "laranja", "maçã", "uva"], type: "fruit", image: "maca.png" },
+                { name: "banana", clue: "Eu sou uma fruta amarela...", options: ["limão", "banana", "abacaxi", "morango"], type: "fruit", image: "banana.png" },
+                { name: "laranja", clue: "Eu sou uma fruta redonda, laranja...", options: ["maçã", "pêssego", "laranja", "kiwi"], type: "fruit", image: "laranja.png" },
+                { name: "morango", clue: "Eu sou uma fruta pequena, vermelha...", options: ["cereja", "framboesa", "morango", "amora"], type: "fruit", image: "morango.png" },
+                { name: "uva", clue: "Eu sou uma fruta pequena que cresce...", options: ["mirtilo", "uva", "goiaba", "figo"], type: "fruit", image: "uva.png" }
             ];
 
-            let currentItemIndex = 0; // Renomeado de 'currentAnimalIndex'
-            let shuffledItems = []; // Renomeado de 'shuffledAnimals'
+            let currentItemIndex = 0;
+            let shuffledItems = [];
 
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
+                    if (i !== j) {
+                        const temp = array [i];
+                        array [i] = array [j];
+                        array [j] = temp;
+                    }
                 }
                 return array;
             }
 
-            function playItemSound(soundFileName) { // Renomeado de 'playAnimalSound'
-                if (soundFileName) { // Só toca se houver um arquivo de som definido
+            function playItemSound(soundFileName) {
+                if (soundFileName) {
                     animalSoundElement.src = soundFileName;
                     animalSoundElement.play().catch(error => {
                         console.log("Erro ao tocar o som do item:", error);
@@ -288,15 +255,34 @@
                 });
             }
 
-            function startGame() {
-                shuffledItems = shuffleArray([...items]); // Embaralha todos os itens
-                currentItemIndex = 0;
-                loadItem(); // Carrega o primeiro item
+            function showFruitInBasket(fruitImage) {
+                const fruitImgElement = document.createElement('div');
+                fruitImgElement.classList.add('fruit-image');
+                fruitImgElement.style.backgroundImage = `url('${fruitImage}')`;
+                fruitSpot.appendChild(fruitImgElement);
+
+                // Força um reflow para garantir que a transição funcione
+                fruitImgElement.offsetHeight;
+
+                fruitImgElement.classList.add('visible');
+
+                setTimeout(() => {
+                    fruitImgElement.classList.remove('visible');
+                    setTimeout(() => {
+                        fruitImgElement.remove(); // Remove o elemento após a transição
+                    }, 500); // Tempo da transição em ms
+                }, 1000); // Tempo que a imagem fica visível
             }
 
-            function loadItem() { // Renomeado de 'loadAnimal'
+            function startGame() {
+                shuffledItems = shuffleArray([...items]);
+                currentItemIndex = 0;
+                loadItem();
+            }
+
+            function loadItem() {
                 if (currentItemIndex >= shuffledItems.length) {
-                    clueElement.textContent = "🥳 Parabéns! Você adivinhou todos os itens! Que tal jogar de novo?";
+                    clueElement.textContent = "🥳 Parabéns! Você descobriu tudo! Que tal jogar de novo?";
                     clueElement.style.color = "#28a745";
                     optionsContainer.innerHTML = '';
                     feedbackElement.textContent = '';
@@ -311,13 +297,13 @@
                     return;
                 }
 
-                const itemData = shuffledItems[currentItemIndex]; // Renomeado de 'animalData'
+                const itemData = shuffledItems [currentItemIndex];
                 clueElement.textContent = itemData.clue;
                 feedbackElement.textContent = '';
                 nextAnimalBtn.style.display = 'none';
                 optionsContainer.innerHTML = '';
 
-                playItemSound(itemData.sound); // Toca o som (se existir)
+                playItemSound(itemData.sound); // Toca o som se for animal
 
                 const shuffledOptions = shuffleArray([...itemData.options]);
 
@@ -325,12 +311,12 @@
                     const button = document.createElement('button');
                     button.classList.add('option-btn');
                     button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-                    button.addEventListener('click', () => checkAnswer(option, itemData.name));
+                    button.addEventListener('click', () => checkAnswer(option, itemData.name, itemData.type, itemData.image));
                     optionsContainer.appendChild(button);
                 });
             }
 
-            function checkAnswer(selectedOption, correctAnswer) {
+            function checkAnswer(selectedOption, correctAnswer, itemType, fruitImage) {
                 const allOptionButtons = document.querySelectorAll('.option-btn');
                 allOptionButtons.forEach(button => button.disabled = true);
 
@@ -338,6 +324,9 @@
                     feedbackElement.textContent = "🥳 Parabéns! Você acertou!";
                     feedbackElement.style.color = "#4CAF50";
                     playCelebrationSound();
+                    if (itemType === "fruit" && fruitImage) {
+                        showFruitInBasket(fruitImage);
+                    }
                     nextAnimalBtn.style.display = 'block';
                 } else {
                     feedbackElement.textContent = `❌ Que pena, não é ${selectedOption}. A resposta correta era ${correctAnswer}.`;
@@ -357,9 +346,9 @@
                 mainContent.classList.add('visible');
             }
 
-            setTimeout(hideSplashScreen, 3000); // Esconde o splash após 3 segundos
+            setTimeout(hideSplashScreen, 3000);
 
-            startGame(); // Inicia o jogo
+            startGame();
         });
     </script>
 </body>
