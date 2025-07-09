@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adivinhe o Quê?</title>
+    <title>Acertar o Gol!</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,11 +12,11 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f8ff; /* Azul claro */
-            color: #333;
+            background-color: #78a35e; /* Campo de futebol */
+            color: #fff;
             text-align: center;
-            overflow: hidden; /* Evita scroll durante o splash */
-            position: relative; /* Para posicionar o cesto relativamente ao body */
+            overflow: hidden;
+            position: relative;
         }
 
         /* --- SPLASH SCREEN STYLES --- */
@@ -26,19 +26,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #87CEEB; /* Um azul céu para o splash */
+            background-color: #4CAF50; /* Verde campo de futebol */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* Garante que fique por cima de tudo */
-            transition: opacity 1.5s ease-out; /* Transição suave para desaparecer */
+            z-index: 1000;
+            transition: opacity 1.5s ease-out;
         }
 
         #splash-screen.hidden {
             opacity: 0;
             visibility: hidden;
-            pointer-events: none; /* Impede interações após desaparecer */
+            pointer-events: none;
         }
 
         #splash-screen h2 {
@@ -49,23 +49,28 @@
         }
 
         #splash-screen .splash-image {
-            width: 150px; /* Tamanho da imagem no splash */
-            height: 150px;
-            object-fit: contain; /* Garante que a imagem se ajuste */
+            width: 180px; /* Tamanho da bola no splash */
+            height: 180px;
+            object-fit: contain;
             margin-bottom: 20px;
         }
         /* --- END SPLASH SCREEN STYLES --- */
 
-
         .container {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.1); /* Fundo transparente */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 90%;
-            max-width: 500px;
-            opacity: 0; /* Começa invisível para aparecer depois do splash */
-            transition: opacity 0.5s ease-in 1.5s; /* Aparece depois que o splash sumir */
+            max-width: 600px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in 1.5s;
+            position: relative;
+            height: 80vh; /* Altura para o campo de jogo */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .container.visible {
@@ -73,271 +78,304 @@
         }
 
         h1 {
-            color: #4CAF50; /* Verde */
-            margin-bottom: 20px;
+            color: #FFC107; /* Amarelo da bola */
+            margin-bottom: 10px;
+            font-size: 2em;
         }
 
-        #game-area {
+        #score {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            background-color: rgba(0,0,0,0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        #field {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            height: 60%; /* Mais espaço para o campo */
+            background-color: #558B2F; /* Verde mais escuro do campo */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            overflow: hidden; /* Para a bola não sair */
+            margin-bottom: 20px;
+            border: 5px solid #fff; /* Linhas do campo */
+        }
+
+        #goal {
+            position: absolute;
+            top: 10%; /* Posição do gol */
+            width: 80%;
+            height: 30%;
+            background-color: rgba(255, 255, 255, 0.2); /* Transparente para ver o campo */
+            border: 5px solid #eee; /* Barras do gol */
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%; /* Espaço para o goleiro */
+        }
+
+        #goalie {
+            position: absolute;
+            bottom: 0; /* Goleiro na linha */
+            width: 40px; /* Largura do goleiro */
+            height: 60px; /* Altura do goleiro */
+            background-color: #FF5722; /* Cor do uniforme do goleiro */
+            border-radius: 5px;
+            transition: transform 0.3s ease-out; /* Animação do goleiro */
+            left: 50%; /* Começa no meio */
+            transform: translateX(-50%);
+        }
+
+        #ball {
+            position: absolute;
+            bottom: 5px; /* Posição inicial da bola */
+            width: 40px;
+            height: 40px;
+            background-color: #FFC107; /* Amarelo da bola */
+            border-radius: 50%;
+            border: 2px solid #333;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: transform 0.5s ease-out; /* Animação do chute */
+            z-index: 20;
+        }
+        
+        #feedback {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 40px;
+            color: #FFEB3B; /* Amarelo vibrante */
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+        }
+
+        #kick-options {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
             margin-top: 20px;
         }
 
-        #clue {
-            font-size: 1.3em;
-            margin-bottom: 25px;
-            min-height: 60px; /* Para evitar pulos ao carregar dica */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #e8f5e9; /* Fundo mais claro para a dica */
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #c8e6c9;
-        }
-
-        #options-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Duas colunas para os botões */
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .option-btn {
+        .kick-btn {
             background-color: #2196F3; /* Azul */
             color: white;
-            padding: 15px 10px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1.1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            flex: 1; /* Distribui igualmente */
+            margin: 0 5px;
         }
 
-        .option-btn:hover {
-            background-color: #1976D2; /* Azul mais escuro */
+        .kick-btn:hover {
+            background-color: #1976D2;
         }
 
-        .option-btn:disabled {
+        .kick-btn:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
 
-        #feedback {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            font-weight: bold;
-            min-height: 30px; /* Evita pulos */
-        }
-
-        #next-animal-btn {
-            background-color: #FFC107; /* Amarelo */
-            color: #333;
-            padding: 12px 25px;
+        #next-kick-btn {
+            background-color: #FF5722; /* Laranja/Vermelho */
+            color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            font-size: 1.1em;
+            font-size: 1em;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-top: 15px;
+            display: none; /* Escondido inicialmente */
+        }
+        #next-kick-btn:hover {
+            background-color: #E64A19;
         }
 
-        #next-animal-btn:hover {
-            background-color: #FFA000; /* Amarelo mais escuro */
+        /* Animações da bola */
+        @keyframes shootLeft {
+            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
+            100% { bottom: 70%; left: 10%; transform: translateX(-50%) scale(0.6); }
         }
-
-        /* --- CESTO E FRUTA --- */
-        #basket-area {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 80px;
-            height: 80px;
-            background-image: url('cesto.png'); /* Certifique-se de ter a imagem 'cesto.png' */
-            background-size: contain;
-            background-repeat: no-repeat;
-            z-index: 10;
+        @keyframes shootCenter {
+            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
+            100% { bottom: 70%; left: 50%; transform: translateX(-50%) scale(0.6); }
         }
-
-        .fruit-image {
-            position: absolute;
-            bottom: 30px; /* Ajuste a posição inicial da fruta */
-            right: 30px; /* Ajuste a posição inicial da fruta */
-            width: 60px;
-            height: 60px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0; /* Começa invisível */
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        .fruit-image.visible {
-            opacity: 1;
+        @keyframes shootRight {
+            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
+            100% { bottom: 70%; left: 90%; transform: translateX(-50%) scale(0.6); }
         }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <img src="logo-animal.png" alt="Logo Animada" class="splash-image"> <h2>Adivinhe o Quê?</h2> <p style="color: white; font-size: 1.1em;">Preparando a diversão...</p>
+        <img src="soccer-ball.png" alt="Bola de Futebol" class="splash-image"> <h2>Acertar o Gol!</h2>
+        <p style="color: white; font-size: 1.1em;">Preparando o chute inicial!</p>
     </div>
 
     <div class="container" id="main-content">
-        <h1>Adivinhe o Quê?</h1> <div id="game-area">
-            <p id="clue">Pensei em algo...</p>
-            <div id="options-container">
-                </div>
-            <p id="feedback"></p>
-            <button id="next-animal-btn" style="display:none;">Próximo</button>
+        <h1>Pênalti!</h1>
+        <p id="score">Gols: 0 / Tentativas: 0</p>
+        
+        <div id="field">
+            <div id="goal">
+                <div id="goalie"></div>
+            </div>
+            <div id="ball"></div>
         </div>
+
+        <p id="feedback"></p>
+
+        <div id="kick-options">
+            <button class="kick-btn" data-target="left">Canto Esquerdo</button>
+            <button class="kick-btn" data-target="center">Meio</button>
+            <button class="kick-btn" data-target="right">Canto Direito</button>
+        </div>
+        <button id="next-kick-btn">Próximo Chute</button>
     </div>
 
-    <div id="basket-area"></div>
-    <div id="fruit-spot"></div> <audio id="animal-sound" preload="auto"></audio>
-    <audio id="celebration-sound" preload="auto" src="vitoria.mp3"></audio>
+    <audio id="kick-sound" preload="auto" src="chute.mp3"></audio>
+    <audio id="goal-sound" preload="auto" src="gol.mp3"></audio>
+    <audio id="save-sound" preload="auto" src="defesa.mp3"></audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splash-screen');
             const mainContent = document.getElementById('main-content');
-            const clueElement = document.getElementById('clue');
-            const optionsContainer = document.getElementById('options-container');
+            const scoreElement = document.getElementById('score');
             const feedbackElement = document.getElementById('feedback');
-            const nextAnimalBtn = document.getElementById('next-animal-btn');
-            const animalSoundElement = document.getElementById('animal-sound');
-            const celebrationSoundElement = document.getElementById('celebration-sound');
-            const fruitSpot = document.getElementById('fruit-spot'); // Onde as frutas aparecerão
+            const kickButtons = document.querySelectorAll('.kick-btn');
+            const nextKickBtn = document.getElementById('next-kick-btn');
+            const ballElement = document.getElementById('ball');
+            const goalieElement = document.getElementById('goalie');
 
-            const items = [
-                // Animais (mantendo a propriedade sound)
-                { name: "cachorro", clue: "Eu faço 'au au'...", options: ["gato", "cachorro", "pássaro", "macaco"], sound: "latido.mp3", type: "animal" },
-                { name: "gato", clue: "Eu faço 'miau'...", options: ["coelho", "cachorro", "gato", "ovelha"], sound: "miado.mp3", type: "animal" },
-                { name: "elefante", clue: "Eu sou bem grandão...", options: ["girafa", "cavalo", "elefante", "leão"], sound: "elefante.mp3", type: "animal" },
-                { name: "pato", clue: "Eu faço 'quá quá'...", options: ["galinha", "pato", "peixe", "sapo"], sound: "quac.mp3", type: "animal" },
-                { name: "leão", clue: "Eu sou o rei da selva...", options: ["tigre", "urso", "leão", "zebra"], sound: "rugido.mp3", type: "animal" },
-                { name: "macaco", clue: "Eu adoro pular...", options: ["cachorro", "macaco", "coelho", "cobra"], sound: "macaco.mp3", type: "animal" },
-                { name: "coelho", clue: "Eu tenho orelhas compridas...", options: ["gato", "esquilo", "coelho", "rato"], sound: "coelho.mp3", type: "animal" },
-                { name: "girafa", clue: "Eu sou muito alta...", options: ["zebra", "elefante", "girafa", "leopardo"], sound: "girafa.mp3", type: "animal" },
-                { name: "abelha", clue: "Eu sou pequena, voo...", options: ["mosca", "abelha", "borboleta", "formiga"], sound: "abelha.mp3", type: "animal" },
-                { name: "tubarão", clue: "Eu vivo no oceano...", options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"], sound: "tubarao.mp3", type: "animal" },
-                // Frutas (sem a propriedade sound)
-                { name: "maçã", clue: "Eu sou uma fruta redonda...", options: ["banana", "laranja", "maçã", "uva"], type: "fruit", image: "maca.png" },
-                { name: "banana", clue: "Eu sou uma fruta amarela...", options: ["limão", "banana", "abacaxi", "morango"], type: "fruit", image: "banana.png" },
-                { name: "laranja", clue: "Eu sou uma fruta redonda, laranja...", options: ["maçã", "pêssego", "laranja", "kiwi"], type: "fruit", image: "laranja.png" },
-                { name: "morango", clue: "Eu sou uma fruta pequena, vermelha...", options: ["cereja", "framboesa", "morango", "amora"], type: "fruit", image: "morango.png" },
-                { name: "uva", clue: "Eu sou uma fruta pequena que cresce...", options: ["mirtilo", "uva", "goiaba", "figo"], type: "fruit", image: "uva.png" }
-            ];
+            const kickSound = document.getElementById('kick-sound');
+            const goalSound = document.getElementById('goal-sound');
+            const saveSound = document.getElementById('save-sound');
 
-            let currentItemIndex = 0;
-            let shuffledItems = [];
+            let goals = 0;
+            let attempts = 0;
 
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    if (i !== j) {
-                        const temp = array [i];
-                        array [i] = array [j];
-                        array [j] = temp;
-                    }
-                }
-                return array;
+            const GOALIE_POSITIONS = {
+                left: '10%',
+                center: '50%',
+                right: '90%'
+            };
+
+            const GOALIE_ANIMATION_CLASS = {
+                left: 'goalie-left',
+                center: 'goalie-center',
+                right: 'goalie-right'
+            };
+
+            function updateScore() {
+                scoreElement.textContent = `Gols: ${goals} / Tentativas: ${attempts}`;
             }
 
-            function playItemSound(soundFileName) {
-                if (soundFileName) {
-                    animalSoundElement.src = soundFileName;
-                    animalSoundElement.play().catch(error => {
-                        console.log("Erro ao tocar o som do item:", error);
-                    });
-                }
+            function resetBallAndGoalie() {
+                ballElement.style.animation = 'none'; // Remove animação anterior
+                ballElement.offsetHeight; // Força reflow
+                ballElement.style.bottom = '5px';
+                ballElement.style.left = '50%';
+                ballElement.style.transform = 'translateX(-50%)';
+                ballElement.style.top = 'auto'; // Reset top if set by animation
+
+                goalieElement.style.transition = 'none'; // Remove transição anterior
+                goalieElement.style.left = '50%';
+                goalieElement.style.transform = 'translateX(-50%)';
+                goalieElement.offsetHeight; // Força reflow
+                goalieElement.style.transition = 'transform 0.3s ease-out'; // Restaura transição
             }
 
-            function playCelebrationSound() {
-                celebrationSoundElement.currentTime = 0;
-                celebrationSoundElement.play().catch(error => {
-                    console.log("Erro ao tocar o som de celebração:", error);
-                });
-            }
-
-            function showFruitInBasket(fruitImage) {
-                const fruitImgElement = document.createElement('div');
-                fruitImgElement.classList.add('fruit-image');
-                fruitImgElement.style.backgroundImage = `url('${fruitImage}')`;
-                fruitSpot.appendChild(fruitImgElement);
-
-                // Força um reflow para garantir que a transição funcione
-                fruitImgElement.offsetHeight;
-
-                fruitImgElement.classList.add('visible');
-
-                setTimeout(() => {
-                    fruitImgElement.classList.remove('visible');
-                    setTimeout(() => {
-                        fruitImgElement.remove(); // Remove o elemento após a transição
-                    }, 500); // Tempo da transição em ms
-                }, 1000); // Tempo que a imagem fica visível
+            function enableKickButtons(enable) {
+                kickButtons.forEach(button => button.disabled = !enable);
             }
 
             function startGame() {
-                shuffledItems = shuffleArray([...items]);
-                currentItemIndex = 0;
-                loadItem();
+                goals = 0;
+                attempts = 0;
+                updateScore();
+                resetBallAndGoalie();
+                feedbackElement.textContent = 'Escolha onde chutar!';
+                enableKickButtons(true);
+                nextKickBtn.style.display = 'none';
             }
 
-            function loadItem() {
-                if (currentItemIndex >= shuffledItems.length) {
-                    clueElement.textContent = "🥳 Parabéns! Você descobriu tudo! Que tal jogar de novo?";
-                    clueElement.style.color = "#28a745";
-                    optionsContainer.innerHTML = '';
-                    feedbackElement.textContent = '';
-                    const restartBtn = document.createElement('button');
-                    restartBtn.textContent = 'Jogar Novamente';
-                    restartBtn.className = 'option-btn';
-                    restartBtn.style.backgroundColor = '#4CAF50';
-                    restartBtn.style.width = '100%';
-                    restartBtn.addEventListener('click', startGame);
-                    optionsContainer.appendChild(restartBtn);
-                    nextAnimalBtn.style.display = 'none';
-                    return;
-                }
+            function playSound(audioElement) {
+                audioElement.currentTime = 0;
+                audioElement.play().catch(error => console.log("Erro ao tocar som:", error));
+            }
 
-                const itemData = shuffledItems [currentItemIndex];
-                clueElement.textContent = itemData.clue;
+            function handleKick(kickTarget) {
+                enableKickButtons(false);
+                nextKickBtn.style.display = 'none';
+                attempts++;
+                updateScore();
                 feedbackElement.textContent = '';
-                nextAnimalBtn.style.display = 'none';
-                optionsContainer.innerHTML = '';
+                playSound(kickSound);
 
-                playItemSound(itemData.sound); // Toca o som se for animal
-
-                const shuffledOptions = shuffleArray([...itemData.options]);
-
-                shuffledOptions.forEach(option => {
-                    const button = document.createElement('button');
-                    button.classList.add('option-btn');
-                    button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-                    button.addEventListener('click', () => checkAnswer(option, itemData.name, itemData.type, itemData.image));
-                    optionsContainer.appendChild(button);
-                });
-            }
-
-            function checkAnswer(selectedOption, correctAnswer, itemType, fruitImage) {
-                const allOptionButtons = document.querySelectorAll('.option-btn');
-                allOptionButtons.forEach(button => button.disabled = true);
-
-                if (selectedOption === correctAnswer) {
-                    feedbackElement.textContent = "🥳 Parabéns! Você acertou!";
-                    feedbackElement.style.color = "#4CAF50";
-                    playCelebrationSound();
-                    if (itemType === "fruit" && fruitImage) {
-                        showFruitInBasket(fruitImage);
-                    }
-                    nextAnimalBtn.style.display = 'block';
+                let goalieSavePosition;
+                const random = Math.random();
+                if (random < 0.33) {
+                    goalieSavePosition = 'left';
+                } else if (random < 0.66) {
+                    goalieSavePosition = 'center';
                 } else {
-                    feedbackElement.textContent = `❌ Que pena, não é ${selectedOption}. A resposta correta era ${correctAnswer}.`;
-                    feedbackElement.style.color = "#F44336";
-                    nextAnimalBtn.style.display = 'block';
+                    goalieSavePosition = 'right';
                 }
+
+                // Animação do goleiro
+                goalieElement.style.transform = `translateX(${GOALIE_POSITIONS[goalieSavePosition].includes('%') ? 'calc(' + GOALIE_POSITIONS[goalieSavePosition] + ' - 50%)' : GOALIE_POSITIONS[goalieSavePosition]})`;
+
+
+                // Animação da bola
+                ballElement.style.animation = `shoot${kickTarget.charAt(0).toUpperCase() + kickTarget.slice(1)} 0.5s forwards`;
+
+                // Verificar resultado após a animação
+                ballElement.addEventListener('animationend', () => {
+                    ballElement.removeEventListener('animationend', arguments.callee); // Remove listener para evitar múltiplos disparos
+
+                    let isGoal = false;
+                    if (kickTarget !== goalieSavePosition) {
+                        isGoal = true;
+                    }
+
+                    if (isGoal) {
+                        feedbackElement.textContent = "⚽ GOL! 🥳";
+                        feedbackElement.style.color = "#FFEB3B";
+                        goals++;
+                        playSound(goalSound);
+                    } else {
+                        feedbackElement.textContent = "🚫 Defendeu! 🥅";
+                        feedbackElement.style.color = "#FF5722";
+                        playSound(saveSound);
+                    }
+                    updateScore();
+                    nextKickBtn.style.display = 'block';
+                }, { once: true }); // Garante que o evento roda uma única vez
             }
 
-            nextAnimalBtn.addEventListener('click', () => {
-                currentItemIndex++;
-                loadItem();
+            kickButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    handleKick(button.dataset.target);
+                });
+            });
+
+            nextKickBtn.addEventListener('click', () => {
+                resetBallAndGoalie();
+                feedbackElement.textContent = 'Escolha onde chutar!';
+                enableKickButtons(true);
+                nextKickBtn.style.display = 'none';
             });
 
             // --- Lógica do Splash Screen ---
@@ -346,9 +384,9 @@
                 mainContent.classList.add('visible');
             }
 
-            setTimeout(hideSplashScreen, 3000);
+            setTimeout(hideSplashScreen, 3000); // Esconde o splash após 3 segundos
 
-            startGame();
+            startGame(); // Inicia o jogo
         });
     </script>
 </body>
