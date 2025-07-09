@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adivinhe o Animal!</title>
-    <style>
+    <title>Adivinhe o Quê?</title> <style>
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -145,18 +144,16 @@
 </head>
 <body>
     <div id="splash-screen">
-        <img src="logo-animal.png" alt="Logo Animada" class="splash-image"> <h2>Adivinhe o Animal!</h2>
-        <p style="color: white; font-size: 1.1em;">Preparando a diversão...</p>
+        <img src="logo-animal.png" alt="Logo Animada" class="splash-image"> <h2>Adivinhe o Quê?</h2> <p style="color: white; font-size: 1.1em;">Preparando a diversão...</p>
     </div>
 
     <div class="container" id="main-content">
-        <h1>Adivinhe o Animal!</h1>
-        <div id="game-area">
-            <p id="clue">Pensei em um animal...</p>
+        <h1>Adivinhe o Quê?</h1> <div id="game-area">
+            <p id="clue">Pensei em algo...</p>
             <div id="options-container">
                 </div>
             <p id="feedback"></p>
-            <button id="next-animal-btn" style="display:none;">Próximo Animal</button>
+            <button id="next-animal-btn" style="display:none;">Próximo</button>
         </div>
     </div>
 
@@ -166,7 +163,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splash-screen');
-            const mainContent = document.getElementById('main-content'); // Onde está o conteúdo do jogo
+            const mainContent = document.getElementById('main-content');
             const clueElement = document.getElementById('clue');
             const optionsContainer = document.getElementById('options-container');
             const feedbackElement = document.getElementById('feedback');
@@ -174,7 +171,8 @@
             const animalSoundElement = document.getElementById('animal-sound');
             const celebrationSoundElement = document.getElementById('celebration-sound');
 
-            const animals = [
+            const items = [ // Renomeado de 'animals' para 'items'
+                // Animais
                 {
                     name: "cachorro",
                     clue: "Eu faço 'au au', sou um ótimo amigo e balanço o rabo quando estou feliz. Qual animal eu sou?",
@@ -234,11 +232,37 @@
                     clue: "Eu vivo no oceano, tenho dentes bem afiados e sou um peixe muito grande. Qual animal eu sou?",
                     options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"],
                     sound: "tubarao.mp3"
+                },
+                // Frutas
+                {
+                    name: "maçã",
+                    clue: "Eu sou uma fruta redonda, posso ser vermelha ou verde e sou crocante. Qual fruta eu sou?",
+                    options: ["banana", "laranja", "maçã", "uva"]
+                },
+                {
+                    name: "banana",
+                    clue: "Eu sou uma fruta amarela, comprida e os macacos adoram me comer. Qual fruta eu sou?",
+                    options: ["limão", "banana", "abacaxi", "morango"]
+                },
+                {
+                    name: "laranja",
+                    clue: "Eu sou uma fruta redonda, laranja e cheia de vitamina C. Qual fruta eu sou?",
+                    options: ["maçã", "pêssego", "laranja", "kiwi"]
+                },
+                {
+                    name: "morango",
+                    clue: "Eu sou uma fruta pequena, vermelha, com sementinhas por fora e sou bem docinha. Qual fruta eu sou?",
+                    options: ["cereja", "framboesa", "morango", "amora"]
+                },
+                {
+                    name: "uva",
+                    clue: "Eu sou uma fruta pequena que cresce em cachos, posso ser verde ou roxa. Qual fruta eu sou?",
+                    options: ["mirtilo", "uva", "goiaba", "figo"]
                 }
             ];
 
-            let currentAnimalIndex = 0;
-            let shuffledAnimals = [];
+            let currentItemIndex = 0; // Renomeado de 'currentAnimalIndex'
+            let shuffledItems = []; // Renomeado de 'shuffledAnimals'
 
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
@@ -248,11 +272,11 @@
                 return array;
             }
 
-            function playAnimalSound(soundFileName) {
-                if (soundFileName) {
+            function playItemSound(soundFileName) { // Renomeado de 'playAnimalSound'
+                if (soundFileName) { // Só toca se houver um arquivo de som definido
                     animalSoundElement.src = soundFileName;
                     animalSoundElement.play().catch(error => {
-                        console.log("Erro ao tocar o som do animal:", error);
+                        console.log("Erro ao tocar o som do item:", error);
                     });
                 }
             }
@@ -265,14 +289,14 @@
             }
 
             function startGame() {
-                shuffledAnimals = shuffleArray([...animals]);
-                currentAnimalIndex = 0;
-                loadAnimal();
+                shuffledItems = shuffleArray([...items]); // Embaralha todos os itens
+                currentItemIndex = 0;
+                loadItem(); // Carrega o primeiro item
             }
 
-            function loadAnimal() {
-                if (currentAnimalIndex >= shuffledAnimals.length) {
-                    clueElement.textContent = "🥳 Parabéns! Você adivinhou todos os animais! Que tal jogar de novo?";
+            function loadItem() { // Renomeado de 'loadAnimal'
+                if (currentItemIndex >= shuffledItems.length) {
+                    clueElement.textContent = "🥳 Parabéns! Você adivinhou todos os itens! Que tal jogar de novo?";
                     clueElement.style.color = "#28a745";
                     optionsContainer.innerHTML = '';
                     feedbackElement.textContent = '';
@@ -287,21 +311,21 @@
                     return;
                 }
 
-                const animalData = shuffledAnimals[currentAnimalIndex];
-                clueElement.textContent = animalData.clue;
+                const itemData = shuffledItems[currentItemIndex]; // Renomeado de 'animalData'
+                clueElement.textContent = itemData.clue;
                 feedbackElement.textContent = '';
                 nextAnimalBtn.style.display = 'none';
                 optionsContainer.innerHTML = '';
 
-                playAnimalSound(animalData.sound);
+                playItemSound(itemData.sound); // Toca o som (se existir)
 
-                const shuffledOptions = shuffleArray([...animalData.options]);
+                const shuffledOptions = shuffleArray([...itemData.options]);
 
                 shuffledOptions.forEach(option => {
                     const button = document.createElement('button');
                     button.classList.add('option-btn');
                     button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-                    button.addEventListener('click', () => checkAnswer(option, animalData.name));
+                    button.addEventListener('click', () => checkAnswer(option, itemData.name));
                     optionsContainer.appendChild(button);
                 });
             }
@@ -323,25 +347,19 @@
             }
 
             nextAnimalBtn.addEventListener('click', () => {
-                currentAnimalIndex++;
-                loadAnimal();
+                currentItemIndex++;
+                loadItem();
             });
 
             // --- Lógica do Splash Screen ---
             function hideSplashScreen() {
-                splashScreen.classList.add('hidden'); // Inicia a transição para sumir
-                mainContent.classList.add('visible'); // Torna o conteúdo principal visível
+                splashScreen.classList.add('hidden');
+                mainContent.classList.add('visible');
             }
 
-            // Esconde o splash screen após 3 segundos (3000 milissegundos)
-            setTimeout(hideSplashScreen, 3000);
+            setTimeout(hideSplashScreen, 3000); // Esconde o splash após 3 segundos
 
-            // O jogo só inicia DEPOIS que o splash screen sumir (ou, na verdade, sua transição terminar)
-            // A chamada para startGame() já está dentro de DOMContentLoaded, o que é suficiente.
-            // O autoplay do som do primeiro animal pode ser afetado pelas políticas de navegador
-            // mas a primeira interação do usuário (clicar numa opção ou no botão de recomeçar)
-            // deve liberar os próximos sons.
-            startGame(); // Inicia o jogo para que os elementos já estejam prontos quando o splash sumir
+            startGame(); // Inicia o jogo
         });
     </script>
 </body>
