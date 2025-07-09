@@ -111,75 +111,75 @@
     </div>
 
     <audio id="animal-sound" preload="auto"></audio>
-
-    <script>
+    <audio id="celebration-sound" preload="auto" src="vitoria.mp3"></audio> <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clueElement = document.getElementById('clue');
             const optionsContainer = document.getElementById('options-container');
             const feedbackElement = document.getElementById('feedback');
             const nextAnimalBtn = document.getElementById('next-animal-btn');
-            const animalSoundElement = document.getElementById('animal-sound'); // Novo elemento de áudio
+            const animalSoundElement = document.getElementById('animal-sound');
+            const celebrationSoundElement = document.getElementById('celebration-sound'); // Novo elemento de áudio
 
             const animals = [
                 {
                     name: "cachorro",
                     clue: "Eu faço 'au au', sou um ótimo amigo e balanço o rabo quando estou feliz. Qual animal eu sou?",
                     options: ["gato", "cachorro", "pássaro", "macaco"],
-                    sound: "latido.mp3" // Nome do arquivo de som para o cachorro
+                    sound: "latido.mp3"
                 },
                 {
                     name: "gato",
                     clue: "Eu faço 'miau', adoro caçar ratos e gosto de dormir em lugares quentinhos. Qual animal eu sou?",
                     options: ["coelho", "cachorro", "gato", "ovelha"],
-                    sound: "miado.mp3" // Nome do arquivo de som para o gato
+                    sound: "miado.mp3"
                 },
                 {
                     name: "elefante",
                     clue: "Eu sou bem grandão, tenho orelhas enormes e um nariz comprido que chamam de tromba. Qual animal eu sou?",
                     options: ["girafa", "cavalo", "elefante", "leão"],
-                    sound: "elefante.mp3" // Exemplo
+                    sound: "elefante.mp3"
                 },
                 {
                     name: "pato",
                     clue: "Eu faço 'quá quá', adoro nadar e tenho bico. Qual animal eu sou?",
                     options: ["galinha", "pato", "peixe", "sapo"],
-                    sound: "quac.mp3" // Exemplo
+                    sound: "quac.mp3"
                 },
                 {
                     name: "leão",
                     clue: "Eu sou o rei da selva, tenho uma juba grande e faço 'grrr'. Qual animal eu sou?",
                     options: ["tigre", "urso", "leão", "zebra"],
-                    sound: "rugido.mp3" // Exemplo
+                    sound: "rugido.mp3"
                 },
                 {
                     name: "macaco",
                     clue: "Eu adoro pular de galho em galho, comer bananas e sou bem brincalhão. Qual animal eu sou?",
                     options: ["cachorro", "macaco", "coelho", "cobra"],
-                    sound: "macaco.mp3" // Exemplo
+                    sound: "macaco.mp3"
                 },
                 {
                     name: "coelho",
                     clue: "Eu tenho orelhas compridas, gosto de cenouras e pulo bem rápido. Qual animal eu sou?",
                     options: ["gato", "esquilo", "coelho", "rato"],
-                    sound: "coelho.mp3" // Exemplo (pode ser difícil encontrar som de coelho, talvez um som de pulo ou algo sutil)
+                    sound: "coelho.mp3"
                 },
                 {
                     name: "girafa",
                     clue: "Eu sou muito alta, tenho um pescoço comprido e sou manchada. Qual animal eu sou?",
                     options: ["zebra", "elefante", "girafa", "leopardo"],
-                    sound: "girafa.mp3" // Exemplo
+                    sound: "girafa.mp3"
                 },
                 {
                     name: "abelha",
                     clue: "Eu sou pequena, voo de flor em flor e faço mel. Qual animal eu sou?",
                     options: ["mosca", "abelha", "borboleta", "formiga"],
-                    sound: "abelha.mp3" // Exemplo
+                    sound: "abelha.mp3"
                 },
                 {
                     name: "tubarão",
                     clue: "Eu vivo no oceano, tenho dentes bem afiados e sou um peixe muito grande. Qual animal eu sou?",
                     options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"],
-                    sound: "tubarao.mp3" // Exemplo (som ambiente de água ou de ataque)
+                    sound: "tubarao.mpol"
                 }
             ];
 
@@ -198,11 +198,17 @@
                 if (soundFileName) {
                     animalSoundElement.src = soundFileName;
                     animalSoundElement.play().catch(error => {
-                        console.log("Erro ao tocar o som:", error);
-                        // Mensagem para o usuário ou log para depuração:
-                        // "O navegador pode ter bloqueado o som. Tente interagir com a página primeiro."
+                        console.log("Erro ao tocar o som do animal:", error);
                     });
                 }
+            }
+
+            function playCelebrationSound() {
+                // Reinicia o som de celebração caso esteja tocando
+                celebrationSoundElement.currentTime = 0;
+                celebrationSoundElement.play().catch(error => {
+                    console.log("Erro ao tocar o som de celebração:", error);
+                });
             }
 
             function startGame() {
@@ -234,7 +240,6 @@
                 nextAnimalBtn.style.display = 'none';
                 optionsContainer.innerHTML = '';
 
-                // Toca o som do animal ao carregar a dica
                 playAnimalSound(animalData.sound);
 
                 const shuffledOptions = shuffleArray([...animalData.options]);
@@ -255,6 +260,7 @@
                 if (selectedOption === correctAnswer) {
                     feedbackElement.textContent = "🥳 Parabéns! Você acertou!";
                     feedbackElement.style.color = "#4CAF50";
+                    playCelebrationSound(); // Toca o som de celebração!
                     nextAnimalBtn.style.display = 'block';
                 } else {
                     feedbackElement.textContent = `❌ Que pena, não é ${selectedOption}. A resposta correta era ${correctAnswer}.`;
