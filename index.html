@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adivinhe o Animal!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff; /* Azul claro */
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #4CAF50; /* Verde */
+            margin-bottom: 20px;
+        }
+
+        #game-area {
+            margin-top: 20px;
+        }
+
+        #clue {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            min-height: 60px; /* Para evitar pulos ao carregar dica */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e8f5e9; /* Fundo mais claro para a dica */
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c8e6c9;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas para os botões */
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background-color: #2196F3; /* Azul */
+            color: white;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background-color: #1976D2; /* Azul mais escuro */
+        }
+
+        .option-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #feedback {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            min-height: 30px; /* Evita pulos */
+        }
+
+        #next-animal-btn {
+            background-color: #FFC107; /* Amarelo */
+            color: #333;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #next-animal-btn:hover {
+            background-color: #FFA000; /* Amarelo mais escuro */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Adivinhe o Animal!</h1>
+        <div id="game-area">
+            <p id="clue">Pensei em um animal...</p>
+            <div id="options-container">
+                </div>
+            <p id="feedback"></p>
+            <button id="next-animal-btn" style="display:none;">Próximo Animal</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clueElement = document.getElementById('clue');
+            const optionsContainer = document.getElementById('options-container');
+            const feedbackElement = document.getElementById('feedback');
+            const nextAnimalBtn = document.getElementById('next-animal-btn');
+
+            const animals = [
+                {
+                    name: "cachorro",
+                    clue: "Eu faço 'au au', sou um ótimo amigo e balanço o rabo quando estou feliz. Qual animal eu sou?",
+                    options: ["gato", "cachorro", "pássaro", "macaco"]
+                },
+                {
+                    name: "gato",
+                    clue: "Eu faço 'miau', adoro caçar ratos e gosto de dormir em lugares quentinhos. Qual animal eu sou?",
+                    options: ["coelho", "cachorro", "gato", "ovelha"]
+                },
+                {
+                    name: "elefante",
+                    clue: "Eu sou bem grandão, tenho orelhas enormes e um nariz comprido que chamam de tromba. Qual animal eu sou?",
+                    options: ["girafa", "cavalo", "elefante", "leão"]
+                },
+                {
+                    name: "pato",
+                    clue: "Eu faço 'quá quá', adoro nadar e tenho bico. Qual animal eu sou?",
+                    options: ["galinha", "pato", "peixe", "sapo"]
+                },
+                {
+                    name: "leão",
+                    clue: "Eu sou o rei da selva, tenho uma juba grande e faço 'grrr'. Qual animal eu sou?",
+                    options: ["tigre", "urso", "leão", "zebra"]
+                }
+            ];
+
+            let currentAnimalIndex = 0;
+            let shuffledAnimals = [];
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function startGame() {
+                shuffledAnimals = shuffleArray([...animals]); // Cria uma cópia e embaralha
+                currentAnimalIndex = 0;
+                loadAnimal();
+            }
+
+            function loadAnimal() {
+                if (currentAnimalIndex >= shuffledAnimals.length) {
+                    clueElement.textContent = "🥳 Parabéns! Você adivinhou todos os animais!";
+                    clueElement.style.color = "#28a745"; // Verde para a mensagem final
+                    optionsContainer.innerHTML = '';
+                    feedbackElement.textContent = '';
+                    nextAnimalBtn.style.display = 'none';
+                    return;
+                }
+
+                const animalData = shuffledAnimals[currentAnimalIndex];
+                clueElement.textContent = animalData.clue;
+                feedbackElement.textContent = '';
+                nextAnimalBtn.style.display = 'none';
+                optionsContainer.innerHTML = ''; // Limpa os botões anteriores
+
+                // Embaralha as opções para não ficarem sempre na mesma ordem
+                const shuffledOptions = shuffleArray([...animalData.options]);
+
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-btn');
+                    button.textContent = option.charAt(0).toUpperCase() + option.slice(1); // Capitaliza a primeira letra
+                    button.addEventListener('click', () => checkAnswer(option, animalData.name));
+                    optionsContainer.appendChild(button);
+                });
+            }
+
+            function checkAnswer(selectedOption, correctAnswer) {
+                const allOptionButtons = document.querySelectorAll('.option-btn');
+                allOptionButtons.forEach(button => button.disabled = true); // Desabilita todos os botões após a escolha
+
+                if (selectedOption === correctAnswer) {
+                    feedbackElement.textContent = "🥳 Parabéns! Você acertou!";
+                    feedbackElement.style.color = "#4CAF50"; // Verde
+                    nextAnimalBtn.style.display = 'block';
+                } else {
+                    feedbackElement.textContent = `❌ Que pena, não é ${selectedOption}. A resposta correta era ${correctAnswer}.`;
+                    feedbackElement.style.color = "#F44336"; // Vermelho
+                    nextAnimalBtn.style.display = 'block';
+                }
+            }
+
+            nextAnimalBtn.addEventListener('click', () => {
+                currentAnimalIndex++;
+                loadAnimal();
+            });
+
+            // Inicia o jogo quando a página carrega
+            startGame();
+        });
+    </script>
+</body>
+</html>
