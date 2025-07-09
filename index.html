@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acertar o Gol!</title>
+    <title>Quiz de Soma!</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,8 +12,8 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #78a35e; /* Campo de futebol */
-            color: #fff;
+            background-color: #f0f8ff; /* Azul claro */
+            color: #333;
             text-align: center;
             overflow: hidden;
             position: relative;
@@ -26,7 +26,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #4CAF50; /* Verde campo de futebol */
+            background-color: #87CEEB; /* Azul céu */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -49,28 +49,26 @@
         }
 
         #splash-screen .splash-image {
-            width: 180px; /* Tamanho da bola no splash */
-            height: 180px;
+            width: 150px;
+            height: 150px;
             object-fit: contain;
             margin-bottom: 20px;
         }
         /* --- END SPLASH SCREEN STYLES --- */
 
         .container {
-            background-color: rgba(255, 255, 255, 0.1); /* Fundo transparente */
+            background-color: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 600px;
+            max-width: 500px;
             opacity: 0;
             transition: opacity 0.5s ease-in 1.5s;
-            position: relative;
-            height: 80vh; /* Altura para o campo de jogo */
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
         }
 
         .container.visible {
@@ -78,305 +76,217 @@
         }
 
         h1 {
-            color: #FFC107; /* Amarelo da bola */
-            margin-bottom: 10px;
-            font-size: 2em;
+            color: #4CAF50; /* Verde */
+            margin-bottom: 15px;
         }
 
-        #score {
+        #score-board {
             font-size: 1.2em;
             margin-bottom: 20px;
-            font-weight: bold;
-            background-color: rgba(0,0,0,0.3);
-            padding: 5px 15px;
+            background-color: #e8f5e9;
+            padding: 8px 15px;
             border-radius: 20px;
-        }
-
-        #field {
-            position: relative;
-            width: 90%;
-            max-width: 400px;
-            height: 60%; /* Mais espaço para o campo */
-            background-color: #558B2F; /* Verde mais escuro do campo */
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            overflow: hidden; /* Para a bola não sair */
-            margin-bottom: 20px;
-            border: 5px solid #fff; /* Linhas do campo */
-        }
-
-        #goal {
-            position: absolute;
-            top: 10%; /* Posição do gol */
+            border: 1px solid #c8e6c9;
             width: 80%;
-            height: 30%;
-            background-color: rgba(255, 255, 255, 0.2); /* Transparente para ver o campo */
-            border: 5px solid #eee; /* Barras do gol */
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5%; /* Espaço para o goleiro */
-        }
-
-        #goalie {
-            position: absolute;
-            bottom: 0; /* Goleiro na linha */
-            width: 40px; /* Largura do goleiro */
-            height: 60px; /* Altura do goleiro */
-            background-color: #FF5722; /* Cor do uniforme do goleiro */
-            border-radius: 5px;
-            transition: transform 0.3s ease-out; /* Animação do goleiro */
-            left: 50%; /* Começa no meio */
-            transform: translateX(-50%);
-        }
-
-        #ball {
-            position: absolute;
-            bottom: 5px; /* Posição inicial da bola */
-            width: 40px;
-            height: 40px;
-            background-color: #FFC107; /* Amarelo da bola */
-            border-radius: 50%;
-            border: 2px solid #333;
-            left: 50%;
-            transform: translateX(-50%);
-            transition: transform 0.5s ease-out; /* Animação do chute */
-            z-index: 20;
-        }
-        
-        #feedback {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-top: 10px;
-            min-height: 40px;
-            color: #FFEB3B; /* Amarelo vibrante */
-            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
-        }
-
-        #kick-options {
             display: flex;
             justify-content: space-around;
-            width: 100%;
-            margin-top: 20px;
         }
 
-        .kick-btn {
+        #question {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #2196F3; /* Azul da pergunta */
+            min-height: 50px; /* Para evitar pulos */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .option-btn {
             background-color: #2196F3; /* Azul */
             color: white;
-            padding: 12px 20px;
+            padding: 15px 10px;
             border: none;
             border-radius: 8px;
-            font-size: 1.1em;
+            font-size: 1.5em;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            flex: 1; /* Distribui igualmente */
-            margin: 0 5px;
         }
 
-        .kick-btn:hover {
-            background-color: #1976D2;
+        .option-btn:hover {
+            background-color: #1976D2; /* Azul mais escuro */
         }
 
-        .kick-btn:disabled {
+        .option-btn:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
 
-        #next-kick-btn {
-            background-color: #FF5722; /* Laranja/Vermelho */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 15px;
-            display: none; /* Escondido inicialmente */
-        }
-        #next-kick-btn:hover {
-            background-color: #E64A19;
+        #feedback {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            min-height: 40px; /* Evita pulos */
         }
 
-        /* Animações da bola */
-        @keyframes shootLeft {
-            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
-            100% { bottom: 70%; left: 10%; transform: translateX(-50%) scale(0.6); }
+        #next-question-btn {
+            background-color: #FFC107; /* Amarelo */
+            color: #333;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: none; /* Escondido inicialmente */
+            margin-top: 10px;
         }
-        @keyframes shootCenter {
-            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
-            100% { bottom: 70%; left: 50%; transform: translateX(-50%) scale(0.6); }
-        }
-        @keyframes shootRight {
-            0% { bottom: 5px; transform: translateX(-50%) scale(1); }
-            100% { bottom: 70%; left: 90%; transform: translateX(-50%) scale(0.6); }
+
+        #next-question-btn:hover {
+            background-color: #FFA000; /* Amarelo mais escuro */
         }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <img src="soccer-ball.png" alt="Bola de Futebol" class="splash-image"> <h2>Acertar o Gol!</h2>
-        <p style="color: white; font-size: 1.1em;">Preparando o chute inicial!</p>
+        <img src="math-icon.png" alt="Ícone de Matemática" class="splash-image">
+        <h2>Quiz de Soma!</h2>
+        <p style="color: white; font-size: 1.1em;">Preparando os números!</p>
     </div>
 
     <div class="container" id="main-content">
-        <h1>Pênalti!</h1>
-        <p id="score">Gols: 0 / Tentativas: 0</p>
+        <h1>Vamos Somar!</h1>
+        <div id="score-board">
+            <span>Acertos: <span id="correct-count">0</span></span>
+            <span>Erros: <span id="wrong-count">0</span></span>
+        </div>
         
-        <div id="field">
-            <div id="goal">
-                <div id="goalie"></div>
+        <p id="question">Carregando...</p>
+
+        <div id="options-container">
             </div>
-            <div id="ball"></div>
-        </div>
-
+        
         <p id="feedback"></p>
-
-        <div id="kick-options">
-            <button class="kick-btn" data-target="left">Canto Esquerdo</button>
-            <button class="kick-btn" data-target="center">Meio</button>
-            <button class="kick-btn" data-target="right">Canto Direito</button>
-        </div>
-        <button id="next-kick-btn">Próximo Chute</button>
+        
+        <button id="next-question-btn">Próxima Soma</button>
     </div>
 
-    <audio id="kick-sound" preload="auto" src="chute.mp3"></audio>
-    <audio id="goal-sound" preload="auto" src="gol.mp3"></audio>
-    <audio id="save-sound" preload="auto" src="defesa.mp3"></audio>
+    <audio id="correct-sound" preload="auto" src="acerto.mp3"></audio>
+    <audio id="wrong-sound" preload="auto" src="erro.mp3"></audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splash-screen');
             const mainContent = document.getElementById('main-content');
-            const scoreElement = document.getElementById('score');
+            const correctCountElement = document.getElementById('correct-count');
+            const wrongCountElement = document.getElementById('wrong-count');
+            const questionElement = document.getElementById('question');
+            const optionsContainer = document.getElementById('options-container');
             const feedbackElement = document.getElementById('feedback');
-            const kickButtons = document.querySelectorAll('.kick-btn');
-            const nextKickBtn = document.getElementById('next-kick-btn');
-            const ballElement = document.getElementById('ball');
-            const goalieElement = document.getElementById('goalie');
+            const nextQuestionBtn = document.getElementById('next-question-btn');
 
-            const kickSound = document.getElementById('kick-sound');
-            const goalSound = document.getElementById('goal-sound');
-            const saveSound = document.getElementById('save-sound');
+            const correctSound = document.getElementById('correct-sound');
+            const wrongSound = document.getElementById('wrong-sound');
 
-            let goals = 0;
-            let attempts = 0;
+            let correctAnswers = 0;
+            let wrongAnswers = 0;
+            let currentCorrectAnswer; // Armazena a resposta correta da pergunta atual
 
-            const GOALIE_POSITIONS = {
-                left: '10%',
-                center: '50%',
-                right: '90%'
-            };
-
-            const GOALIE_ANIMATION_CLASS = {
-                left: 'goalie-left',
-                center: 'goalie-center',
-                right: 'goalie-right'
-            };
-
-            function updateScore() {
-                scoreElement.textContent = `Gols: ${goals} / Tentativas: ${attempts}`;
-            }
-
-            function resetBallAndGoalie() {
-                ballElement.style.animation = 'none'; // Remove animação anterior
-                ballElement.offsetHeight; // Força reflow
-                ballElement.style.bottom = '5px';
-                ballElement.style.left = '50%';
-                ballElement.style.transform = 'translateX(-50%)';
-                ballElement.style.top = 'auto'; // Reset top if set by animation
-
-                goalieElement.style.transition = 'none'; // Remove transição anterior
-                goalieElement.style.left = '50%';
-                goalieElement.style.transform = 'translateX(-50%)';
-                goalieElement.offsetHeight; // Força reflow
-                goalieElement.style.transition = 'transform 0.3s ease-out'; // Restaura transição
-            }
-
-            function enableKickButtons(enable) {
-                kickButtons.forEach(button => button.disabled = !enable);
-            }
-
-            function startGame() {
-                goals = 0;
-                attempts = 0;
-                updateScore();
-                resetBallAndGoalie();
-                feedbackElement.textContent = 'Escolha onde chutar!';
-                enableKickButtons(true);
-                nextKickBtn.style.display = 'none';
-            }
-
+            // Função para tocar sons
             function playSound(audioElement) {
-                audioElement.currentTime = 0;
+                audioElement.currentTime = 0; // Reinicia o som
                 audioElement.play().catch(error => console.log("Erro ao tocar som:", error));
             }
 
-            function handleKick(kickTarget) {
-                enableKickButtons(false);
-                nextKickBtn.style.display = 'none';
-                attempts++;
-                updateScore();
-                feedbackElement.textContent = '';
-                playSound(kickSound);
-
-                let goalieSavePosition;
-                const random = Math.random();
-                if (random < 0.33) {
-                    goalieSavePosition = 'left';
-                } else if (random < 0.66) {
-                    goalieSavePosition = 'center';
-                } else {
-                    goalieSavePosition = 'right';
-                }
-
-                // Animação do goleiro
-                goalieElement.style.transform = `translateX(${GOALIE_POSITIONS[goalieSavePosition].includes('%') ? 'calc(' + GOALIE_POSITIONS[goalieSavePosition] + ' - 50%)' : GOALIE_POSITIONS[goalieSavePosition]})`;
-
-
-                // Animação da bola
-                ballElement.style.animation = `shoot${kickTarget.charAt(0).toUpperCase() + kickTarget.slice(1)} 0.5s forwards`;
-
-                // Verificar resultado após a animação
-                ballElement.addEventListener('animationend', () => {
-                    ballElement.removeEventListener('animationend', arguments.callee); // Remove listener para evitar múltiplos disparos
-
-                    let isGoal = false;
-                    if (kickTarget !== goalieSavePosition) {
-                        isGoal = true;
-                    }
-
-                    if (isGoal) {
-                        feedbackElement.textContent = "⚽ GOL! 🥳";
-                        feedbackElement.style.color = "#FFEB3B";
-                        goals++;
-                        playSound(goalSound);
-                    } else {
-                        feedbackElement.textContent = "🚫 Defendeu! 🥅";
-                        feedbackElement.style.color = "#FF5722";
-                        playSound(saveSound);
-                    }
-                    updateScore();
-                    nextKickBtn.style.display = 'block';
-                }, { once: true }); // Garante que o evento roda uma única vez
+            // Gera um número aleatório entre min e max (inclusive)
+            function getRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
             }
 
-            kickButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    handleKick(button.dataset.target);
-                });
-            });
+            // Gera uma nova pergunta de soma
+            function generateQuestion() {
+                const num1 = getRandomNumber(1, 9); // Números de 1 a 9 para soma simples
+                const num2 = getRandomNumber(1, 9);
+                currentCorrectAnswer = num1 + num2;
 
-            nextKickBtn.addEventListener('click', () => {
-                resetBallAndGoalie();
-                feedbackElement.textContent = 'Escolha onde chutar!';
-                enableKickButtons(true);
-                nextKickBtn.style.display = 'none';
-            });
+                questionElement.textContent = `${num1} + ${num2} = ?`;
+                
+                generateOptions(currentCorrectAnswer);
+                feedbackElement.textContent = '';
+                nextQuestionBtn.style.display = 'none';
+                enableOptions(true);
+            }
+
+            // Gera as opções de resposta
+            function generateOptions(correctAnswer) {
+                optionsContainer.innerHTML = ''; // Limpa botões anteriores
+                const options = new Set(); // Usa Set para garantir opções únicas
+                options.add(correctAnswer); // Adiciona a resposta correta
+
+                while (options.size < 4) {
+                    // Gera opções erradas próximas à resposta correta para desafiar
+                    let wrongOption = correctAnswer + getRandomNumber(-3, 3);
+                    // Garante que a opção não seja negativa e não seja a resposta correta
+                    if (wrongOption < 0) wrongOption = 0; 
+                    if (wrongOption !== correctAnswer) {
+                        options.add(wrongOption);
+                    }
+                }
+
+                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5); // Converte para array e embaralha
+
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-btn');
+                    button.textContent = option;
+                    button.addEventListener('click', () => checkAnswer(option));
+                    optionsContainer.appendChild(button);
+                });
+            }
+
+            // Verifica a resposta
+            function checkAnswer(selectedAnswer) {
+                enableOptions(false); // Desabilita os botões após a escolha
+
+                if (selectedAnswer === currentCorrectAnswer) {
+                    feedbackElement.textContent = "🥳 Acertou! Muito bem!";
+                    feedbackElement.style.color = "#4CAF50"; // Verde
+                    correctAnswers++;
+                    playSound(correctSound);
+                } else {
+                    feedbackElement.textContent = `❌ Errou! A resposta era ${currentCorrectAnswer}.`;
+                    feedbackElement.style.color = "#F44336"; // Vermelho
+                    wrongAnswers++;
+                    playSound(wrongSound);
+                }
+                updateScoreBoard();
+                nextQuestionBtn.style.display = 'block'; // Mostra botão para próxima pergunta
+            }
+
+            // Atualiza o placar
+            function updateScoreBoard() {
+                correctCountElement.textContent = correctAnswers;
+                wrongCountElement.textContent = wrongAnswers;
+            }
+
+            // Habilita/desabilita botões de opção
+            function enableOptions(enable) {
+                optionsContainer.querySelectorAll('.option-btn').forEach(button => {
+                    button.disabled = !enable;
+                });
+            }
+
+            // Evento para o botão "Próxima Soma"
+            nextQuestionBtn.addEventListener('click', generateQuestion);
 
             // --- Lógica do Splash Screen ---
             function hideSplashScreen() {
@@ -384,9 +294,12 @@
                 mainContent.classList.add('visible');
             }
 
-            setTimeout(hideSplashScreen, 3000); // Esconde o splash após 3 segundos
+            // Esconde o splash screen após 3 segundos
+            setTimeout(hideSplashScreen, 3000);
 
-            startGame(); // Inicia o jogo
+            // Inicia o quiz após o splash (ou quando DOM estiver pronto)
+            updateScoreBoard(); // Inicia o placar em 0
+            generateQuestion(); // Gera a primeira pergunta
         });
     </script>
 </body>
