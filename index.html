@@ -15,7 +15,46 @@
             background-color: #f0f8ff; /* Azul claro */
             color: #333;
             text-align: center;
+            overflow: hidden; /* Evita scroll durante o splash */
         }
+
+        /* --- SPLASH SCREEN STYLES --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #87CEEB; /* Um azul céu para o splash */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Garante que fique por cima de tudo */
+            transition: opacity 1.5s ease-out; /* Transição suave para desaparecer */
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Impede interações após desaparecer */
+        }
+
+        #splash-screen h2 {
+            color: white;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        #splash-screen .splash-image {
+            width: 150px; /* Tamanho da imagem no splash */
+            height: 150px;
+            object-fit: contain; /* Garante que a imagem se ajuste */
+            margin-bottom: 20px;
+        }
+        /* --- END SPLASH SCREEN STYLES --- */
+
 
         .container {
             background-color: #fff;
@@ -24,6 +63,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 90%;
             max-width: 500px;
+            opacity: 0; /* Começa invisível para aparecer depois do splash */
+            transition: opacity 0.5s ease-in 1.5s; /* Aparece depois que o splash sumir */
+        }
+
+        .container.visible {
+            opacity: 1;
         }
 
         h1 {
@@ -99,7 +144,12 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="splash-screen">
+        <img src="logo-animal.png" alt="Logo Animada" class="splash-image"> <h2>Adivinhe o Animal!</h2>
+        <p style="color: white; font-size: 1.1em;">Preparando a diversão...</p>
+    </div>
+
+    <div class="container" id="main-content">
         <h1>Adivinhe o Animal!</h1>
         <div id="game-area">
             <p id="clue">Pensei em um animal...</p>
@@ -111,14 +161,18 @@
     </div>
 
     <audio id="animal-sound" preload="auto"></audio>
-    <audio id="celebration-sound" preload="auto" src="vitoria.mp3"></audio> <script>
+    <audio id="celebration-sound" preload="auto" src="vitoria.mp3"></audio>
+
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const mainContent = document.getElementById('main-content'); // Onde está o conteúdo do jogo
             const clueElement = document.getElementById('clue');
             const optionsContainer = document.getElementById('options-container');
             const feedbackElement = document.getElementById('feedback');
             const nextAnimalBtn = document.getElementById('next-animal-btn');
             const animalSoundElement = document.getElementById('animal-sound');
-            const celebrationSoundElement = document.getElementById('celebration-sound'); // Novo elemento de áudio
+            const celebrationSoundElement = document.getElementById('celebration-sound');
 
             const animals = [
                 {
@@ -179,7 +233,7 @@
                     name: "tubarão",
                     clue: "Eu vivo no oceano, tenho dentes bem afiados e sou um peixe muito grande. Qual animal eu sou?",
                     options: ["golfinho", "baleia", "peixe-palhaço", "tubarão"],
-                    sound: "tubarao.mpol"
+                    sound: "tubarao.mp3"
                 }
             ];
 
@@ -204,7 +258,6 @@
             }
 
             function playCelebrationSound() {
-                // Reinicia o som de celebração caso esteja tocando
                 celebrationSoundElement.currentTime = 0;
                 celebrationSoundElement.play().catch(error => {
                     console.log("Erro ao tocar o som de celebração:", error);
@@ -260,7 +313,7 @@
                 if (selectedOption === correctAnswer) {
                     feedbackElement.textContent = "🥳 Parabéns! Você acertou!";
                     feedbackElement.style.color = "#4CAF50";
-                    playCelebrationSound(); // Toca o som de celebração!
+                    playCelebrationSound();
                     nextAnimalBtn.style.display = 'block';
                 } else {
                     feedbackElement.textContent = `❌ Que pena, não é ${selectedOption}. A resposta correta era ${correctAnswer}.`;
@@ -274,7 +327,21 @@
                 loadAnimal();
             });
 
-            startGame();
+            // --- Lógica do Splash Screen ---
+            function hideSplashScreen() {
+                splashScreen.classList.add('hidden'); // Inicia a transição para sumir
+                mainContent.classList.add('visible'); // Torna o conteúdo principal visível
+            }
+
+            // Esconde o splash screen após 3 segundos (3000 milissegundos)
+            setTimeout(hideSplashScreen, 3000);
+
+            // O jogo só inicia DEPOIS que o splash screen sumir (ou, na verdade, sua transição terminar)
+            // A chamada para startGame() já está dentro de DOMContentLoaded, o que é suficiente.
+            // O autoplay do som do primeiro animal pode ser afetado pelas políticas de navegador
+            // mas a primeira interação do usuário (clicar numa opção ou no botão de recomeçar)
+            // deve liberar os próximos sons.
+            startGame(); // Inicia o jogo para que os elementos já estejam prontos quando o splash sumir
         });
     </script>
 </body>
