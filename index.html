@@ -90,7 +90,13 @@
             width: 80%;
             display: flex;
             justify-content: space-around;
+            align-items: center;
         }
+        #score-board #timer {
+            font-weight: bold;
+            color: #E64A19; /* Vermelho para o timer */
+        }
+
 
         #question {
             font-size: 2.5em;
@@ -154,6 +160,64 @@
         #next-question-btn:hover {
             background-color: #FFA000; /* Amarelo mais escuro */
         }
+
+        /* --- RANKING SCREEN STYLES --- */
+        #ranking-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #4CAF50; /* Verde campo de futebol */
+            color: white;
+            display: none; /* Escondido inicialmente */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        #ranking-screen h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #ranking-list {
+            list-style: none;
+            padding: 0;
+            font-size: 1.4em;
+        }
+
+        #ranking-list li {
+            margin-bottom: 10px;
+            background-color: rgba(0,0,0,0.2);
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            width: 250px;
+        }
+
+        #ranking-list li:first-child {
+            font-weight: bold;
+            color: #FFEB3B; /* Ouro */
+            transform: scale(1.1);
+        }
+
+        #restart-game-btn {
+            background-color: #FFC107;
+            color: #333;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.3em;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s ease;
+        }
+        #restart-game-btn:hover {
+            background-color: #FFA000;
+        }
     </style>
 </head>
 <body>
@@ -168,6 +232,7 @@
         <div id="score-board">
             <span>Acertos: <span id="correct-count">0</span></span>
             <span>Erros: <span id="wrong-count">0</span></span>
+            <span>Tempo: <span id="timer">3</span>s</span>
         </div>
         
         <p id="question">Carregando...</p>
@@ -180,8 +245,19 @@
         <button id="next-question-btn">Próxima Soma</button>
     </div>
 
+    <div id="ranking-screen">
+        <h2>Ranking dos Vencedores!</h2>
+        <ul id="ranking-list">
+            <li>Nenhum recorde ainda!</li>
+        </ul>
+        <button id="restart-game-btn">Jogar Novamente</button>
+    </div>
+
     <audio id="correct-sound" preload="auto" src="acerto.mp3"></audio>
     <audio id="wrong-sound" preload="auto" src="erro.mp3"></audio>
+    <audio id="time-up-sound" preload="auto" src="tempo-esgotado.mp3"></audio>
+    <audio id="game-over-sound" preload="auto" src="game-over.mp3"></audio>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -189,60 +265,101 @@
             const mainContent = document.getElementById('main-content');
             const correctCountElement = document.getElementById('correct-count');
             const wrongCountElement = document.getElementById('wrong-count');
+            const timerElement = document.getElementById('timer');
             const questionElement = document.getElementById('question');
             const optionsContainer = document.getElementById('options-container');
             const feedbackElement = document.getElementById('feedback');
             const nextQuestionBtn = document.getElementById('next-question-btn');
+            const rankingScreen = document.getElementById('ranking-screen');
+            const rankingList = document.getElementById('ranking-list');
+            const restartGameBtn = document.getElementById('restart-game-btn');
 
             const correctSound = document.getElementById('correct-sound');
             const wrongSound = document.getElementById('wrong-sound');
+            const timeUpSound = document.getElementById('time-up-sound');
+            const gameOverSound = document.getElementById('game-over-sound');
+
+
+            const TOTAL_QUESTIONS = 10; // Número de perguntas por jogo
+            const TIME_PER_QUESTION = 3; // Segundos
 
             let correctAnswers = 0;
             let wrongAnswers = 0;
-            let currentCorrectAnswer; // Armazena a resposta correta da pergunta atual
+            let currentQuestionNumber = 0;
+            let currentCorrectAnswer;
+            let countdownInterval;
+            let gameFinished = false; // Flag para controlar o fim do jogo
 
             // Função para tocar sons
             function playSound(audioElement) {
-                audioElement.currentTime = 0; // Reinicia o som
+                audioElement.currentTime = 0;
                 audioElement.play().catch(error => console.log("Erro ao tocar som:", error));
             }
 
-            // Gera um número aleatório entre min e max (inclusive)
             function getRandomNumber(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
 
-            // Gera uma nova pergunta de soma
+            function startTimer() {
+                let timeLeft = TIME_PER_QUESTION;
+                timerElement.textContent = timeLeft;
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        if (!gameFinished) { // Só avalia se não terminou o jogo
+                            handleTimeUp();
+                        }
+                    }
+                }, 1000);
+            }
+
+            function handleTimeUp() {
+                playSound(timeUpSound);
+                feedbackElement.textContent = `⏰ Tempo esgotado! A resposta era ${currentCorrectAnswer}.`;
+                feedbackElement.style.color = "#FF5722"; // Laranja/vermelho para tempo esgotado
+                wrongAnswers++;
+                updateScoreBoard();
+                endQuestionRound();
+            }
+
             function generateQuestion() {
-                const num1 = getRandomNumber(1, 9); // Números de 1 a 9 para soma simples
+                if (currentQuestionNumber >= TOTAL_QUESTIONS) {
+                    endGame();
+                    return;
+                }
+
+                currentQuestionNumber++;
+                gameFinished = false; // Garante que o jogo não está no estado final
+                resetFeedback();
+                enableOptions(true);
+                nextQuestionBtn.style.display = 'none';
+
+                const num1 = getRandomNumber(1, 9);
                 const num2 = getRandomNumber(1, 9);
                 currentCorrectAnswer = num1 + num2;
 
                 questionElement.textContent = `${num1} + ${num2} = ?`;
                 
                 generateOptions(currentCorrectAnswer);
-                feedbackElement.textContent = '';
-                nextQuestionBtn.style.display = 'none';
-                enableOptions(true);
+                startTimer(); // Inicia o timer para a nova pergunta
             }
 
-            // Gera as opções de resposta
             function generateOptions(correctAnswer) {
-                optionsContainer.innerHTML = ''; // Limpa botões anteriores
-                const options = new Set(); // Usa Set para garantir opções únicas
-                options.add(correctAnswer); // Adiciona a resposta correta
+                optionsContainer.innerHTML = '';
+                const options = new Set();
+                options.add(correctAnswer);
 
                 while (options.size < 4) {
-                    // Gera opções erradas próximas à resposta correta para desafiar
                     let wrongOption = correctAnswer + getRandomNumber(-3, 3);
-                    // Garante que a opção não seja negativa e não seja a resposta correta
                     if (wrongOption < 0) wrongOption = 0; 
                     if (wrongOption !== correctAnswer) {
                         options.add(wrongOption);
                     }
                 }
 
-                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5); // Converte para array e embaralha
+                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
 
                 shuffledOptions.forEach(option => {
                     const button = document.createElement('button');
@@ -253,40 +370,109 @@
                 });
             }
 
-            // Verifica a resposta
             function checkAnswer(selectedAnswer) {
-                enableOptions(false); // Desabilita os botões após a escolha
+                if (gameFinished) return; // Impede múltiplas respostas após o fim do tempo ou jogo
+
+                clearInterval(countdownInterval); // Para o timer
+                enableOptions(false); // Desabilita os botões
 
                 if (selectedAnswer === currentCorrectAnswer) {
                     feedbackElement.textContent = "🥳 Acertou! Muito bem!";
-                    feedbackElement.style.color = "#4CAF50"; // Verde
+                    feedbackElement.style.color = "#4CAF50";
                     correctAnswers++;
                     playSound(correctSound);
                 } else {
                     feedbackElement.textContent = `❌ Errou! A resposta era ${currentCorrectAnswer}.`;
-                    feedbackElement.style.color = "#F44336"; // Vermelho
+                    feedbackElement.style.color = "#F44336";
                     wrongAnswers++;
                     playSound(wrongSound);
                 }
                 updateScoreBoard();
-                nextQuestionBtn.style.display = 'block'; // Mostra botão para próxima pergunta
+                endQuestionRound();
             }
 
-            // Atualiza o placar
+            function endQuestionRound() {
+                nextQuestionBtn.style.display = 'block';
+                if (currentQuestionNumber >= TOTAL_QUESTIONS) {
+                    nextQuestionBtn.textContent = "Ver Resultado Final";
+                } else {
+                    nextQuestionBtn.textContent = "Próxima Soma";
+                }
+            }
+
             function updateScoreBoard() {
                 correctCountElement.textContent = correctAnswers;
                 wrongCountElement.textContent = wrongAnswers;
+                timerElement.textContent = TIME_PER_QUESTION; // Reseta o timer visualmente ao atualizar placar
             }
 
-            // Habilita/desabilita botões de opção
+            function resetFeedback() {
+                feedbackElement.textContent = '';
+                feedbackElement.style.color = '#333'; // Cor padrão
+            }
+
             function enableOptions(enable) {
                 optionsContainer.querySelectorAll('.option-btn').forEach(button => {
                     button.disabled = !enable;
                 });
             }
 
-            // Evento para o botão "Próxima Soma"
+            function endGame() {
+                gameFinished = true; // Marca o jogo como finalizado
+                clearInterval(countdownInterval); // Garante que o timer parou
+                playSound(gameOverSound);
+
+                mainContent.style.display = 'none'; // Esconde o jogo
+                rankingScreen.style.display = 'flex'; // Mostra a tela de ranking
+
+                const finalScore = correctAnswers; // A pontuação final é o número de acertos
+                addScoreToRanking(finalScore);
+                displayRanking();
+            }
+
+            function getRanking() {
+                const ranking = JSON.parse(localStorage.getItem('mathQuizRanking')) || [];
+                return ranking.sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
+            }
+
+            function addScoreToRanking(score) {
+                let ranking = getRanking();
+                const userName = prompt(`Fim de jogo! Sua pontuação: ${score} acertos. Digite seu nome para o ranking:`);
+                if (userName && userName.trim() !== '') {
+                    ranking.push({ name: userName.trim().substring(0, 10), score: score }); // Limita o nome a 10 caracteres
+                    ranking.sort((a, b) => b.score - a.score);
+                    ranking = ranking.slice(0, 5); // Mantém apenas os 5 melhores
+                    localStorage.setItem('mathQuizRanking', JSON.stringify(ranking));
+                }
+            }
+
+            function displayRanking() {
+                const ranking = getRanking();
+                rankingList.innerHTML = '';
+                if (ranking.length === 0) {
+                    rankingList.innerHTML = '<li>Nenhum recorde ainda!</li>';
+                } else {
+                    ranking.forEach((entry, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${index + 1}. ${entry.name}: ${entry.score} acertos`;
+                        rankingList.appendChild(listItem);
+                    });
+                }
+            }
+
+            function resetGame() {
+                correctAnswers = 0;
+                wrongAnswers = 0;
+                currentQuestionNumber = 0;
+                updateScoreBoard();
+                mainContent.style.display = 'flex'; // Volta para a tela do jogo
+                rankingScreen.style.display = 'none'; // Esconde o ranking
+                generateQuestion(); // Começa uma nova rodada
+            }
+
+            // Eventos
             nextQuestionBtn.addEventListener('click', generateQuestion);
+            restartGameBtn.addEventListener('click', resetGame);
 
             // --- Lógica do Splash Screen ---
             function hideSplashScreen() {
@@ -294,12 +480,11 @@
                 mainContent.classList.add('visible');
             }
 
-            // Esconde o splash screen após 3 segundos
             setTimeout(hideSplashScreen, 3000);
 
-            // Inicia o quiz após o splash (ou quando DOM estiver pronto)
-            updateScoreBoard(); // Inicia o placar em 0
-            generateQuestion(); // Gera a primeira pergunta
+            // Inicia o jogo
+            updateScoreBoard();
+            generateQuestion();
         });
     </script>
 </body>
