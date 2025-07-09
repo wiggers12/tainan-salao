@@ -238,7 +238,7 @@
         <p id="question">Carregando...</p>
 
         <div id="options-container">
-            </div>
+        </div>
         
         <p id="feedback"></p>
         
@@ -280,18 +280,18 @@
             const gameOverSound = document.getElementById('game-over-sound');
 
 
-            const TOTAL_QUESTIONS = 50; // Número de perguntas por jogo (alterado para 50)
-            const TIME_PER_QUESTION = 3; // Segundos
-            const RANKING_LIMIT = 10; // Limite de jogadores no ranking (alterado para 10)
+            // TOTAL_QUESTIONS não é mais relevante para o fim do jogo, mas mantido para lógica de placar/ranking
+            const TOTAL_QUESTIONS = 50; 
+            const TIME_PER_QUESTION = 3; 
+            const RANKING_LIMIT = 10; 
 
             let correctAnswers = 0;
-            let wrongAnswers = 0;
-            let currentQuestionNumber = 0;
+            let wrongAnswers = 0; // Este contador será sempre 0 ou 1 antes do fim do jogo
+            let currentQuestionNumber = 0; // Quantidade de perguntas respondidas
             let currentCorrectAnswer;
             let countdownInterval;
-            let gameFinished = false; // Flag para controlar o fim do jogo
+            let gameFinished = false; 
 
-            // Função para tocar sons
             function playSound(audioElement) {
                 audioElement.currentTime = 0;
                 audioElement.play().catch(error => console.log("Erro ao tocar som:", error));
@@ -309,7 +309,7 @@
                     timerElement.textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(countdownInterval);
-                        if (!gameFinished) { // Só avalia se não terminou o jogo
+                        if (!gameFinished) { 
                             handleTimeUp();
                         }
                     }
@@ -319,50 +319,49 @@
             function handleTimeUp() {
                 playSound(timeUpSound);
                 feedbackElement.textContent = `⏰ Tempo esgotado! A resposta era ${currentCorrectAnswer}.`;
-                feedbackElement.style.color = "#FF5722"; // Laranja/vermelho para tempo esgotado
-                wrongAnswers++;
+                feedbackElement.style.color = "#FF5722"; 
+                wrongAnswers = 1; // Marca como erro para encerrar
                 updateScoreBoard();
-                endQuestionRound();
+                endGame(); // Encerra o jogo imediatamente
             }
 
             function generateQuestion() {
-                if (currentQuestionNumber >= TOTAL_QUESTIONS) {
+                // Se o jogo já deveria ter terminado por erro, não gera nova pergunta
+                if (gameFinished) { 
                     endGame();
                     return;
                 }
 
-                currentQuestionNumber++;
-                gameFinished = false; // Garante que o jogo não está no estado final
+                currentQuestionNumber++; // Incrementa o contador de perguntas respondidas
+                
                 resetFeedback();
                 enableOptions(true);
                 nextQuestionBtn.style.display = 'none';
 
-                const num1 = getRandomNumber(1, 9); // Números de 1 a 9 para soma simples
+                const num1 = getRandomNumber(1, 9); 
                 const num2 = getRandomNumber(1, 9);
                 currentCorrectAnswer = num1 + num2;
 
                 questionElement.textContent = `${num1} + ${num2} = ?`;
                 
                 generateOptions(currentCorrectAnswer);
-                startTimer(); // Inicia o timer para a nova pergunta
+                startTimer(); 
             }
 
             function generateOptions(correctAnswer) {
-                optionsContainer.innerHTML = ''; // Limpa botões anteriores
-                const options = new Set(); // Usa Set para garantir opções únicas
-                options.add(correctAnswer); // Adiciona a resposta correta
+                optionsContainer.innerHTML = ''; 
+                const options = new Set(); 
+                options.add(correctAnswer); 
 
                 while (options.size < 4) {
-                    // Gera opções erradas próximas à resposta correta para desafiar
                     let wrongOption = correctAnswer + getRandomNumber(-3, 3);
-                    // Garante que a opção não seja negativa e não seja a resposta correta
                     if (wrongOption < 0) wrongOption = 0; 
                     if (wrongOption !== correctAnswer) {
                         options.add(wrongOption);
                     }
                 }
 
-                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5); // Converte para array e embaralha
+                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5); 
 
                 shuffledOptions.forEach(option => {
                     const button = document.createElement('button');
@@ -373,50 +372,47 @@
                 });
             }
 
-            // Verifica a resposta
             function checkAnswer(selectedAnswer) {
-                if (gameFinished) return; // Impede múltiplas respostas após o fim do tempo ou jogo
+                if (gameFinished) return; 
 
-                clearInterval(countdownInterval); // Para o timer
-                enableOptions(false); // Desabilita os botões após a escolha
+                clearInterval(countdownInterval); 
+                enableOptions(false); 
 
                 if (selectedAnswer === currentCorrectAnswer) {
                     feedbackElement.textContent = "🥳 Acertou! Muito bem!";
-                    feedbackElement.style.color = "#4CAF50"; // Verde
+                    feedbackElement.style.color = "#4CAF50"; 
                     correctAnswers++;
                     playSound(correctSound);
+                    
+                    // Se acertou, prepara para a próxima pergunta
+                    endQuestionRound(); 
+
                 } else {
                     feedbackElement.textContent = `❌ Errou! A resposta era ${currentCorrectAnswer}.`;
-                    feedbackElement.style.color = "#F44336"; // Vermelho
-                    wrongAnswers++;
+                    feedbackElement.style.color = "#F44336";
+                    wrongAnswers = 1; // Marca como erro para encerrar
                     playSound(wrongSound);
+                    endGame(); // Encerra o jogo imediatamente ao errar
                 }
                 updateScoreBoard();
-                endQuestionRound();
             }
 
             function endQuestionRound() {
-                nextQuestionBtn.style.display = 'block'; // Mostra botão para próxima pergunta
-                if (currentQuestionNumber >= TOTAL_QUESTIONS) {
-                    nextQuestionBtn.textContent = "Ver Resultado Final";
-                } else {
-                    nextQuestionBtn.textContent = "Próxima Soma";
-                }
+                nextQuestionBtn.style.display = 'block'; 
+                nextQuestionBtn.textContent = "Próxima Soma"; // Sempre "Próxima Soma" se não encerrou
             }
 
-            // Atualiza o placar
             function updateScoreBoard() {
                 correctCountElement.textContent = correctAnswers;
-                wrongCountElement.textContent = wrongAnswers;
-                timerElement.textContent = TIME_PER_QUESTION; // Reseta o timer visualmente ao atualizar placar
+                // wrongCountElement.textContent não será atualizado para 1, pois o jogo termina
+                timerElement.textContent = TIME_PER_QUESTION; 
             }
 
             function resetFeedback() {
                 feedbackElement.textContent = '';
-                feedbackElement.style.color = '#333'; // Cor padrão
+                feedbackElement.style.color = '#333'; 
             }
 
-            // Habilita/desabilita botões de opção
             function enableOptions(enable) {
                 optionsContainer.querySelectorAll('.option-btn').forEach(button => {
                     button.disabled = !enable;
@@ -424,30 +420,31 @@
             }
 
             function endGame() {
-                gameFinished = true; // Marca o jogo como finalizado
-                clearInterval(countdownInterval); // Garante que o timer parou
+                gameFinished = true; 
+                clearInterval(countdownInterval); 
                 playSound(gameOverSound);
 
-                mainContent.style.display = 'none'; // Esconde o jogo
-                rankingScreen.style.display = 'flex'; // Mostra a tela de ranking
+                mainContent.style.display = 'none'; 
+                rankingScreen.style.display = 'flex'; 
 
-                const finalScore = correctAnswers; // A pontuação final é o número de acertos
+                const finalScore = correctAnswers; 
                 addScoreToRanking(finalScore);
                 displayRanking();
             }
 
             function getRanking() {
                 const ranking = JSON.parse(localStorage.getItem('mathQuizRanking')) || [];
-                return ranking.sort((a, b) => b.score - a.score).slice(0, RANKING_LIMIT); // Top 10 (alterado)
+                return ranking.sort((a, b) => b.score - a.score).slice(0, RANKING_LIMIT); 
             }
 
             function addScoreToRanking(score) {
                 let ranking = getRanking();
-                const userName = prompt(`Fim de jogo! Sua pontuação: ${score} acertos de ${TOTAL_QUESTIONS}! Digite seu nome para o ranking (até 10 letras):`);
+                // A mensagem do prompt mudou para refletir que o jogo encerra ao erro
+                const userName = prompt(`Fim de jogo! Você acertou ${score} somas! Digite seu nome para o ranking (até 10 letras):`);
                 if (userName && userName.trim() !== '') {
-                    ranking.push({ name: userName.trim().substring(0, 10), score: score }); // Limita o nome a 10 caracteres
+                    ranking.push({ name: userName.trim().substring(0, 10), score: score }); 
                     ranking.sort((a, b) => b.score - a.score);
-                    ranking = ranking.slice(0, RANKING_LIMIT); // Mantém apenas os 10 melhores (alterado)
+                    ranking = ranking.slice(0, RANKING_LIMIT); 
                     localStorage.setItem('mathQuizRanking', JSON.stringify(ranking));
                 }
             }
@@ -470,17 +467,16 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 currentQuestionNumber = 0;
+                gameFinished = false; // Resetar flag de fim de jogo
                 updateScoreBoard();
-                mainContent.style.display = 'flex'; // Volta para a tela do jogo
-                rankingScreen.style.display = 'none'; // Esconde o ranking
-                generateQuestion(); // Começa uma nova rodada
+                mainContent.style.display = 'flex'; 
+                rankingScreen.style.display = 'none'; 
+                generateQuestion(); 
             }
 
-            // Eventos
             nextQuestionBtn.addEventListener('click', generateQuestion);
             restartGameBtn.addEventListener('click', resetGame);
 
-            // --- Lógica do Splash Screen ---
             function hideSplashScreen() {
                 splashScreen.classList.add('hidden');
                 mainContent.classList.add('visible');
@@ -488,7 +484,6 @@
 
             setTimeout(hideSplashScreen, 3000);
 
-            // Inicia o jogo
             updateScoreBoard();
             generateQuestion();
         });
