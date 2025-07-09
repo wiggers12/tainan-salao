@@ -185,23 +185,23 @@
         #ranking-list {
             list-style: none;
             padding: 0;
-            font-size: 1.4em;
+            font-size: 1.2em; /* Reduzido um pouco para caber mais */
         }
 
         #ranking-list li {
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* Espaçamento menor */
             background-color: rgba(0,0,0,0.2);
             padding: 8px 15px;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
-            width: 250px;
+            width: 280px; /* Aumentado a largura para nomes mais longos */
         }
 
         #ranking-list li:first-child {
             font-weight: bold;
             color: #FFEB3B; /* Ouro */
-            transform: scale(1.1);
+            transform: scale(1.05); /* Escala menor para top 1 */
         }
 
         #restart-game-btn {
@@ -282,13 +282,14 @@
 
             const TOTAL_QUESTIONS = 10; // Número de perguntas por jogo
             const TIME_PER_QUESTION = 3; // Segundos
+            const MAX_RANKING_ENTRIES = 10; // Salvar os últimos 10 jogadores
 
             let correctAnswers = 0;
             let wrongAnswers = 0;
             let currentQuestionNumber = 0;
             let currentCorrectAnswer;
             let countdownInterval;
-            let gameFinished = false; // Flag para controlar o fim do jogo
+            let gameActive = true; // Flag para controlar se o jogo está ativo (não terminou por erro/tempo)
 
             // Função para tocar sons
             function playSound(audioElement) {
@@ -308,7 +309,7 @@
                     timerElement.textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(countdownInterval);
-                        if (!gameFinished) { // Só avalia se não terminou o jogo
+                        if (gameActive) { // Só avalia se o jogo ainda está ativo
                             handleTimeUp();
                         }
                     }
@@ -321,17 +322,18 @@
                 feedbackElement.style.color = "#FF5722"; // Laranja/vermelho para tempo esgotado
                 wrongAnswers++;
                 updateScoreBoard();
-                endQuestionRound();
+                endGame(); // Termina o jogo ao errar ou esgotar o tempo
             }
 
             function generateQuestion() {
+                if (!gameActive) return; // Não gera nova pergunta se o jogo terminou
+
                 if (currentQuestionNumber >= TOTAL_QUESTIONS) {
-                    endGame();
+                    endGame(); // Termina o jogo se todas as perguntas foram respondidas
                     return;
                 }
 
                 currentQuestionNumber++;
-                gameFinished = false; // Garante que o jogo não está no estado final
                 resetFeedback();
                 enableOptions(true);
                 nextQuestionBtn.style.display = 'none';
@@ -353,6 +355,7 @@
 
                 while (options.size < 4) {
                     let wrongOption = correctAnswer + getRandomNumber(-3, 3);
+                    // Garante que a opção não seja negativa e seja diferente da correta
                     if (wrongOption < 0) wrongOption = 0; 
                     if (wrongOption !== correctAnswer) {
                         options.add(wrongOption);
@@ -371,7 +374,7 @@
             }
 
             function checkAnswer(selectedAnswer) {
-                if (gameFinished) return; // Impede múltiplas respostas após o fim do tempo ou jogo
+                if (!gameActive) return; // Impede respostas se o jogo já terminou
 
                 clearInterval(countdownInterval); // Para o timer
                 enableOptions(false); // Desabilita os botões
@@ -381,14 +384,16 @@
                     feedbackElement.style.color = "#4CAF50";
                     correctAnswers++;
                     playSound(correctSound);
+                    // Se acertou, pode ir para a próxima pergunta
+                    endQuestionRound();
                 } else {
                     feedbackElement.textContent = `❌ Errou! A resposta era ${currentCorrectAnswer}.`;
                     feedbackElement.style.color = "#F44336";
                     wrongAnswers++;
                     playSound(wrongSound);
+                    endGame(); // Termina o jogo imediatamente ao errar
                 }
                 updateScoreBoard();
-                endQuestionRound();
             }
 
             function endQuestionRound() {
@@ -418,7 +423,7 @@
             }
 
             function endGame() {
-                gameFinished = true; // Marca o jogo como finalizado
+                gameActive = false; // Marca o jogo como inativo
                 clearInterval(countdownInterval); // Garante que o timer parou
                 playSound(gameOverSound);
 
@@ -430,31 +435,35 @@
                 displayRanking();
             }
 
+            // Funções de Ranking
             function getRanking() {
                 const ranking = JSON.parse(localStorage.getItem('mathQuizRanking')) || [];
-                return ranking.sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
+                return ranking; // Retorna todos os itens, sem ordenar ou limitar aqui
             }
 
             function addScoreToRanking(score) {
                 let ranking = getRanking();
                 const userName = prompt(`Fim de jogo! Sua pontuação: ${score} acertos. Digite seu nome para o ranking:`);
                 if (userName && userName.trim() !== '') {
-                    ranking.push({ name: userName.trim().substring(0, 10), score: score }); // Limita o nome a 10 caracteres
-                    ranking.sort((a, b) => b.score - a.score);
-                    ranking = ranking.slice(0, 5); // Mantém apenas os 5 melhores
+                    ranking.push({ name: userName.trim().substring(0, 15), score: score, date: new Date().toLocaleString() }); // Adiciona data e limita o nome
+                    // O ranking agora salva os últimos MAX_RANKING_ENTRIES jogadores, não os ordena por score
+                    if (ranking.length > MAX_RANKING_ENTRIES) {
+                        ranking = ranking.slice(ranking.length - MAX_RANKING_ENTRIES); // Remove os mais antigos
+                    }
                     localStorage.setItem('mathQuizRanking', JSON.stringify(ranking));
                 }
             }
 
             function displayRanking() {
-                const ranking = getRanking();
+                const ranking = getRanking().reverse(); // Exibe os mais recentes primeiro
                 rankingList.innerHTML = '';
                 if (ranking.length === 0) {
                     rankingList.innerHTML = '<li>Nenhum recorde ainda!</li>';
                 } else {
                     ranking.forEach((entry, index) => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${index + 1}. ${entry.name}: ${entry.score} acertos`;
+                        // Exibe a data para os últimos 10 jogadores
+                        listItem.textContent = `${entry.name}: ${entry.score} acertos (${entry.date})`;
                         rankingList.appendChild(listItem);
                     });
                 }
@@ -464,6 +473,7 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 currentQuestionNumber = 0;
+                gameActive = true; // Ativa o jogo novamente
                 updateScoreBoard();
                 mainContent.style.display = 'flex'; // Volta para a tela do jogo
                 rankingScreen.style.display = 'none'; // Esconde o ranking
