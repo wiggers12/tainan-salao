@@ -185,23 +185,23 @@
         #ranking-list {
             list-style: none;
             padding: 0;
-            font-size: 1.2em; /* Reduzido um pouco para caber mais */
+            font-size: 1.4em;
         }
 
         #ranking-list li {
-            margin-bottom: 8px; /* Espaçamento menor */
+            margin-bottom: 10px;
             background-color: rgba(0,0,0,0.2);
             padding: 8px 15px;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
-            width: 280px; /* Aumentado a largura para nomes mais longos */
+            width: 250px;
         }
 
         #ranking-list li:first-child {
             font-weight: bold;
             color: #FFEB3B; /* Ouro */
-            transform: scale(1.05); /* Escala menor para top 1 */
+            transform: scale(1.1);
         }
 
         #restart-game-btn {
@@ -280,16 +280,16 @@
             const gameOverSound = document.getElementById('game-over-sound');
 
 
-            const TOTAL_QUESTIONS = 10; // Número de perguntas por jogo
+            const TOTAL_QUESTIONS = 50; // Número de perguntas por jogo (alterado para 50)
             const TIME_PER_QUESTION = 3; // Segundos
-            const MAX_RANKING_ENTRIES = 10; // Salvar os últimos 10 jogadores
+            const RANKING_LIMIT = 10; // Limite de jogadores no ranking (alterado para 10)
 
             let correctAnswers = 0;
             let wrongAnswers = 0;
             let currentQuestionNumber = 0;
             let currentCorrectAnswer;
             let countdownInterval;
-            let gameActive = true; // Flag para controlar se o jogo está ativo (não terminou por erro/tempo)
+            let gameFinished = false; // Flag para controlar o fim do jogo
 
             // Função para tocar sons
             function playSound(audioElement) {
@@ -309,7 +309,7 @@
                     timerElement.textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(countdownInterval);
-                        if (gameActive) { // Só avalia se o jogo ainda está ativo
+                        if (!gameFinished) { // Só avalia se não terminou o jogo
                             handleTimeUp();
                         }
                     }
@@ -322,23 +322,22 @@
                 feedbackElement.style.color = "#FF5722"; // Laranja/vermelho para tempo esgotado
                 wrongAnswers++;
                 updateScoreBoard();
-                endGame(); // Termina o jogo ao errar ou esgotar o tempo
+                endQuestionRound();
             }
 
             function generateQuestion() {
-                if (!gameActive) return; // Não gera nova pergunta se o jogo terminou
-
                 if (currentQuestionNumber >= TOTAL_QUESTIONS) {
-                    endGame(); // Termina o jogo se todas as perguntas foram respondidas
+                    endGame();
                     return;
                 }
 
                 currentQuestionNumber++;
+                gameFinished = false; // Garante que o jogo não está no estado final
                 resetFeedback();
                 enableOptions(true);
                 nextQuestionBtn.style.display = 'none';
 
-                const num1 = getRandomNumber(1, 9);
+                const num1 = getRandomNumber(1, 9); // Números de 1 a 9 para soma simples
                 const num2 = getRandomNumber(1, 9);
                 currentCorrectAnswer = num1 + num2;
 
@@ -349,20 +348,21 @@
             }
 
             function generateOptions(correctAnswer) {
-                optionsContainer.innerHTML = '';
-                const options = new Set();
-                options.add(correctAnswer);
+                optionsContainer.innerHTML = ''; // Limpa botões anteriores
+                const options = new Set(); // Usa Set para garantir opções únicas
+                options.add(correctAnswer); // Adiciona a resposta correta
 
                 while (options.size < 4) {
+                    // Gera opções erradas próximas à resposta correta para desafiar
                     let wrongOption = correctAnswer + getRandomNumber(-3, 3);
-                    // Garante que a opção não seja negativa e seja diferente da correta
+                    // Garante que a opção não seja negativa e não seja a resposta correta
                     if (wrongOption < 0) wrongOption = 0; 
                     if (wrongOption !== correctAnswer) {
                         options.add(wrongOption);
                     }
                 }
 
-                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+                const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5); // Converte para array e embaralha
 
                 shuffledOptions.forEach(option => {
                     const button = document.createElement('button');
@@ -373,31 +373,30 @@
                 });
             }
 
+            // Verifica a resposta
             function checkAnswer(selectedAnswer) {
-                if (!gameActive) return; // Impede respostas se o jogo já terminou
+                if (gameFinished) return; // Impede múltiplas respostas após o fim do tempo ou jogo
 
                 clearInterval(countdownInterval); // Para o timer
-                enableOptions(false); // Desabilita os botões
+                enableOptions(false); // Desabilita os botões após a escolha
 
                 if (selectedAnswer === currentCorrectAnswer) {
                     feedbackElement.textContent = "🥳 Acertou! Muito bem!";
-                    feedbackElement.style.color = "#4CAF50";
+                    feedbackElement.style.color = "#4CAF50"; // Verde
                     correctAnswers++;
                     playSound(correctSound);
-                    // Se acertou, pode ir para a próxima pergunta
-                    endQuestionRound();
                 } else {
                     feedbackElement.textContent = `❌ Errou! A resposta era ${currentCorrectAnswer}.`;
-                    feedbackElement.style.color = "#F44336";
+                    feedbackElement.style.color = "#F44336"; // Vermelho
                     wrongAnswers++;
                     playSound(wrongSound);
-                    endGame(); // Termina o jogo imediatamente ao errar
                 }
                 updateScoreBoard();
+                endQuestionRound();
             }
 
             function endQuestionRound() {
-                nextQuestionBtn.style.display = 'block';
+                nextQuestionBtn.style.display = 'block'; // Mostra botão para próxima pergunta
                 if (currentQuestionNumber >= TOTAL_QUESTIONS) {
                     nextQuestionBtn.textContent = "Ver Resultado Final";
                 } else {
@@ -405,6 +404,7 @@
                 }
             }
 
+            // Atualiza o placar
             function updateScoreBoard() {
                 correctCountElement.textContent = correctAnswers;
                 wrongCountElement.textContent = wrongAnswers;
@@ -416,6 +416,7 @@
                 feedbackElement.style.color = '#333'; // Cor padrão
             }
 
+            // Habilita/desabilita botões de opção
             function enableOptions(enable) {
                 optionsContainer.querySelectorAll('.option-btn').forEach(button => {
                     button.disabled = !enable;
@@ -423,7 +424,7 @@
             }
 
             function endGame() {
-                gameActive = false; // Marca o jogo como inativo
+                gameFinished = true; // Marca o jogo como finalizado
                 clearInterval(countdownInterval); // Garante que o timer parou
                 playSound(gameOverSound);
 
@@ -435,35 +436,31 @@
                 displayRanking();
             }
 
-            // Funções de Ranking
             function getRanking() {
                 const ranking = JSON.parse(localStorage.getItem('mathQuizRanking')) || [];
-                return ranking; // Retorna todos os itens, sem ordenar ou limitar aqui
+                return ranking.sort((a, b) => b.score - a.score).slice(0, RANKING_LIMIT); // Top 10 (alterado)
             }
 
             function addScoreToRanking(score) {
                 let ranking = getRanking();
-                const userName = prompt(`Fim de jogo! Sua pontuação: ${score} acertos. Digite seu nome para o ranking:`);
+                const userName = prompt(`Fim de jogo! Sua pontuação: ${score} acertos de ${TOTAL_QUESTIONS}! Digite seu nome para o ranking (até 10 letras):`);
                 if (userName && userName.trim() !== '') {
-                    ranking.push({ name: userName.trim().substring(0, 15), score: score, date: new Date().toLocaleString() }); // Adiciona data e limita o nome
-                    // O ranking agora salva os últimos MAX_RANKING_ENTRIES jogadores, não os ordena por score
-                    if (ranking.length > MAX_RANKING_ENTRIES) {
-                        ranking = ranking.slice(ranking.length - MAX_RANKING_ENTRIES); // Remove os mais antigos
-                    }
+                    ranking.push({ name: userName.trim().substring(0, 10), score: score }); // Limita o nome a 10 caracteres
+                    ranking.sort((a, b) => b.score - a.score);
+                    ranking = ranking.slice(0, RANKING_LIMIT); // Mantém apenas os 10 melhores (alterado)
                     localStorage.setItem('mathQuizRanking', JSON.stringify(ranking));
                 }
             }
 
             function displayRanking() {
-                const ranking = getRanking().reverse(); // Exibe os mais recentes primeiro
+                const ranking = getRanking();
                 rankingList.innerHTML = '';
                 if (ranking.length === 0) {
                     rankingList.innerHTML = '<li>Nenhum recorde ainda!</li>';
                 } else {
                     ranking.forEach((entry, index) => {
                         const listItem = document.createElement('li');
-                        // Exibe a data para os últimos 10 jogadores
-                        listItem.textContent = `${entry.name}: ${entry.score} acertos (${entry.date})`;
+                        listItem.textContent = `${index + 1}. ${entry.name}: ${entry.score} acertos`;
                         rankingList.appendChild(listItem);
                     });
                 }
@@ -473,7 +470,6 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 currentQuestionNumber = 0;
-                gameActive = true; // Ativa o jogo novamente
                 updateScoreBoard();
                 mainContent.style.display = 'flex'; // Volta para a tela do jogo
                 rankingScreen.style.display = 'none'; // Esconde o ranking
