@@ -177,7 +177,7 @@
         }
 
         .list-fake {
-            padding-left: 15px;
+            padding-left: 0; /* Remover padding padrão da UL */
             color: #444;
             list-style: none; /* Remove bullet points padrão */
         }
@@ -283,8 +283,7 @@
                     </select>
                     <input type="text" id="financeiro-descricao" placeholder="Descrição">
                     <input type="number" id="financeiro-valor" placeholder="Valor R$">
-                    <button id="btn-salvar-transacao">Salvar Transação</button>
-                    <hr />
+                    <button id="btn-salvar-transacao">Salvar Transação</button> <hr />
                     <h3>Balanço Mensal</h3>
                     <p>Entradas: <span id="total-entradas">R$ 0,00</span></p>
                     <p>Saídas: <span id="total-saidas">R$ 0,00</span></p>
@@ -518,7 +517,7 @@
                 document.getElementById('cliente-nome').value = cliente.nome;
                 document.getElementById('cliente-telefone').value = cliente.telefone;
                 document.getElementById('cliente-email').value = cliente.email;
-                alert('Cliente selecionado para edição. Altere os campos e clique em Salvar.');
+                alert('Cliente selecionado para edição. Altere os campos e clique em Salvar Cliente.');
             }
         };
 
@@ -530,7 +529,7 @@
                 // Formatar data para datetime-local
                 document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
                 document.getElementById('agenda-servico').value = agendamento.servico;
-                alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar.');
+                alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar Agendamento.');
             }
         };
 
@@ -541,7 +540,7 @@
                 document.getElementById('financeiro-tipo').value = transacao.tipo;
                 document.getElementById('financeiro-descricao').value = transacao.descricao;
                 document.getElementById('financeiro-valor').value = transacao.valor;
-                alert('Transação selecionada para edição. Altere os campos e clique em Salvar.');
+                alert('Transação selecionada para edição. Altere os campos e clique em Salvar Transação.');
             }
         };
 
@@ -551,7 +550,7 @@
                 document.getElementById('estoque-id-edit').value = produto.id;
                 document.getElementById('estoque-nome-produto').value = produto.nome;
                 document.getElementById('estoque-quantidade').value = produto.quantidade;
-                alert('Produto selecionado para edição. Altere os campos e clique em Salvar.');
+                alert('Produto selecionado para edição. Altere os campos e clique em Salvar Produto.');
             }
         };
 
@@ -561,10 +560,9 @@
                 document.getElementById('profissional-id-edit').value = profissional.id;
                 document.getElementById('profissional-nome').value = profissional.nome;
                 document.getElementById('profissional-especialidade').value = profissional.especialidade;
-                alert('Profissional selecionado para edição. Altere os campos e clique em Salvar.');
+                alert('Profissional selecionado para edição. Altere os campos e clique em Salvar Profissional.');
             }
         };
-
 
         // --- Funções de Exclusão (Delete) ---
 
@@ -612,7 +610,6 @@
                 alert('Profissional excluído com sucesso!');
             }
         };
-
 
         // --- Funções de Inicialização e Event Listeners ---
         document.addEventListener("DOMContentLoaded", () => {
@@ -735,7 +732,7 @@
                     document.getElementById('financeiro-descricao').value = '';
                     document.getElementById('financeiro-valor').value = '';
                 } else {
-                    alert('Por favor, preencha todos os campos corretamente (tipo, descrição, valor numérico positivo).');
+                    alert('Por favor, selecione o tipo, preencha a descrição e um valor numérico positivo.');
                 }
             });
 
