@@ -1,249 +1,406 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Espaço Tai Botelho</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Espaço Tai Botelho</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      overflow: hidden;
-      visibility: hidden;
-    }
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Esconde a barra de rolagem inicial */
+            visibility: hidden; /* Esconde o corpo até que o JS carregue */
+        }
 
-    /* Splash Screen */
-    #splash-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      opacity: 1;
-      transition: opacity 1s ease-out;
-    }
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
 
-    #splash-screen.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
+        #splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Desabilita cliques quando oculto */
+        }
 
-    .splash-initials {
-      font-size: 8em;
-      font-weight: 700;
-      margin: 0;
-      background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
-      letter-spacing: 5px;
-    }
+        .splash-initials {
+            font-size: 8em;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, #FFD700, #DAA520, #B8860B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.5);
+            letter-spacing: 5px;
+        }
 
-    .splash-full-name {
-      color: #FFD700;
-      font-size: 2.5em;
-      font-weight: 600;
-      margin-top: 10px;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-      letter-spacing: 1px;
-    }
+        .splash-full-name {
+            color: #FFD700;
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            letter-spacing: 1px;
+        }
 
-    #splash-enter-button {
-      background: linear-gradient(45deg, #FFD700, #DAA520);
-      color: #000;
-      padding: 10px 30px;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      font-size: 1.2em;
-      font-weight: 700;
-      margin-top: 40px;
-      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      letter-spacing: 0.5px;
-    }
+        #splash-enter-button {
+            background: linear-gradient(45deg, #FFD700, #DAA520);
+            color: #000;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-top: 40px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            letter-spacing: 0.5px;
+        }
 
-    #splash-enter-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
-    }
+        #splash-enter-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+        }
 
-    /* Conteúdo principal */
-    #main-content {
-      padding: 20px;
-      text-align: center;
-      background-color: #f0f0f0;
-      min-height: 100vh;
-      box-sizing: border-box;
-      display: none;
-    }
+        /* Conteúdo principal */
+        #main-content {
+            padding: 20px;
+            text-align: center;
+            background-color: #f0f0f0;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: none; /* Inicia oculto, será mostrado pelo JS */
+        }
 
-    #dashboard-icons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      padding: 40px 20px;
-      background-color: #fff;
-    }
+        #dashboard-icons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+            background-color: #fff;
+        }
 
-    .icon-card {
-      background: #f9f9f9;
-      border-radius: 15px;
-      padding: 20px;
-      width: 280px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+        .icon-card {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-    .icon-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
+        .icon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
 
-    .icon-card .material-icons {
-      font-size: 48px;
-      color: #DAA520;
-      margin-bottom: 10px;
-    }
+        .icon-card .material-icons {
+            font-size: 48px;
+            color: #DAA520;
+            margin-bottom: 10px;
+        }
 
-    .icon-card h2 {
-      font-size: 1.4em;
-      margin: 10px 0;
-      color: #333;
-    }
+        .icon-card h2 {
+            font-size: 1.4em;
+            margin: 10px 0;
+            color: #333;
+        }
 
-    .open-btn {
-      background: #daa520;
-      color: #fff;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
+        .open-btn {
+            background: #daa520;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
 
-    .icon-content {
-      display: none;
-      text-align: left;
-      margin-top: 10px;
-    }
+        .icon-content {
+            display: none; /* Conteúdo das seções inicia oculto */
+            text-align: left;
+            margin-top: 10px;
+        }
 
-    .icon-content input,
-    .icon-content select,
-    .icon-content button {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 0.95em;
-    }
+        .icon-content input,
+        .icon-content select,
+        .icon-content button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.95em;
+        }
 
-    .icon-content button {
-      background: #000;
-      color: #FFD700;
-      border: none;
-      font-weight: bold;
-    }
+        .icon-content button {
+            background: #000;
+            color: #FFD700;
+            border: none;
+            font-weight: bold;
+        }
 
-    .list-fake {
-      padding-left: 15px;
-      color: #444;
-    }
+        .list-fake {
+            padding-left: 15px;
+            color: #444;
+        }
 
-    @media (max-width: 768px) {
-      .splash-initials {
-        font-size: 5em;
-      }
+        @media (max-width: 768px) {
+            .splash-initials {
+                font-size: 5em;
+            }
 
-      .splash-full-name {
-        font-size: 1.8em;
-      }
+            .splash-full-name {
+                font-size: 1.8em;
+            }
 
-      #splash-enter-button {
-        font-size: 1em;
-        padding: 8px 20px;
-        margin-top: 30px;
-      }
+            #splash-enter-button {
+                font-size: 1em;
+                padding: 8px 20px;
+                margin-top: 30px;
+            }
 
-      .icon-card {
-        width: 90%;
-      }
-    }
-  </style>
+            .icon-card {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div id="splash-screen">
-    <h1 class="splash-initials">TB</h1>
-    <p class="splash-full-name">Espaço Tai Botelho</p>
-    <button id="splash-enter-button" aria-label="Entrar no site" role="button">Comece aqui</button>
-  </div>
+    <div id="splash-screen">
+        <h1 class="splash-initials">TB</h1>
+        <p class="splash-full-name">Espaço Tai Botelho</p>
+        <button id="splash-enter-button" aria-label="Entrar no site" role="button">Comece aqui</button>
+    </div>
 
-    <div id="main-content">
-    <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
-    <p>Explore as funcionalidades abaixo:</p>
+    <div id="main-content">
+        <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
+        <p>Explore as funcionalidades abaixo:</p>
 
-    <section id="dashboard-icons">
+        <section id="dashboard-icons">
 
-            <div class="icon-card">
-        <span class="material-icons">person</span>
-        <h2>Cliente</h2>
-        <button class="open-btn" onclick="toggleSection('cliente-section', 'cliente')">Abrir</button>
-        <div class="icon-content" id="cliente-section">
-          <h3>Cadastrar Cliente</h3>
-          <input type="text" id="cliente-nome" placeholder="Nome Completo">
-          <input type="text" id="cliente-telefone" placeholder="Telefone">
-          <input type="email" id="cliente-email" placeholder="E-mail">
-          <button id="btn-cadastrar-cliente">Cadastrar</button>
-          <hr />
-          <h3>Lista de Clientes</h3>
-          <ul id="lista-clientes" class="list-fake">
-                      </ul>
-        </div>
-      </div>
+            <div class="icon-card">
+                <span class="material-icons">person</span>
+                <h2>Cliente</h2>
+                <button class="open-btn" onclick="toggleSection('cliente-section')">Abrir</button>
+                <div class="icon-content" id="cliente-section">
+                    <h3>Cadastrar Cliente</h3>
+                    <input type="text" id="cliente-nome" placeholder="Nome Completo">
+                    <input type="text" id="cliente-telefone" placeholder="Telefone">
+                    <input type="email" id="cliente-email" placeholder="E-mail">
+                    <button id="btn-cadastrar-cliente">Cadastrar</button>
+                    <hr />
+                    <h3>Lista de Clientes</h3>
+                    <ul id="lista-clientes" class="list-fake">
+                        </ul>
+                </div>
+            </div>
 
-            <div class="icon-card">
-        <span class="material-icons">event</span>
-        <h2>Agenda</h2>
-        <button class="open-btn" onclick="toggleSection('agenda-section')">Abrir</button>
-        <div class="icon-content" id="agenda-section">
-          <h3>Novo Agendamento</h3>
-          <input type="text" placeholder="Nome do Cliente">
-          <input type="datetime-local">
-          <select>
-            <option>Escova</option>
-            <option>Coloração</option>
-            <option>Corte</option>
-          </select>
-          <button>Agendar</button>
-          <hr />
-          <h3>Próximos Agendamentos</h3>
-          <ul class="list-fake">
-            <li>10/07 - Ana, Corte às 14h</li>
-            <li>11/07 - Bruna, Mechas às 16h</li>
-          </ul>
-        </div>
-      </div>
+            <div class="icon-card">
+                <span class="material-icons">event</span>
+                <h2>Agenda</h2>
+                <button class="open-btn" onclick="toggleSection('agenda-section')">Abrir</button>
+                <div class="icon-content" id="agenda-section">
+                    <h3>Novo Agendamento</h3>
+                    <input type="text" placeholder="Nome do Cliente">
+                    <input type="datetime-local">
+                    <select>
+                        <option>Escova</option>
+                        <option>Coloração</option>
+                        <option>Corte</option>
+                    </select>
+                    <button>Agendar</button>
+                    <hr />
+                    <h3>Próximos Agendamentos</h3>
+                    <ul class="list-fake">
+                        <li>10/07 - Ana, Corte às 14h</li>
+                        <li>11/07 - Bruna, Mechas às 16h</li>
+                    </ul>
+                </div>
+            </div>
 
-            <div class="icon-card">
-        <span class="material-icons">attach_money</span>
-        <h2>Financeiro</h2>
-        <button class="open-btn" onclick="toggleSection('financeiro-section')">Abrir</button>
-        <div class="icon-content" id="financeiro-section">
-          <h3>Entradas</h3>
-          <p>Total: R$ 2.300,00</p>
-          <h3>Despesas</h3>
-          <p>
+            <div class="icon-card">
+                <span class="material-icons">attach_money</span>
+                <h2>Financeiro</h2>
+                <button class="open-btn" onclick="toggleSection('financeiro-section')">Abrir</button>
+                <div class="icon-content" id="financeiro-section">
+                    <h3>Entradas</h3>
+                    <p>Total: R$ 2.300,00</p>
+                    <h3>Despesas</h3>
+                    <p>Total: R$ 1.200,00</p>
+                    <h3>Relatório Mensal</h3>
+                    <ul class="list-fake">
+                        <li>Janeiro: +R$ 500</li>
+                        <li>Fevereiro: +R$ 800</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="icon-card">
+                <span class="material-icons">inventory_2</span>
+                <h2>Estoque</h2>
+                <button class="open-btn" onclick="toggleSection('estoque-section')">Abrir</button>
+                <div class="icon-content" id="estoque-section">
+                    <h3>Cadastro de Produto</h3>
+                    <input type="text" placeholder="Nome do Produto">
+                    <input type="number" placeholder="Quantidade">
+                    <button>Adicionar</button>
+                    <hr />
+                    <h3>Alerta de Estoque Baixo</h3>
+                    <ul class="list-fake">
+                        <li>Shampoo Liso - 2 unid.</li>
+                        <li>Tinta Loira - 1 unid.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="icon-card">
+                <span class="material-icons">people</span>
+                <h2>Profissional</h2>
+                <button class="open-btn" onclick="toggleSection('profissional-section')">Abrir</button>
+                <div class="icon-content" id="profissional-section">
+                    <h3>Cadastrar Profissional</h3>
+                    <input type="text" placeholder="Nome Completo">
+                    <input type="text" placeholder="Especialidade">
+                    <button>Salvar</button>
+                    <hr />
+                    <h3>Comissões do Mês</h3>
+                    <ul class="list-fake">
+                        <li>Jéssica: R$ 1.000</li>
+                        <li>Carla: R$ 800</li>
+                    </ul>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        // Variável global para armazenar os clientes
+        let clientes = [];
+
+        // Função para carregar clientes do localStorage
+        const carregarClientes = () => {
+            const clientesSalvos = localStorage.getItem('clientesEspacoTaiBotelho');
+            if (clientesSalvos) {
+                clientes = JSON.parse(clientesSalvos);
+            }
+        };
+
+        // Função para salvar clientes no localStorage
+        const salvarClientes = () => {
+            localStorage.setItem('clientesEspacoTaiBotelho', JSON.stringify(clientes));
+        };
+
+        // Função para renderizar a lista de clientes na interface
+        const renderizarClientes = () => {
+            const listaClientesUl = document.getElementById('lista-clientes');
+            listaClientesUl.innerHTML = ''; // Limpa a lista existente
+
+            if (clientes.length === 0) {
+                listaClientesUl.innerHTML = '<li>Nenhum cliente cadastrado ainda.</li>';
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const li = document.createElement('li');
+                li.textContent = `${cliente.nome} - ${cliente.telefone}`;
+                listaClientesUl.appendChild(li);
+            });
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.style.visibility = "visible";
+
+            const splash = document.getElementById("splash-screen");
+            const button = document.getElementById("splash-enter-button");
+            const main = document.getElementById("main-content");
+
+            const showMainContent = () => {
+                if (!splash.classList.contains("hidden")) {
+                    splash.classList.add("hidden");
+                    splash.addEventListener(
+                        "transitionend",
+                        () => {
+                            splash.style.display = "none";
+                            main.style.display = "block";
+                            document.body.style.overflow = "auto";
+                        },
+                        { once: true }
+                    );
+                }
+            };
+
+            button.addEventListener("click", showMainContent);
+            // Removi o setTimeout para que a splash screen só suma com o clique no botão.
+            // Se quiser que ela suma automaticamente após 6 segundos, descomente a linha abaixo:
+            // setTimeout(showMainContent, 6000); 
+
+            // --- Lógica para Clientes (ao carregar a página) ---
+            carregarClientes();
+            renderizarClientes(); // Exibe os clientes salvos logo de início
+
+            // Event listener para o botão de cadastro de cliente
+            const btnCadastrarCliente = document.getElementById('btn-cadastrar-cliente');
+            btnCadastrarCliente.addEventListener('click', () => {
+                const nome = document.getElementById('cliente-nome').value.trim();
+                const telefone = document.getElementById('cliente-telefone').value.trim();
+                const email = document.getElementById('cliente-email').value.trim();
+
+                if (nome && telefone) {
+                    clientes.push({ nome, telefone, email });
+                    salvarClientes();
+                    renderizarClientes();
+                    alert('Cliente cadastrado com sucesso!');
+                    // Limpa os campos após o cadastro
+                    document.getElementById('cliente-nome').value = '';
+                    document.getElementById('cliente-telefone').value = '';
+                    document.getElementById('cliente-email').value = '';
+                } else {
+                    alert('Por favor, preencha o nome e o telefone do cliente.');
+                }
+            });
+        });
+
+        // Função para alternar a visibilidade das seções
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            const isCurrentlyVisible = el.style.display === "block";
+
+            // Fecha todas as outras seções abertas para evitar sobreposição
+            document.querySelectorAll('.icon-content').forEach(section => {
+                if (section.id !== id) {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Alterna a visibilidade da seção clicada
+            el.style.display = isCurrentlyVisible ? "none" : "block";
+
+            // Se a seção de cliente for aberta, atualiza a lista para garantir que os dados mais recentes são mostrados
+            if (id === 'cliente-section') {
+                renderizarClientes();
+            }
+        }
+    </script>
+</body>
+</html>
