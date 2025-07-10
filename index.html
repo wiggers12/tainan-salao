@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Doce Sabor Caseiro</title>
   <style>
+    /* --- CSS Inserido Aqui --- */
     body {
       font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
+      margin: 0; 
+      padding: 0;
       background-color: #ffeef2; /* Rosa claro */
       color: #333;
-      overflow: hidden; /* Evita scroll durante o splash */
+      overflow-x: hidden; /* Evita scroll horizontal */
     }
+
     header {
       background: #e91e63; /* Rosa mais escuro */
       color: white;
@@ -20,75 +23,124 @@
       font-size: 24px;
       font-weight: bold;
     }
+
     nav {
       display: flex;
       justify-content: center;
       background: #fff;
       border-bottom: 2px solid #e91e63; /* Rosa mais escuro */
       flex-wrap: wrap;
+      padding: 10px 0; /* Espaçamento para botões menores */
     }
+
     nav button {
       background: none;
       border: none;
-      padding: 15px 20px;
-      font-size: 16px;
+      padding: 10px 15px; /* Padding ajustado */
+      font-size: 15px; /* Tamanho da fonte ajustado */
       cursor: pointer;
       color: #e91e63; /* Rosa mais escuro */
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      white-space: nowrap; /* Evita quebra de linha nos botões */
     }
-    nav button:hover, nav button.active {
+
+    nav button:hover, 
+    nav button.active {
       background-color: #e91e63; /* Rosa mais escuro */
       color: white;
       border-radius: 5px 5px 0 0;
     }
+
     main {
       padding: 20px;
       max-width: 1000px;
       margin: 0 auto;
     }
-    section { display: none; }
-    section.active { display: block; }
+
+    section { 
+      display: none; 
+      animation: fadeIn 0.5s ease-in-out; /* Animação ao mostrar seção */
+    }
+
+    section.active { 
+      display: block; 
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     input, select, textarea {
       font-size: 16px;
-      padding: 8px;
+      padding: 10px; /* Padding um pouco maior */
       margin: 5px 0 15px 0;
       width: 100%;
       box-sizing: border-box;
       border: 1px solid #ffb3c1; /* Rosa claro para bordas */
       border-radius: 4px;
     }
+
+    .form-actions {
+        display: flex;
+        gap: 10px; /* Espaço entre os botões */
+        justify-content: flex-start;
+        margin-top: 15px;
+    }
+
     button.primary {
       background-color: #e91e63; /* Rosa mais escuro */
       color: white;
       border: none;
       cursor: pointer;
-      padding: 12px;
+      padding: 12px 20px; /* Padding horizontal maior */
       border-radius: 4px;
       font-weight: bold;
       width: auto;
+      transition: background-color 0.3s ease;
     }
+
     button.primary:hover {
       background-color: #c2185b; /* Tom de rosa mais escuro no hover */
     }
+
+    button.primary.cancel-button {
+        background-color: #ccc; /* Cor cinza para cancelar */
+        color: #333;
+    }
+    button.primary.cancel-button:hover {
+        background-color: #a0a0a0;
+    }
+
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 30px;
     }
+
     th, td {
       border: 1px solid #ffb3c1; /* Rosa claro para bordas da tabela */
       padding: 10px;
       text-align: left;
     }
+
     th {
       background-color: #e91e63; /* Rosa mais escuro */
       color: white;
     }
-    .table-wrapper { overflow-x: auto; }
+
+    .table-wrapper { 
+        overflow-x: auto; /* Permite scroll horizontal em tabelas grandes */
+        border-radius: 8px; /* Bordas arredondadas na tabela */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra suave */
+    }
+
     .action-buttons {
       display: flex;
-      gap: 5px;
+      gap: 8px; /* Espaçamento entre os botões de ação */
     }
+
     .action-buttons button {
       width: auto;
       padding: 8px 12px;
@@ -99,8 +151,9 @@
       border: 1px solid #e91e63;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
     .action-buttons button:hover {
         background-color: #e91e63;
         color: white;
@@ -168,9 +221,31 @@
     }
     .daily-summary {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajustado para 250px */
         gap: 20px;
         margin-top: 20px;
+    }
+
+    /* Responsividade para telas menores */
+    @media (max-width: 768px) {
+        nav {
+            flex-direction: column;
+            align-items: center;
+        }
+        nav button {
+            width: 90%;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        main {
+            padding: 10px;
+        }
+        .daily-summary {
+            grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
+        }
+        input, select, textarea {
+            font-size: 14px;
+        }
     }
   </style>
 </head>
@@ -194,87 +269,99 @@
     <section id="clientes" class="active">
       <h2>Cadastro de Clientes</h2>
       <form id="form-clientes">
-        <label>Nome:</label>
+        <label for="cliente-nome">Nome:</label>
         <input type="text" id="cliente-nome" required />
-        <label>Telefone:</label>
+        <label for="cliente-telefone">Telefone:</label>
         <input type="tel" id="cliente-telefone" />
-        <label>Observações:</label>
+        <label for="cliente-observacoes">Observações:</label>
         <textarea id="cliente-observacoes"></textarea>
-        <div id="cliente-form-actions">
+        <div class="form-actions">
             <button type="submit" class="primary" id="btn-submit-cliente">Salvar Cliente</button>
         </div>
       </form>
       <div class="table-wrapper">
-        <table id="tabela-clientes"><thead>
-          <tr><th>Nome</th><th>Telefone</th><th>Observações</th><th>Ações</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="tabela-clientes">
+            <thead>
+                <tr><th>Nome</th><th>Telefone</th><th>Observações</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="tabela-clientes-body"></tbody>
+        </table>
       </div>
     </section>
 
     <section id="agenda">
       <h2>Agenda de Pedidos</h2>
       <form id="form-agenda">
-        <label>Cliente:</label>
+        <label for="pedido-cliente">Cliente:</label>
         <input type="text" id="pedido-cliente" required />
-        <label>Data da Entrega:</label>
+        <label for="pedido-data">Data da Entrega:</label>
         <input type="date" id="pedido-data" required />
-        <label>Tipo de Bolo:</label>
+        <label for="pedido-tipo">Tipo de Bolo:</label>
         <input type="text" id="pedido-tipo" required />
-        <label>Tamanho:</label>
+        <label for="pedido-tamanho">Tamanho:</label>
         <select id="pedido-tamanho" required>
           <option value="">Selecione</option>
           <option>Pequeno</option>
           <option>Médio</option>
           <option>Grande</option>
         </select>
-        <label>Valor (R$):</label>
+        <label for="pedido-valor">Valor (R$):</label>
         <input type="number" id="pedido-valor" step="0.01" required />
-        <div id="pedido-form-actions">
+        <div class="form-actions">
             <button type="submit" class="primary" id="btn-submit-pedido">Adicionar Pedido</button>
         </div>
       </form>
       <div class="table-wrapper">
-        <table id="tabela-agenda"><thead>
-          <tr><th>Cliente</th><th>Data</th><th>Tipo</th><th>Tamanho</th><th>Valor</th><th>Ações</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="tabela-agenda">
+            <thead>
+                <tr><th>Cliente</th><th>Data</th><th>Tipo</th><th>Tamanho</th><th>Valor</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="tabela-agenda-body"></tbody>
+        </table>
       </div>
     </section>
 
     <section id="estoque">
       <h2>Estoque de Ingredientes</h2>
       <form id="form-estoque">
-        <label>Ingrediente:</label>
+        <label for="ingrediente-nome">Ingrediente:</label>
         <input type="text" id="ingrediente-nome" required />
-        <label>Quantidade:</label>
+        <label for="ingrediente-quantidade">Quantidade:</label>
         <input type="number" id="ingrediente-quantidade" required />
-        <div id="estoque-form-actions">
+        <div class="form-actions">
             <button type="submit" class="primary" id="btn-submit-estoque">Adicionar Ingrediente</button>
         </div>
       </form>
       <div class="table-wrapper">
-        <table id="tabela-estoque"><thead>
-          <tr><th>Ingrediente</th><th>Quantidade</th><th>Ações</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="tabela-estoque">
+            <thead>
+                <tr><th>Ingrediente</th><th>Quantidade</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="tabela-estoque-body"></tbody>
+        </table>
       </div>
     </section>
 
     <section id="gastos">
       <h2>Gastos com Produtos</h2>
       <form id="form-gastos">
-        <label>Produto Comprado:</label>
+        <label for="gasto-produto">Produto Comprado:</label>
         <input type="text" id="gasto-produto" required />
-        <label>Quantidade:</label>
+        <label for="gasto-quantidade">Quantidade:</label>
         <input type="number" id="gasto-quantidade" required />
-        <label>Valor Total (R$):</label>
+        <label for="gasto-valor">Valor Total (R$):</label>
         <input type="number" id="gasto-valor" step="0.01" required />
-        <div id="gasto-form-actions">
+        <div class="form-actions">
             <button type="submit" class="primary" id="btn-submit-gasto">Registrar Gasto</button>
         </div>
       </form>
       <div class="table-wrapper">
-        <table id="tabela-gastos"><thead>
-          <tr><th>Produto</th><th>Quantidade</th><th>Valor</th><th>Ações</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="tabela-gastos">
+            <thead>
+                <tr><th>Produto</th><th>Quantidade</th><th>Valor</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="tabela-gastos-body"></tbody>
+        </table>
       </div>
     </section>
 
@@ -305,121 +392,218 @@
   </main>
 
   <script>
-    const botoes = document.querySelectorAll("nav button");
+    /* --- JavaScript Inserido Aqui --- */
+
+    // --- Elementos DOM ---
+    const botoesNav = document.querySelectorAll("nav button");
     const secoes = document.querySelectorAll("main section");
     const splashScreen = document.getElementById("splash-screen");
 
-    // Adiciona um atraso para o splash screen
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        splashScreen.classList.add("fade-out");
-        document.body.style.overflow = "auto"; // Permite o scroll após o splash
-      }, 2000); // 2 segundos de exibição do splash
-    });
-
-    // Variáveis globais para controlar o modo de edição
+    // --- Variáveis de Estado (para edição) ---
     let editingItemIndex = -1;
     let editingStorageKey = ''; // 'clientes', 'agenda', 'estoque', 'gastos'
 
-    // Função genérica para alternar seções
-    botoes.forEach(botao => {
-      botao.addEventListener("click", () => {
-        botoes.forEach(b => b.classList.remove("active"));
+    // --- Mapeamentos para formulários (ID do campo no formulário) ---
+    const formMappings = {
+        clientes: {
+            formId: 'form-clientes',
+            tableBodyId: 'tabela-clientes-body',
+            submitBtnId: 'btn-submit-cliente',
+            formActionsId: 'cliente-form-actions',
+            itemSingularName: 'cliente',
+            inputMap: {
+                nome: 'cliente-nome',
+                telefone: 'cliente-telefone',
+                observacoes: 'cliente-observacoes'
+            }
+        },
+        agenda: {
+            formId: 'form-agenda',
+            tableBodyId: 'tabela-agenda-body',
+            submitBtnId: 'btn-submit-pedido',
+            formActionsId: 'pedido-form-actions',
+            itemSingularName: 'pedido',
+            inputMap: {
+                cliente: 'pedido-cliente',
+                data: 'pedido-data',
+                tipo: 'pedido-tipo',
+                tamanho: 'pedido-tamanho',
+                valor: 'pedido-valor'
+            }
+        },
+        estoque: {
+            formId: 'form-estoque',
+            tableBodyId: 'tabela-estoque-body',
+            submitBtnId: 'btn-submit-estoque',
+            formActionsId: 'estoque-form-actions',
+            itemSingularName: 'ingrediente',
+            inputMap: {
+                nome: 'ingrediente-nome',
+                quantidade: 'ingrediente-quantidade'
+            }
+        },
+        gastos: {
+            formId: 'form-gastos',
+            tableBodyId: 'tabela-gastos-body',
+            submitBtnId: 'btn-submit-gasto',
+            formActionsId: 'gasto-form-actions',
+            itemSingularName: 'gasto',
+            inputMap: {
+                produto: 'gasto-produto',
+                quantidade: 'gasto-quantidade',
+                valor: 'gasto-valor'
+            }
+        }
+    };
+
+    // --- Funções de Utilitários ---
+
+    // Formata valor para moeda BRL
+    const formatCurrency = (value) => {
+        return parseFloat(value).toFixed(2).replace('.', ',');
+    };
+
+    // Obtém dados do LocalStorage
+    const getLocalStorageData = (key) => {
+        return JSON.parse(localStorage.getItem(key) || "[]");
+    };
+
+    // Salva dados no LocalStorage
+    const setLocalStorageData = (key, data) => {
+        localStorage.setItem(key, JSON.stringify(data));
+    };
+
+    // --- Funções de UI/UX ---
+
+    // Exibe o splash screen e o esconde após um tempo
+    const setupSplashScreen = () => {
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                splashScreen.classList.add("fade-out");
+                document.body.style.overflow = "auto";
+            }, 2000);
+        });
+    };
+
+    // Alterna a seção ativa
+    const switchSection = (sectionId) => {
+        botoesNav.forEach(b => b.classList.remove("active"));
         secoes.forEach(s => s.classList.remove("active"));
-        botao.classList.add("active");
-        document.getElementById(botao.id.replace("btn-", "")).classList.add("active");
         
-        // Atualiza os dados financeiros e de vendas sempre que uma nova seção é ativada
+        const targetButton = document.getElementById(`btn-${sectionId}`);
+        const targetSection = document.getElementById(sectionId);
+
+        if (targetButton) targetButton.classList.add("active");
+        if (targetSection) targetSection.classList.add("active");
+        
+        // Atualiza resumos ao trocar de seção
         atualizarFinanceiro();
         atualizarVendasPeriodo();
-      });
-    });
+    };
 
-    // --- Funções Genéricas para CRUD (Create, Read, Update, Delete) ---
+    // --- Funções Genéricas de CRUD ---
 
-    // Função para carregar dados na tabela
-    function carregarDados(storageKey, tabelaBody, itemHtmlBuilder, resetFormCallback = null) {
-      const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      tabelaBody.innerHTML = "";
-      dados.forEach((item, i) => {
-        tabelaBody.innerHTML += itemHtmlBuilder(item, i);
-      });
-      if (resetFormCallback) resetFormCallback(); // Reseta o formulário após carregar
-    }
+    // Carrega dados e constrói a tabela
+    const carregarDados = (config) => {
+        const { storageKey, tableBodyId, itemHtmlBuilder } = config;
+        const dados = getLocalStorageData(storageKey);
+        const tableBody = document.getElementById(tableBodyId);
 
-    // Função para iniciar a edição
-    function editarItem(storageKey, index, formId, inputMapping, submitBtnId, formActionsId, itemSingularName) {
-        const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        if (tableBody) { // Garante que o elemento exista antes de tentar manipulá-lo
+            tableBody.innerHTML = "";
+            dados.forEach((item, i) => {
+                tableBody.innerHTML += itemHtmlBuilder(item, i);
+            });
+        }
+        resetForm(config); // Reseta o formulário após carregar
+    };
+
+    // Inicia o modo de edição
+    const editarItem = (storageKey, index) => {
+        const config = formMappings[storageKey];
+        if (!config) {
+            console.error('Configuração não encontrada para:', storageKey);
+            return;
+        }
+
+        const dados = getLocalStorageData(storageKey);
         const item = dados[index];
-        const formElement = document.getElementById(formId);
-        const submitButton = document.getElementById(submitBtnId);
-        const formActions = document.getElementById(formActionsId);
+        const submitButton = document.getElementById(config.submitBtnId);
+        const formActions = document.querySelector(`#${config.formId} .form-actions`); // Pega o div de ações dentro do formulário
 
         // Preenche o formulário
-        for (const key in inputMapping) {
-            const inputId = inputMapping[key];
-            if (document.getElementById(inputId)) {
-                document.getElementById(inputId).value = item[key];
+        for (const key in config.inputMap) {
+            const inputElement = document.getElementById(config.inputMap[key]);
+            if (inputElement) {
+                inputElement.value = item[key];
             }
         }
         
-        submitButton.textContent = `Atualizar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
-        submitButton.classList.add("edit-mode");
+        let submitButtonText = `Atualizar ${config.itemSingularName.charAt(0).toUpperCase() + config.itemSingularName.slice(1)}`;
+        if (config.itemSingularName === 'gasto') submitButtonText = "Atualizar Gasto"; 
+        if (config.itemSingularName === 'cliente') submitButtonText = "Salvar Alterações"; 
+        if (submitButton) {
+            submitButton.textContent = submitButtonText;
+            submitButton.classList.add("edit-mode");
+        }
         
         // Adiciona o botão de cancelar se não existir
-        const cancelButtonId = `btn-cancel-${formId.replace('form-', '')}`;
-        if (!document.getElementById(cancelButtonId)) {
+        const cancelButtonId = `btn-cancel-${config.formId.replace('form-', '')}`;
+        if (formActions && !document.getElementById(cancelButtonId)) {
             const cancelButton = document.createElement("button");
             cancelButton.textContent = "Cancelar";
             cancelButton.type = "button";
             cancelButton.id = cancelButtonId;
-            cancelButton.classList.add("primary"); 
-            cancelButton.style.backgroundColor = "#ccc"; 
-            cancelButton.style.marginLeft = "10px";
-            cancelButton.onclick = () => resetForm(formId, submitBtnId, formActionsId, itemSingularName);
+            cancelButton.classList.add("primary", "cancel-button"); 
+            cancelButton.onclick = () => resetForm(config);
             formActions.appendChild(cancelButton);
         }
 
         editingItemIndex = index; 
         editingStorageKey = storageKey;
-    }
+    };
 
-    // Função para resetar formulário e sair do modo de edição
-    function resetForm(formId, submitBtnId, formActionsId, itemSingularName) {
-        document.getElementById(formId).reset();
-        const submitButton = document.getElementById(submitBtnId);
-        let buttonText = `Adicionar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
-        if (itemSingularName === 'gasto') buttonText = "Registrar Gasto"; 
-        if (itemSingularName === 'cliente') buttonText = "Salvar Cliente"; 
-        submitButton.textContent = buttonText;
+    // Reseta o formulário e sai do modo de edição
+    const resetForm = (config) => {
+        const formElement = document.getElementById(config.formId);
+        if (formElement) formElement.reset();
+        
+        const submitButton = document.getElementById(config.submitBtnId);
+        let buttonText = `Adicionar ${config.itemSingularName.charAt(0).toUpperCase() + config.itemSingularName.slice(1)}`;
+        if (config.itemSingularName === 'gasto') buttonText = "Registrar Gasto"; 
+        if (config.itemSingularName === 'cliente') buttonText = "Salvar Cliente"; 
+        if (submitButton) {
+            submitButton.textContent = buttonText;
+            submitButton.classList.remove("edit-mode");
+        }
 
-        submitButton.classList.remove("edit-mode");
-        const cancelButton = document.getElementById(`btn-cancel-${formId.replace('form-', '')}`);
+        const cancelButton = document.getElementById(`btn-cancel-${config.formId.replace('form-', '')}`);
         if (cancelButton) {
             cancelButton.remove();
         }
         editingItemIndex = -1; 
         editingStorageKey = '';
-    }
-
-    // Função para excluir item
-    function excluirItem(chave, index, callback) {
-      const dados = JSON.parse(localStorage.getItem(chave) || "[]");
-      dados.splice(index, 1);
-      localStorage.setItem(chave, JSON.stringify(dados));
-      callback(); // Recarrega a tabela específica
-      atualizarFinanceiro(); // Atualiza financeiro
-      atualizarVendasPeriodo(); // Atualiza vendas do período
-    }
-
-    // --- Seção Clientes ---
-    const tabelaClientes = document.querySelector("#tabela-clientes tbody");
-    const formClientes = document.getElementById("form-clientes");
-    const clienteInputMap = {
-        nome: 'cliente-nome', 
-        telefone: 'cliente-telefone', 
-        observacoes: 'cliente-observacoes'
     };
+
+    // Exclui um item
+    const excluirItem = (storageKey, index) => {
+        const config = formMappings[storageKey];
+        if (!config) {
+            console.error('Configuração não encontrada para:', storageKey);
+            return;
+        }
+        const dados = getLocalStorageData(storageKey);
+        dados.splice(index, 1);
+        setLocalStorageData(storageKey, dados);
+        
+        carregarDados(config); // Recarrega a tabela específica
+        atualizarFinanceiro(); // Atualiza financeiro
+        atualizarVendasPeriodo(); // Atualiza vendas do período
+    };
+
+    // --- Funções Específicas de Conteúdo e Lógica ---
+
+    // Builders de HTML para as tabelas
     const clienteHtmlBuilder = (c, i) => `
         <tr>
             <td>${c.nome}</td>
@@ -427,165 +611,113 @@
             <td>${c.observacoes}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions', 'cliente')">Editar</button>
-                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente')))">Excluir</button>
+                    <button onclick="editarItem('clientes', ${i})">Editar</button>
+                    <button onclick="excluirItem('clientes', ${i})">Excluir</button>
                 </div>
             </td>
         </tr>`;
 
-    formClientes.onsubmit = e => {
-      e.preventDefault();
-      const nome = document.getElementById("cliente-nome").value;
-      const telefone = document.getElementById("cliente-telefone").value;
-      const observacoes = document.getElementById("cliente-observacoes").value;
-      let clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-
-      if (editingItemIndex !== -1 && editingStorageKey === 'clientes') {
-        clientes[editingItemIndex] = { nome, telefone, observacoes };
-      } else {
-        clientes.push({ nome, telefone, observacoes });
-      }
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-      carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
-    }
-
-    // --- Seção Agenda de Pedidos ---
-    const tabelaAgenda = document.querySelector("#tabela-agenda tbody");
-    const formAgenda = document.getElementById("form-agenda");
-    const pedidoInputMap = {
-        cliente: 'pedido-cliente',
-        data: 'pedido-data',
-        tipo: 'pedido-tipo',
-        tamanho: 'pedido-tamanho',
-        valor: 'pedido-valor'
-    };
     const pedidoHtmlBuilder = (a, i) => `
         <tr>
             <td>${a.cliente}</td>
             <td>${a.data}</td>
             <td>${a.tipo}</td>
             <td>${a.tamanho}</td>
-            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
+            <td>R$ ${formatCurrency(a.valor)}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions', 'pedido')">Editar</button>
-                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido')))">Excluir</button>
+                    <button onclick="editarItem('agenda', ${i})">Editar</button>
+                    <button onclick="excluirItem('agenda', ${i})">Excluir</button>
                 </div>
             </td>
         </tr>`;
 
-    formAgenda.onsubmit = e => {
-      e.preventDefault();
-      const a = {
-        cliente: document.getElementById("pedido-cliente").value,
-        data: document.getElementById("pedido-data").value,
-        tipo: document.getElementById("pedido-tipo").value,
-        tamanho: document.getElementById("pedido-tamanho").value,
-        valor: document.getElementById("pedido-valor").value
-      };
-      let agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-
-      if (editingItemIndex !== -1 && editingStorageKey === 'agenda') {
-        agenda[editingItemIndex] = a;
-      } else {
-        agenda.push(a);
-      }
-      localStorage.setItem("agenda", JSON.stringify(agenda));
-      carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
-      atualizarFinanceiro(); 
-      atualizarVendasPeriodo();
-    }
-
-    // --- Seção Estoque ---
-    const tabelaEstoque = document.querySelector("#tabela-estoque tbody");
-    const formEstoque = document.getElementById("form-estoque");
-    const estoqueInputMap = {
-        nome: 'ingrediente-nome', 
-        quantidade: 'ingrediente-quantidade'
-    };
     const ingredienteHtmlBuilder = (e, i) => `
         <tr>
             <td>${e.nome}</td>
             <td>${e.quantidade}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente')">Editar</button>
-                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente')))">Excluir</button>
+                    <button onclick="editarItem('estoque', ${i})">Editar</button>
+                    <button onclick="excluirItem('estoque', ${i})">Excluir</button>
                 </div>
             </td>
         </tr>`;
 
-    formEstoque.onsubmit = e => {
-      e.preventDefault();
-      const nome = document.getElementById("ingrediente-nome").value;
-      const quantidade = document.getElementById("ingrediente-quantidade").value;
-      let estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
-
-      if (editingItemIndex !== -1 && editingStorageKey === 'estoque') {
-        estoque[editingItemIndex] = { nome, quantidade };
-      } else {
-        estoque.push({ nome, quantidade });
-      }
-      localStorage.setItem("estoque", JSON.stringify(estoque));
-      carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
-    }
-
-    // --- Seção Gastos ---
-    const tabelaGastos = document.querySelector("#tabela-gastos tbody");
-    const formGastos = document.getElementById("form-gastos");
-    const gastoInputMap = {
-        produto: 'gasto-produto', 
-        quantidade: 'gasto-quantidade', 
-        valor: 'gasto-valor'
-    };
     const gastoHtmlBuilder = (g, i) => `
         <tr>
             <td>${g.produto}</td>
             <td>${g.quantidade}</td>
-            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+            <td>R$ ${formatCurrency(g.valor)}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions', 'gasto')">Editar</button>
-                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto')))">Excluir</button>
+                    <button onclick="editarItem('gastos', ${i})">Editar</button>
+                    <button onclick="excluirItem('gastos', ${i})">Excluir</button>
                 </div>
             </td>
         </tr>`;
 
-    formGastos.onsubmit = e => {
-      e.preventDefault();
-      const produto = document.getElementById("gasto-produto").value;
-      const quantidade = document.getElementById("gasto-quantidade").value;
-      const valor = document.getElementById("gasto-valor").value;
-      let gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+    // --- Configuração dos Formulários ---
+    const setupForm = (config) => {
+        const formElement = document.getElementById(config.formId);
+        if (!formElement) return; // Garante que o formulário exista
 
-      if (editingItemIndex !== -1 && editingStorageKey === 'gastos') {
-        gastos[editingItemIndex] = { produto, quantidade, valor };
-      } else {
-        gastos.push({ produto, quantidade, valor });
-      }
-      localStorage.setItem("gastos", JSON.stringify(gastos));
-      carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
-      atualizarFinanceiro(); 
-    }
+        formElement.onsubmit = (e) => {
+            e.preventDefault();
+            
+            let newItem = {};
+            for (const key in config.inputMap) {
+                const inputElement = document.getElementById(config.inputMap[key]);
+                if (inputElement) {
+                    newItem[key] = inputElement.value;
+                }
+            }
+            
+            // Validação básica para valores numéricos
+            if (newItem.valor !== undefined && isNaN(parseFloat(newItem.valor))) {
+                alert('Por favor, insira um valor numérico válido para o valor.');
+                return;
+            }
+            if (newItem.quantidade !== undefined && isNaN(parseInt(newItem.quantidade))) {
+                alert('Por favor, insira uma quantidade numérica válida.');
+                return;
+            }
 
-    // --- Seção Financeiro ---
-    function atualizarFinanceiro() {
-      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+            let data = getLocalStorageData(config.storageKey);
 
-      const ganhos = agenda.reduce((s, p) => s + parseFloat(p.valor || 0), 0);
-      const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor || 0), 0);
-      const lucro = ganhos - despesas;
+            if (editingItemIndex !== -1 && editingStorageKey === config.storageKey) {
+                data[editingItemIndex] = newItem;
+            } else {
+                data.push(newItem);
+            }
+            setLocalStorageData(config.storageKey, data);
+            
+            carregarDados(config); // Recarrega a tabela e reseta o formulário
+            atualizarFinanceiro(); // Atualiza painéis de resumo
+            atualizarVendasPeriodo();
+        };
+    };
 
-      document.getElementById("ganhos").textContent = ganhos.toFixed(2);
-      document.getElementById("gastos").textContent = despesas.toFixed(2);
-      document.getElementById("lucro").textContent = lucro.toFixed(2);
-    }
+    // --- Funções de Resumo ---
 
-    // --- Seção Vendas do Período ---
-    function atualizarVendasPeriodo() {
-        const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-        const hoje = new Date('2025-07-10T00:00:00'); // Usando a data atual fixa: 10 de julho de 2025
+    const atualizarFinanceiro = () => {
+        const agenda = getLocalStorageData("agenda");
+        const gastos = getLocalStorageData("gastos");
+
+        const ganhos = agenda.reduce((s, p) => s + parseFloat(p.valor || 0), 0);
+        const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor || 0), 0);
+        const lucro = ganhos - despesas;
+
+        document.getElementById("ganhos").textContent = formatCurrency(ganhos);
+        document.getElementById("gastos").textContent = formatCurrency(despesas);
+        document.getElementById("lucro").textContent = formatCurrency(lucro);
+    };
+
+    const atualizarVendasPeriodo = () => {
+        const agenda = getLocalStorageData("agenda");
+        // Usando a data atual fixa: 10 de julho de 2025 para consistência nos testes
+        // Para usar a data real do sistema, substitua por `new Date()`
+        const hoje = new Date('2025-07-10T00:00:00'); 
         hoje.setHours(0, 0, 0, 0); 
 
         // Vendas do Dia
@@ -597,7 +729,7 @@
             }
             return total;
         }, 0);
-        document.getElementById("vendas-dia").textContent = vendasDia.toFixed(2);
+        document.getElementById("vendas-dia").textContent = formatCurrency(vendasDia);
 
         // Vendas da Semana (Domingo a Sábado)
         const inicioSemana = new Date(hoje);
@@ -616,7 +748,7 @@
             }
             return total;
         }, 0);
-        document.getElementById("vendas-semana").textContent = vendasSemana.toFixed(2);
+        document.getElementById("vendas-semana").textContent = formatCurrency(vendasSemana);
 
         // Vendas do Mês
         const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -631,18 +763,38 @@
             }
             return total;
         }, 0);
-        document.getElementById("vendas-mes").textContent = vendasMes.toFixed(2);
-    }
+        document.getElementById("vendas-mes").textContent = formatCurrency(vendasMes);
+    };
 
+    // --- Inicialização ---
+    document.addEventListener("DOMContentLoaded", () => {
+        setupSplashScreen();
 
-    // --- Carregamento inicial de todas as seções e atualização dos resumos ---
-    carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
-    carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
-    carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
-    carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
-    
-    atualizarFinanceiro();
-    atualizarVendasPeriodo();
+        // Adiciona o evento de click aos botões de navegação
+        botoesNav.forEach(botao => {
+            botao.addEventListener("click", () => switchSection(botao.id.replace("btn-", "")));
+        });
+
+        // Anexa as funções genéricas ao objeto window para acesso global (onclick em HTML)
+        window.editarItem = editarItem;
+        window.excluirItem = excluirItem;
+
+        // Configura os formulários
+        setupForm({ ...formMappings.clientes, storageKey: 'clientes' });
+        setupForm({ ...formMappings.agenda, storageKey: 'agenda' });
+        setupForm({ ...formMappings.estoque, storageKey: 'estoque' });
+        setupForm({ ...formMappings.gastos, storageKey: 'gastos' });
+
+        // Inicia o carregamento dos dados para todas as tabelas
+        carregarDados({ ...formMappings.clientes, storageKey: 'clientes', itemHtmlBuilder: clienteHtmlBuilder });
+        carregarDados({ ...formMappings.agenda, storageKey: 'agenda', itemHtmlBuilder: pedidoHtmlBuilder });
+        carregarDados({ ...formMappings.estoque, storageKey: 'estoque', itemHtmlBuilder: ingredienteHtmlBuilder });
+        carregarDados({ ...formMappings.gastos, storageKey: 'gastos', itemHtmlBuilder: gastoHtmlBuilder });
+
+        // Atualiza os painéis de resumo
+        atualizarFinanceiro();
+        atualizarVendasPeriodo();
+    });
   </script>
 </body>
 </html>
