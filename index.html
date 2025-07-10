@@ -48,7 +48,7 @@
     }
     section { display: none; }
     section.active { display: block; }
-    input, select, textarea, button {
+    input, select, textarea {
       font-size: 16px;
       padding: 8px;
       margin: 5px 0 15px 0;
@@ -94,6 +94,16 @@
       padding: 8px 12px;
       margin: 0;
       font-size: 14px;
+      background-color: #f7a4b6; /* Rosa mais suave para botões de ação */
+      color: #333;
+      border: 1px solid #e91e63;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .action-buttons button:hover {
+        background-color: #e91e63;
+        color: white;
     }
 
     /* Estilos para o Splash Screen */
@@ -135,6 +145,33 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .info-card {
+        background-color: #fff;
+        border: 1px solid #ffb3c1;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .info-card h3 {
+        color: #e91e63;
+        margin-top: 0;
+        font-size: 1.2em;
+    }
+    .info-card p {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #c2185b;
+        margin: 5px 0;
+    }
+    .daily-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -151,6 +188,7 @@
     <button id="btn-estoque">Estoque</button>
     <button id="btn-gastos">Gastos com Produtos</button>
     <button id="btn-financeiro">Financeiro</button>
+    <button id="btn-vendas-diarias">Vendas do Período</button>
   </nav>
   <main>
     <section id="clientes" class="active">
@@ -162,7 +200,9 @@
         <input type="tel" id="cliente-telefone" />
         <label>Observações:</label>
         <textarea id="cliente-observacoes"></textarea>
-        <button type="submit" class="primary">Salvar Cliente</button>
+        <div id="cliente-form-actions">
+            <button type="submit" class="primary" id="btn-submit-cliente">Salvar Cliente</button>
+        </div>
       </form>
       <div class="table-wrapper">
         <table id="tabela-clientes"><thead>
@@ -189,7 +229,9 @@
         </select>
         <label>Valor (R$):</label>
         <input type="number" id="pedido-valor" step="0.01" required />
-        <button type="submit" class="primary">Adicionar Pedido</button>
+        <div id="pedido-form-actions">
+            <button type="submit" class="primary" id="btn-submit-pedido">Adicionar Pedido</button>
+        </div>
       </form>
       <div class="table-wrapper">
         <table id="tabela-agenda"><thead>
@@ -242,6 +284,24 @@
       <p><strong>Total de Gastos:</strong> R$ <span id="gastos">0.00</span></p>
       <p><strong>Lucro:</strong> R$ <span id="lucro">0.00</span></p>
     </section>
+
+    <section id="vendas-diarias">
+        <h2>Vendas do Período</h2>
+        <div class="daily-summary">
+            <div class="info-card">
+                <h3>Vendas do Dia</h3>
+                <p>R$ <span id="vendas-dia">0.00</span></p>
+            </div>
+            <div class="info-card">
+                <h3>Vendas da Semana</h3>
+                <p>R$ <span id="vendas-semana">0.00</span></p>
+            </div>
+            <div class="info-card">
+                <h3>Vendas do Mês</h3>
+                <p>R$ <span id="vendas-mes">0.00</span></p>
+            </div>
+        </div>
+    </section>
   </main>
 
   <script>
@@ -257,63 +317,146 @@
       }, 2000); // 2 segundos de exibição do splash
     });
 
+    // Variáveis globais para controlar o modo de edição
+    let editingItemIndex = -1;
+    let editingStorageKey = ''; // 'clientes', 'agenda', 'estoque', 'gastos'
+
+    // Função genérica para alternar seções
     botoes.forEach(botao => {
       botao.addEventListener("click", () => {
         botoes.forEach(b => b.classList.remove("active"));
         secoes.forEach(s => s.classList.remove("active"));
         botao.classList.add("active");
         document.getElementById(botao.id.replace("btn-", "")).classList.add("active");
+        
+        // Atualiza os dados financeiros e de vendas sempre que uma nova seção é ativada
         atualizarFinanceiro();
+        atualizarVendasPeriodo();
       });
     });
 
-    const formClientes = document.getElementById("form-clientes");
-    const tabelaClientes = document.querySelector("#tabela-clientes tbody");
+    // --- Funções Genéricas para CRUD (Create, Read, Update, Delete) ---
 
-    function carregarClientes() {
-      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-      tabelaClientes.innerHTML = "";
-      clientes.forEach((c, i) => {
-        tabelaClientes.innerHTML += `
-          <tr>
-            <td>${c.nome}</td>
-            <td>${c.telefone}</td>
-            <td>${c.observacoes}</td>
-            <td><div class="action-buttons"><button onclick="excluirItem('clientes', ${i}, carregarClientes)">Excluir</button></div></td>
-          </tr>`;
+    // Função para carregar dados na tabela
+    function carregarDados(storageKey, tabelaBody, itemHtmlBuilder, callback = null) {
+      const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      tabelaBody.innerHTML = "";
+      dados.forEach((item, i) => {
+        tabelaBody.innerHTML += itemHtmlBuilder(item, i);
       });
+      if (callback) callback(); // Reseta o formulário após carregar
     }
 
+    // Função para iniciar a edição
+    function editarItem(storageKey, index, formId, inputMapping, submitBtnId, formActionsId) {
+        const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        const item = dados[index];
+        const formElement = document.getElementById(formId);
+        const submitButton = document.getElementById(submitBtnId);
+        const formActions = document.getElementById(formActionsId);
+
+        // Preenche o formulário
+        for (const key in inputMapping) {
+            const inputId = inputMapping[key];
+            if (document.getElementById(inputId)) {
+                document.getElementById(inputId).value = item[key];
+            }
+        }
+        
+        submitButton.textContent = `Atualizar ${storageKey.slice(0, -1)}`; // Ex: Atualizar cliente
+        submitButton.classList.add("edit-mode");
+        
+        // Adiciona o botão de cancelar se não existir
+        const cancelButtonId = `btn-cancel-${formId.replace('form-', '')}`;
+        if (!document.getElementById(cancelButtonId)) {
+            const cancelButton = document.createElement("button");
+            cancelButton.textContent = "Cancelar";
+            cancelButton.type = "button";
+            cancelButton.id = cancelButtonId;
+            cancelButton.classList.add("primary"); 
+            cancelButton.style.backgroundColor = "#ccc"; 
+            cancelButton.style.marginLeft = "10px";
+            cancelButton.onclick = () => resetForm(formId, submitBtnId, formActionsId, storageKey.slice(0, -1));
+            formActions.appendChild(cancelButton);
+        }
+
+        editingItemIndex = index; 
+        editingStorageKey = storageKey;
+    }
+
+    // Função para resetar formulário e sair do modo de edição
+    function resetForm(formId, submitBtnId, formActionsId, itemSingularName) {
+        document.getElementById(formId).reset();
+        const submitButton = document.getElementById(submitBtnId);
+        submitButton.textContent = `Adicionar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
+        if (itemSingularName === 'gasto') submitButton.textContent = "Registrar Gasto"; // Exceção para "Registrar Gasto"
+        if (itemSingularName === 'cliente') submitButton.textContent = "Salvar Cliente"; // Exceção para "Salvar Cliente"
+
+        submitButton.classList.remove("edit-mode");
+        const cancelButton = document.getElementById(`btn-cancel-${formId.replace('form-', '')}`);
+        if (cancelButton) {
+            cancelButton.remove();
+        }
+        editingItemIndex = -1; 
+        editingStorageKey = '';
+    }
+
+    // Função para excluir item
+    function excluirItem(chave, index, callback) {
+      const dados = JSON.parse(localStorage.getItem(chave) || "[]");
+      dados.splice(index, 1);
+      localStorage.setItem(chave, JSON.stringify(dados));
+      callback(); // Recarrega a tabela específica
+      atualizarFinanceiro(); // Atualiza financeiro
+      atualizarVendasPeriodo(); // Atualiza vendas do período
+    }
+
+    // --- Seção Clientes ---
+    const tabelaClientes = document.querySelector("#tabela-clientes tbody");
+    const formClientes = document.getElementById("form-clientes");
+    const clienteInputMap = {
+        nome: 'cliente-nome', 
+        telefone: 'cliente-telefone', 
+        observacoes: 'cliente-observacoes'
+    };
     formClientes.onsubmit = e => {
       e.preventDefault();
       const nome = document.getElementById("cliente-nome").value;
       const telefone = document.getElementById("cliente-telefone").value;
       const observacoes = document.getElementById("cliente-observacoes").value;
-      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-      clientes.push({ nome, telefone, observacoes });
+      let clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+
+      if (editingItemIndex !== -1 && editingStorageKey === 'clientes') {
+        clientes[editingItemIndex] = { nome, telefone, observacoes };
+      } else {
+        clientes.push({ nome, telefone, observacoes });
+      }
       localStorage.setItem("clientes", JSON.stringify(clientes));
-      formClientes.reset(); carregarClientes();
-    }
-
-    const formAgenda = document.getElementById("form-agenda");
-    const tabelaAgenda = document.querySelector("#tabela-agenda tbody");
-
-    function carregarAgenda() {
-      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-      tabelaAgenda.innerHTML = "";
-      agenda.forEach((a, i) => {
-        tabelaAgenda.innerHTML += `
+      carregarDados('clientes', tabelaClientes, (c, i) => `
           <tr>
-            <td>${a.cliente}</td>
-            <td>${a.data}</td>
-            <td>${a.tipo}</td>
-            <td>${a.tamanho}</td>
-            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
-            <td><div class="action-buttons"><button onclick="excluirItem('agenda', ${i}, carregarAgenda)">Excluir</button></div></td>
-          </tr>`;
-      });
+            <td>${c.nome}</td>
+            <td>${c.telefone}</td>
+            <td>${c.observacoes}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions')">Editar</button>
+                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, (c, i) => this.innerHTML))">Excluir</button>
+                </div>
+            </td>
+          </tr>`
+      , () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
     }
 
+    // --- Seção Agenda de Pedidos ---
+    const tabelaAgenda = document.querySelector("#tabela-agenda tbody");
+    const formAgenda = document.getElementById("form-agenda");
+    const pedidoInputMap = {
+        cliente: 'pedido-cliente',
+        data: 'pedido-data',
+        tipo: 'pedido-tipo',
+        tamanho: 'pedido-tamanho',
+        valor: 'pedido-valor'
+    };
     formAgenda.onsubmit = e => {
       e.preventDefault();
       const a = {
@@ -323,155 +466,72 @@
         tamanho: document.getElementById("pedido-tamanho").value,
         valor: document.getElementById("pedido-valor").value
       };
-      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-      agenda.push(a);
+      let agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+
+      if (editingItemIndex !== -1 && editingStorageKey === 'agenda') {
+        agenda[editingItemIndex] = a;
+      } else {
+        agenda.push(a);
+      }
       localStorage.setItem("agenda", JSON.stringify(agenda));
-      formAgenda.reset(); carregarAgenda();
-      atualizarFinanceiro(); // Atualiza financeiro ao adicionar pedido
-    }
-
-    const formEstoque = document.getElementById("form-estoque");
-    const tabelaEstoque = document.querySelector("#tabela-estoque tbody");
-    const btnSubmitEstoque = document.getElementById("btn-submit-estoque");
-    const estoqueFormActions = document.getElementById("estoque-form-actions");
-    let editingEstoqueIndex = -1; // Variável para controlar qual item do estoque está sendo editado
-
-    function carregarEstoque() {
-      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
-      tabelaEstoque.innerHTML = "";
-      estoque.forEach((e, i) => {
-        tabelaEstoque.innerHTML += `
+      carregarDados('agenda', tabelaAgenda, (a, i) => `
           <tr>
-            <td>${e.nome}</td>
-            <td>${e.quantidade}</td>
+            <td>${a.cliente}</td>
+            <td>${a.data}</td>
+            <td>${a.tipo}</td>
+            <td>${a.tamanho}</td>
+            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarEstoque(${i})">Editar</button>
-                    <button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button>
+                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions')">Editar</button>
+                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, (a, i) => this.innerHTML))">Excluir</button>
                 </div>
             </td>
-          </tr>`;
-      });
-      resetEstoqueForm(); // Garante que o formulário esteja no modo de adição ao carregar
+          </tr>`
+      , () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
     }
 
-    function editarEstoque(index) {
-      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
-      const ingrediente = estoque[index];
-      
-      document.getElementById("ingrediente-nome").value = ingrediente.nome;
-      document.getElementById("ingrediente-quantidade").value = ingrediente.quantidade;
-      
-      btnSubmitEstoque.textContent = "Atualizar Ingrediente";
-      btnSubmitEstoque.classList.add("edit-mode"); 
-      
-      if (!document.getElementById("btn-cancel-estoque")) {
-          const cancelButton = document.createElement("button");
-          cancelButton.textContent = "Cancelar";
-          cancelButton.type = "button";
-          cancelButton.id = "btn-cancel-estoque";
-          cancelButton.classList.add("primary"); 
-          cancelButton.style.backgroundColor = "#ccc"; 
-          cancelButton.style.marginLeft = "10px";
-          cancelButton.onclick = resetEstoqueForm;
-          estoqueFormActions.appendChild(cancelButton);
-      }
-
-      editingEstoqueIndex = index; 
-    }
-
-    function resetEstoqueForm() {
-        formEstoque.reset();
-        btnSubmitEstoque.textContent = "Adicionar Ingrediente";
-        btnSubmitEstoque.classList.remove("edit-mode");
-        const cancelButton = document.getElementById("btn-cancel-estoque");
-        if (cancelButton) {
-            cancelButton.remove();
-        }
-        editingEstoqueIndex = -1; 
-    }
-
+    // --- Seção Estoque ---
+    const tabelaEstoque = document.querySelector("#tabela-estoque tbody");
+    const formEstoque = document.getElementById("form-estoque");
+    const estoqueInputMap = {
+        nome: 'ingrediente-nome', 
+        quantidade: 'ingrediente-quantidade'
+    };
     formEstoque.onsubmit = e => {
       e.preventDefault();
       const nome = document.getElementById("ingrediente-nome").value;
       const quantidade = document.getElementById("ingrediente-quantidade").value;
       let estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
 
-      if (editingEstoqueIndex !== -1) {
-        // Modo de edição
-        estoque[editingEstoqueIndex] = { nome, quantidade };
+      if (editingItemIndex !== -1 && editingStorageKey === 'estoque') {
+        estoque[editingItemIndex] = { nome, quantidade };
       } else {
-        // Modo de adição
         estoque.push({ nome, quantidade });
       }
-      
       localStorage.setItem("estoque", JSON.stringify(estoque));
-      carregarEstoque(); 
-    }
-
-    const formGastos = document.getElementById("form-gastos");
-    const tabelaGastos = document.querySelector("#tabela-gastos tbody");
-    const btnSubmitGasto = document.getElementById("btn-submit-gasto");
-    const gastoFormActions = document.getElementById("gasto-form-actions");
-    let editingGastoIndex = -1; // Variável para controlar qual item está sendo editado
-
-    function carregarGastos() {
-      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
-      tabelaGastos.innerHTML = "";
-      gastos.forEach((g, i) => {
-        tabelaGastos.innerHTML += `
+      carregarDados('estoque', tabelaEstoque, (e, i) => `
           <tr>
-            <td>${g.produto}</td>
-            <td>${g.quantidade}</td>
-            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+            <td>${e.nome}</td>
+            <td>${e.quantidade}</td>
             <td>
                 <div class="action-buttons">
-                    <button onclick="editarGasto(${i})">Editar</button>
-                    <button onclick="excluirItem('gastos', ${i}, carregarGastos)">Excluir</button>
+                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions')">Editar</button>
+                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, (e, i) => this.innerHTML))">Excluir</button>
                 </div>
             </td>
-          </tr>`;
-      });
-      resetGastoForm(); // Garante que o formulário esteja no modo de adição ao carregar
+          </tr>`
+      , () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
     }
 
-    function editarGasto(index) {
-      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
-      const gasto = gastos[index];
-      
-      document.getElementById("gasto-produto").value = gasto.produto;
-      document.getElementById("gasto-quantidade").value = gasto.quantidade;
-      document.getElementById("gasto-valor").value = gasto.valor;
-      
-      btnSubmitGasto.textContent = "Atualizar Gasto";
-      btnSubmitGasto.classList.add("edit-mode"); 
-      
-      if (!document.getElementById("btn-cancel-gasto")) {
-          const cancelButton = document.createElement("button");
-          cancelButton.textContent = "Cancelar";
-          cancelButton.type = "button";
-          cancelButton.id = "btn-cancel-gasto";
-          cancelButton.classList.add("primary"); 
-          cancelButton.style.backgroundColor = "#ccc"; 
-          cancelButton.style.marginLeft = "10px";
-          cancelButton.onclick = resetGastoForm;
-          gastoFormActions.appendChild(cancelButton);
-      }
-
-      editingGastoIndex = index; 
-    }
-
-    function resetGastoForm() {
-        formGastos.reset();
-        btnSubmitGasto.textContent = "Registrar Gasto";
-        btnSubmitGasto.classList.remove("edit-mode");
-        const cancelButton = document.getElementById("btn-cancel-gasto");
-        if (cancelButton) {
-            cancelButton.remove();
-        }
-        editingGastoIndex = -1; 
-    }
-
+    // --- Seção Gastos ---
+    const tabelaGastos = document.querySelector("#tabela-gastos tbody");
+    const formGastos = document.getElementById("form-gastos");
+    const gastoInputMap = {
+        produto: 'gasto-produto', 
+        quantidade: 'gasto-quantidade', 
+        valor: 'gasto-valor'
+    };
     formGastos.onsubmit = e => {
       e.preventDefault();
       const produto = document.getElementById("gasto-produto").value;
@@ -479,19 +539,28 @@
       const valor = document.getElementById("gasto-valor").value;
       let gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
 
-      if (editingGastoIndex !== -1) {
-        // Modo de edição
-        gastos[editingGastoIndex] = { produto, quantidade, valor };
+      if (editingItemIndex !== -1 && editingStorageKey === 'gastos') {
+        gastos[editingItemIndex] = { produto, quantidade, valor };
       } else {
-        // Modo de adição
         gastos.push({ produto, quantidade, valor });
       }
-      
       localStorage.setItem("gastos", JSON.stringify(gastos));
-      carregarGastos(); 
-      atualizarFinanceiro(); // Atualiza financeiro ao adicionar/editar gasto
+      carregarDados('gastos', tabelaGastos, (g, i) => `
+          <tr>
+            <td>${g.produto}</td>
+            <td>${g.quantidade}</td>
+            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions')">Editar</button>
+                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, (g, i) => this.innerHTML))">Excluir</button>
+                </div>
+            </td>
+          </tr>`
+      , () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
     }
 
+    // --- Seção Financeiro ---
     function atualizarFinanceiro() {
       const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
       const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
@@ -500,28 +569,130 @@
       const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor || 0), 0);
       const lucro = ganhos - despesas;
 
-      const ganhosFormatados = isNaN(ganhos) ? 0 : ganhos;
-      const despesasFormatadas = isNaN(despesas) ? 0 : despesas;
-      const lucroFormatado = isNaN(lucro) ? 0 : lucro;
-
-      document.getElementById("ganhos").textContent = ganhosFormatados.toFixed(2);
-      document.getElementById("gastos").textContent = despesasFormatadas.toFixed(2);
-      document.getElementById("lucro").textContent = lucroFormatado.toFixed(2);
+      document.getElementById("ganhos").textContent = ganhos.toFixed(2);
+      document.getElementById("gastos").textContent = despesas.toFixed(2);
+      document.getElementById("lucro").textContent = lucro.toFixed(2);
     }
 
-    function excluirItem(chave, index, callback) {
-      const dados = JSON.parse(localStorage.getItem(chave) || "[]");
-      dados.splice(index, 1);
-      localStorage.setItem(chave, JSON.stringify(dados));
-      callback();
-      atualizarFinanceiro();
+    // --- Seção Vendas do Período ---
+    function atualizarVendasPeriodo() {
+        const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0); // Zera hora para comparação de data
+
+        // Vendas do Dia
+        const vendasDia = agenda.reduce((total, pedido) => {
+            const dataPedido = new Date(pedido.data + 'T00:00:00'); // Adiciona T00:00:00 para evitar problemas de fuso horário
+            dataPedido.setHours(0, 0, 0, 0);
+            if (dataPedido.getTime() === hoje.getTime()) {
+                return total + parseFloat(pedido.valor || 0);
+            }
+            return total;
+        }, 0);
+        document.getElementById("vendas-dia").textContent = vendasDia.toFixed(2);
+
+        // Vendas da Semana (Domingo a Sábado)
+        const inicioSemana = new Date(hoje);
+        inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Define para o último domingo
+        inicioSemana.setHours(0, 0, 0, 0);
+
+        const fimSemana = new Date(inicioSemana);
+        fimSemana.setDate(inicioSemana.getDate() + 6); // Define para o próximo sábado
+        fimSemana.setHours(23, 59, 59, 999);
+
+        const vendasSemana = agenda.reduce((total, pedido) => {
+            const dataPedido = new Date(pedido.data + 'T00:00:00');
+            dataPedido.setHours(0, 0, 0, 0);
+            if (dataPedido >= inicioSemana && dataPedido <= fimSemana) {
+                return total + parseFloat(pedido.valor || 0);
+            }
+            return total;
+        }, 0);
+        document.getElementById("vendas-semana").textContent = vendasSemana.toFixed(2);
+
+        // Vendas do Mês
+        const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0); // Último dia do mês
+        fimMes.setHours(23, 59, 59, 999);
+
+        const vendasMes = agenda.reduce((total, pedido) => {
+            const dataPedido = new Date(pedido.data + 'T00:00:00');
+            dataPedido.setHours(0, 0, 0, 0);
+            if (dataPedido >= inicioMes && dataPedido <= fimMes) {
+                return total + parseFloat(pedido.valor || 0);
+            }
+            return total;
+        }, 0);
+        document.getElementById("vendas-mes").textContent = vendasMes.toFixed(2);
     }
 
-    carregarClientes();
-    carregarAgenda();
-    carregarEstoque(); 
-    carregarGastos(); 
+
+    // --- Carregamento inicial de todas as seções e atualização dos resumos ---
+    // A função carregarDados agora precisa do builder de HTML para cada item.
+    // O ideal seria criar esses builders como funções separadas.
+
+    // Builders de HTML para carregarDados
+    const clienteHtmlBuilder = (c, i) => `
+        <tr>
+            <td>${c.nome}</td>
+            <td>${c.telefone}</td>
+            <td>${c.observacoes}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions')">Editar</button>
+                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, clienteHtmlBuilder))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
+    const pedidoHtmlBuilder = (a, i) => `
+        <tr>
+            <td>${a.cliente}</td>
+            <td>${a.data}</td>
+            <td>${a.tipo}</td>
+            <td>${a.tamanho}</td>
+            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions')">Editar</button>
+                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
+    const ingredienteHtmlBuilder = (e, i) => `
+        <tr>
+            <td>${e.nome}</td>
+            <td>${e.quantidade}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions')">Editar</button>
+                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
+    const gastoHtmlBuilder = (g, i) => `
+        <tr>
+            <td>${g.produto}</td>
+            <td>${g.quantidade}</td>
+            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions')">Editar</button>
+                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, gastoHtmlBuilder))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
+    // Carregamento inicial
+    carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
+    carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
+    carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
+    carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
+    
     atualizarFinanceiro();
+    atualizarVendasPeriodo();
   </script>
 </body>
 </html>
