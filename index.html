@@ -115,13 +115,13 @@
             background: #fff;
             border-radius: 15px;
             padding: 25px;
-            width: 300px; /* Aumentei um pouco */
+            width: 300px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            display: flex; /* Para centralizar conteúdo */
+            display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Espaça o botão do título */
+            justify-content: space-between;
         }
 
         .icon-card:hover {
@@ -130,24 +130,24 @@
         }
 
         .icon-card .material-icons {
-            font-size: 52px; /* Aumentei o ícone */
+            font-size: 52px;
             color: #DAA520;
             margin-bottom: 15px;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .icon-card h2 {
-            font-size: 1.6em; /* Aumentei o título */
-            margin: 10px 0 20px; /* Mais espaço abaixo do título */
+            font-size: 1.6em;
+            margin: 10px 0 20px;
             color: #333;
         }
 
         .open-btn {
-            background: linear-gradient(45deg, #DAA520, #B8860B); /* Gradiente para botões de abrir */
+            background: linear-gradient(45deg, #DAA520, #B8860B);
             color: #fff;
             border: none;
-            padding: 10px 25px; /* Mais padding */
-            border-radius: 25px; /* Mais arredondado */
+            padding: 10px 25px;
+            border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s ease, transform 0.2s ease;
@@ -160,9 +160,9 @@
         }
 
         .icon-content {
-            display: none; /* Conteúdo das seções inicia oculto */
+            display: none;
             text-align: left;
-            margin-top: 20px; /* Mais espaço */
+            margin-top: 20px;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
@@ -178,14 +178,15 @@
         }
 
         .icon-content input,
-        .icon-content select {
-            width: calc(100% - 20px); /* Ajuste para padding */
+        .icon-content select,
+        .icon-content textarea {
+            width: calc(100% - 20px);
             padding: 10px;
-            margin-bottom: 15px; /* Mais espaço */
-            border-radius: 8px; /* Mais arredondado */
+            margin-bottom: 15px;
+            border-radius: 8px;
             border: 1px solid #ddd;
             font-size: 0.98em;
-            box-sizing: border-box; /* Inclui padding na largura */
+            box-sizing: border-box;
         }
 
         .icon-content button {
@@ -197,18 +198,18 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s ease;
-            width: auto; /* Permite que o botão se ajuste ao conteúdo */
-            margin-right: 10px; /* Espaço entre botões */
+            width: auto;
+            margin-right: 10px;
         }
 
         .icon-content button:hover {
             background: #333;
         }
 
-        .icon-content .btn-action { /* Botões específicos de ação no form */
+        .icon-content .btn-action {
             width: 100%;
             margin-top: 15px;
-            background: #DAA520; /* Cor primária para ações principais */
+            background: #DAA520;
             color: #fff;
             font-size: 1.1em;
             padding: 12px;
@@ -217,19 +218,18 @@
             background: #B8860B;
         }
 
-
         /* Estilo para botões de ação na lista (Editar/Excluir) */
         .list-actions button {
             width: auto;
-            padding: 6px 12px; /* Aumentei padding */
-            margin-left: 8px; /* Mais espaço */
+            padding: 6px 12px;
+            margin-left: 8px;
             font-size: 0.88em;
             border-radius: 6px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .list-actions .edit-btn {
-            background-color: #007bff; /* Azul */
+            background-color: #007bff;
         }
 
         .list-actions .edit-btn:hover {
@@ -237,7 +237,7 @@
         }
 
         .list-actions .delete-btn {
-            background-color: #dc3545; /* Vermelho */
+            background-color: #dc3545;
         }
 
         .list-actions .delete-btn:hover {
@@ -245,16 +245,16 @@
         }
 
         .list-fake {
-            padding-left: 0; /* Remover padding padrão da UL */
+            padding-left: 0;
             color: #444;
-            list-style: none; /* Remove bullet points padrão */
+            list-style: none;
             margin-top: 20px;
         }
 
         .list-fake li {
             background-color: #f5f5f5;
-            margin-bottom: 8px; /* Mais espaço entre itens */
-            padding: 10px; /* Mais padding */
+            margin-bottom: 8px;
+            padding: 10px;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
@@ -275,11 +275,11 @@
         }
         .search-container input {
             flex-grow: 1;
-            margin-bottom: 0; /* Remove margin do input base */
+            margin-bottom: 0;
         }
         .search-container button {
             width: auto;
-            background: #4CAF50; /* Verde para busca */
+            background: #4CAF50;
             color: white;
             padding: 10px 15px;
             border-radius: 8px;
@@ -288,24 +288,49 @@
             background: #45a049;
         }
 
-        /* Relatórios Financeiros */
-        #financeiro-relatorio-output {
-            margin-top: 20px;
+        /* Relatórios Financeiros e Metas */
+        .finance-section-group {
+            margin-bottom: 20px;
             padding: 15px;
-            background-color: #f0f8ff; /* Azul claro */
+            background-color: #f0f8ff;
             border-left: 5px solid #DAA520;
             border-radius: 8px;
             text-align: left;
-            font-size: 1.1em;
-            line-height: 1.6;
         }
-        #financeiro-relatorio-output p {
+        .finance-section-group h4 {
+            margin-top: 0;
+            color: #555;
+        }
+        .finance-section-group p {
             margin: 5px 0;
             color: #333;
+            font-size: 1em;
         }
-        #financeiro-relatorio-output strong {
+        .finance-section-group strong {
             color: #DAA520;
         }
+        .finance-section-group input {
+            margin-bottom: 5px; /* Menos margem entre inputs de valor */
+        }
+        .finance-section-group .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            height: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .finance-section-group .progress-bar {
+            height: 100%;
+            background-color: #4CAF50; /* Verde para progresso */
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        .finance-section-group .progress-bar.red {
+            background-color: #dc3545; /* Vermelho para deficit */
+        }
+
 
         /* Estilo para exportação */
         .export-buttons {
@@ -316,7 +341,7 @@
             flex-wrap: wrap;
         }
         .export-buttons button {
-            background: #6c757d; /* Cinza para exportação */
+            background: #6c757d;
             color: #fff;
             padding: 10px 20px;
             border-radius: 8px;
@@ -324,6 +349,56 @@
         }
         .export-buttons button:hover {
             background: #5a6268;
+        }
+
+        /* Notificações no Dashboard */
+        #dashboard-notifications {
+            background-color: #fff3cd; /* Amarelo claro para avisos */
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            color: #664d03;
+            text-align: left;
+        }
+        #dashboard-notifications ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #dashboard-notifications li {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+        }
+        #dashboard-notifications li .material-icons {
+            margin-right: 8px;
+            color: #DAA520; /* Ícone dourado */
+        }
+        #dashboard-notifications p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .notification-item {
+            background-color: #e6ffe6; /* Fundo verde claro para agendamento */
+            border: 1px solid #c3e6cb;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        /* Sugestão Inteligente */
+        #sugestao-inteligente {
+            background-color: #e0f2f7; /* Azul claro */
+            border-left: 5px solid #2196F3;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #3f51b5;
+            font-size: 0.9em;
         }
 
         @media (max-width: 768px) {
@@ -354,12 +429,21 @@
 
             .icon-content input,
             .icon-content select,
+            .icon-content textarea,
             .icon-content button {
                 width: 100%;
+                margin-right: 0;
             }
             .list-actions button {
                 padding: 4px 8px;
                 font-size: 0.8em;
+            }
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-container button {
+                width: 100%;
             }
         }
     </style>
@@ -376,6 +460,12 @@
         <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
         <p>Explore as funcionalidades abaixo:</p>
 
+        <div id="dashboard-notifications" style="display: none;">
+            <p>Avisos Importantes:</p>
+            <ul id="notifications-list">
+                </ul>
+        </div>
+
         <section id="dashboard-icons">
 
             <div class="icon-card">
@@ -385,14 +475,17 @@
                 <div class="icon-content" id="cliente-section">
                     <h3>Cadastrar/Atualizar Cliente</h3>
                     <input type="hidden" id="cliente-id-edit">
-                    <input type="text" id="cliente-nome" placeholder="Nome Completo">
+                    <input type="text" id="cliente-nome" placeholder="Nome Completo" list="clientes-datalist">
+                    <datalist id="clientes-datalist"></datalist>
                     <input type="text" id="cliente-telefone" placeholder="Telefone">
                     <input type="email" id="cliente-email" placeholder="E-mail">
+                    <textarea id="cliente-historico-servicos" placeholder="Histórico de Serviços Realizados"></textarea>
+                    <textarea id="cliente-observacoes" placeholder="Observações/Preferências do Cliente"></textarea>
                     <button id="btn-salvar-cliente" class="btn-action">Salvar Cliente</button>
                     <hr />
                     <h3>Lista de Clientes</h3>
                     <div class="search-container">
-                        <input type="text" id="search-cliente" placeholder="Buscar cliente por nome...">
+                        <input type="text" id="search-cliente" placeholder="Buscar cliente por nome/telefone...">
                         <button id="btn-search-cliente">Buscar</button>
                     </div>
                     <ul id="lista-clientes" class="list-fake">
@@ -410,7 +503,8 @@
                 <div class="icon-content" id="agenda-section">
                     <h3>Novo Agendamento</h3>
                     <input type="hidden" id="agenda-id-edit">
-                    <input type="text" id="agenda-cliente-nome" placeholder="Nome do Cliente">
+                    <input type="text" id="agenda-cliente-nome" placeholder="Nome do Cliente" list="clientes-agendamento-datalist">
+                    <datalist id="clientes-agendamento-datalist"></datalist>
                     <input type="datetime-local" id="agenda-data-hora">
                     <select id="agenda-servico">
                         <option value="">Selecione um Serviço</option>
@@ -421,8 +515,21 @@
                         <option value="Manicure">Manicure</option>
                         <option value="Pedicure">Pedicure</option>
                         <option value="Sobrancelha">Sobrancelha</option>
+                        <option value="Outro">Outro (especifique nas observações)</option>
                     </select>
+                    <div id="sugestao-inteligente" style="display:none;">
+                        <p>Sugestão para este cliente: <span id="sugestao-texto"></span></p>
+                    </div>
+                    <textarea id="agenda-observacoes" placeholder="Observações sobre o agendamento"></textarea>
                     <button id="btn-salvar-agendamento" class="btn-action">Salvar Agendamento</button>
+                    <hr />
+                    <h3>Notificação de Agendamento para o Cliente</h3>
+                    <div class="finance-section-group">
+                        <h4>Gerar Mensagem para Envio Manual</h4>
+                        <textarea id="agendamento-mensagem-pronta" rows="4" readonly style="width: 100%; resize: vertical;"></textarea>
+                        <button onclick="copiarMensagemAgendamento()">Copiar Mensagem</button>
+                        <p style="font-size: 0.85em; color: #666; margin-top: 10px;">Copie a mensagem acima e cole no WhatsApp/SMS para o cliente.</p>
+                    </div>
                     <hr />
                     <h3>Próximos Agendamentos</h3>
                     <div class="search-container">
@@ -453,20 +560,44 @@
                     <input type="number" id="financeiro-valor" placeholder="Valor R$">
                     <button id="btn-salvar-transacao" class="btn-action">Salvar Transação</button>
                     <hr />
-                    <h3>Balanço Mensal</h3>
-                    <p>Entradas: <span id="total-entradas">R$ 0,00</span></p>
-                    <p>Saídas: <span id="total-saidas">R$ 0,00</span></p>
-                    <p>Saldo: <span id="saldo-total">R$ 0,00</span></p>
+                    <div class="finance-section-group">
+                        <h4>Balanço Atual</h4>
+                        <p>Entradas: <span id="total-entradas">R$ 0,00</span></p>
+                        <p>Saídas: <span id="total-saidas">R$ 0,00</span></p>
+                        <p>Saldo: <span id="saldo-total">R$ 0,00</span></p>
+                    </div>
                     <hr />
-                    <h3>Relatórios Financeiros</h3>
-                    <select id="financeiro-relatorio-tipo">
-                        <option value="todos">Todas as Transações</option>
-                        <option value="entradas">Apenas Entradas</option>
-                        <option value="saidas">Apenas Saídas</option>
-                    </select>
-                    <button id="btn-gerar-relatorio">Gerar Relatório</button>
-                    <div id="financeiro-relatorio-output">
-                        <p>Selecione uma opção e clique em "Gerar Relatório".</p>
+                    <div class="finance-section-group">
+                        <h4>Metas Financeiras do Mês</h4>
+                        <label for="meta-entrada">Meta de Entrada (R$):</label>
+                        <input type="number" id="meta-entrada" placeholder="Ex: 5000">
+                        <label for="meta-saida">Meta de Saída (R$):</label>
+                        <input type="number" id="meta-saida" placeholder="Ex: 2000">
+                        <button id="btn-salvar-metas">Salvar Metas</button>
+                        <p>Progresso Entrada: <span id="progresso-entrada-valor">R$ 0,00</span> de <span id="meta-entrada-valor">R$ 0,00</span></p>
+                        <div class="progress-bar-container"><div id="progress-bar-entrada" class="progress-bar"></div></div>
+                        <p>Progresso Saída: <span id="progresso-saida-valor">R$ 0,00</span> de <span id="meta-saida-valor">R$ 0,00</span></p>
+                        <div class="progress-bar-container"><div id="progress-bar-saida" class="progress-bar"></div></div>
+                    </div>
+                    <hr />
+                    <div class="finance-section-group">
+                        <h4>Relatórios por Período</h4>
+                        <label for="relatorio-data-inicio">Data Início:</label>
+                        <input type="date" id="relatorio-data-inicio">
+                        <label for="relatorio-data-fim">Data Fim:</label>
+                        <input type="date" id="relatorio-data-fim">
+                        <select id="financeiro-relatorio-tipo">
+                            <option value="todos">Todas as Transações</option>
+                            <option value="entradas">Apenas Entradas</option>
+                            <option value="saidas">Apenas Saídas</option>
+                        </select>
+                        <button id="btn-gerar-relatorio">Gerar Relatório</button>
+                        <div id="financeiro-relatorio-output">
+                            <p>Selecione um período e opção e clique em "Gerar Relatório".</p>
+                        </div>
+                        <div class="export-buttons">
+                            <button onclick="exportarDados('transacoes')">Exportar Transações (CSV)</button>
+                        </div>
                     </div>
                     <hr />
                     <h3>Histórico de Transações</h3>
@@ -533,6 +664,7 @@
         let transacoes = [];
         let produtos = [];
         let profissionais = [];
+        let financeiroMetas = { entrada: 0, saida: 0 }; // Nova variável para metas
 
         // --- Funções Genéricas para LocalStorage ---
         const carregarDados = (chave) => {
@@ -551,7 +683,7 @@
         const renderizarClientes = (filtro = '') => {
             const listaClientesUl = document.getElementById('lista-clientes');
             listaClientesUl.innerHTML = '';
-            const clientesFiltrados = clientes.filter(cliente => 
+            const clientesFiltrados = clientes.filter(cliente =>
                 cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
                 cliente.telefone.includes(filtro) ||
                 (cliente.email && cliente.email.toLowerCase().includes(filtro.toLowerCase()))
@@ -572,15 +704,16 @@
                 `;
                 listaClientesUl.appendChild(li);
             });
+            preencherDatalistClientes(); // Atualiza o datalist de clientes
         };
 
         const renderizarAgendamentos = (filtro = '') => {
             const listaAgendamentosUl = document.getElementById('lista-agendamentos');
             listaAgendamentosUl.innerHTML = '';
-            // Ordenar agendamentos por data, filtrando depois
-            const agendamentosOrdenados = agendamentos.sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
-            
-            const agendamentosFiltrados = agendamentosOrdenados.filter(agendamento => 
+            // Ordenar agendamentos por data
+            const agendamentosOrdenados = [...agendamentos].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+
+            const agendamentosFiltrados = agendamentosOrdenados.filter(agendamento =>
                 agendamento.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
                 agendamento.servico.toLowerCase().includes(filtro.toLowerCase()) ||
                 new Date(agendamento.dataHora).toLocaleDateString('pt-BR').includes(filtro)
@@ -602,6 +735,7 @@
                 `;
                 listaAgendamentosUl.appendChild(li);
             });
+            atualizarNotificacoesDashboard(); // Atualiza notificações ao renderizar agendamentos
         };
 
         const renderizarTransacoes = () => {
@@ -642,6 +776,8 @@
             totalSaidasSpan.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             saldoTotalSpan.textContent = saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             saldoTotalSpan.style.color = saldo >= 0 ? 'green' : 'red';
+
+            atualizarMetasFinanceirasDisplay(totalEntradas, totalSaidas);
         };
 
         const renderizarProdutos = (filtro = '') => {
@@ -650,7 +786,7 @@
             listaProdutosUl.innerHTML = '';
             listaAlertaEstoqueUl.innerHTML = '';
 
-            const produtosFiltrados = produtos.filter(produto => 
+            const produtosFiltrados = produtos.filter(produto =>
                 produto.nome.toLowerCase().includes(filtro.toLowerCase())
             );
 
@@ -681,7 +817,7 @@
             }
         };
 
-        const renderizarProfissionais = () => { // Profissionais não terão busca para simplificar, se precisar é só adicionar
+        const renderizarProfissionais = () => {
             const listaProfissionaisUl = document.getElementById('lista-profissionais');
             listaProfissionaisUl.innerHTML = '';
             if (profissionais.length === 0) {
@@ -710,6 +846,8 @@
                 document.getElementById('cliente-nome').value = cliente.nome;
                 document.getElementById('cliente-telefone').value = cliente.telefone;
                 document.getElementById('cliente-email').value = cliente.email;
+                document.getElementById('cliente-historico-servicos').value = cliente.historicoServicos || '';
+                document.getElementById('cliente-observacoes').value = cliente.observacoes || '';
                 alert('Cliente selecionado para edição. Altere os campos e clique em Salvar Cliente.');
             }
         };
@@ -721,6 +859,7 @@
                 document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
                 document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
                 document.getElementById('agenda-servico').value = agendamento.servico;
+                document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
                 alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar Agendamento.');
             }
         };
@@ -807,25 +946,45 @@
 
         const gerarRelatorioFinanceiro = () => {
             const tipoRelatorio = document.getElementById('financeiro-relatorio-tipo').value;
+            const dataInicioStr = document.getElementById('relatorio-data-inicio').value;
+            const dataFimStr = document.getElementById('relatorio-data-fim').value;
             const outputDiv = document.getElementById('financeiro-relatorio-output');
             outputDiv.innerHTML = '';
+
+            let transacoesFiltradasPorData = transacoes;
+            if (dataInicioStr && dataFimStr) {
+                const dataInicio = new Date(dataInicioStr + 'T00:00:00');
+                const dataFim = new Date(dataFimStr + 'T23:59:59'); // Inclui o dia inteiro
+                transacoesFiltradasPorData = transacoes.filter(t => {
+                    // Adicionei a data de criação para cada transação na hora de salvar, caso contrário,
+                    // precisamos de uma propriedade de data para filtrar.
+                    // Para fins de demonstração, se não tiver data, vou pular.
+                    if (!t.dataCriacao) return true; // Se não tem data, inclui tudo (comportamento de compatibilidade)
+                    const transacaoDate = new Date(t.dataCriacao);
+                    return transacaoDate >= dataInicio && transacaoDate <= dataFim;
+                });
+            } else if (dataInicioStr || dataFimStr) {
+                 alert('Por favor, preencha AMBAS as datas de início e fim para filtrar por período.');
+                 return;
+            }
+
 
             let transacoesParaRelatorio = [];
             let totalEntradasRelatorio = 0;
             let totalSaidasRelatorio = 0;
 
             if (tipoRelatorio === 'entradas') {
-                transacoesParaRelatorio = transacoes.filter(t => t.tipo === 'entrada');
+                transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'entrada');
                 totalEntradasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
                 outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
             } else if (tipoRelatorio === 'saidas') {
-                transacoesParaRelatorio = transacoes.filter(t => t.tipo === 'saida');
+                transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'saida');
                 totalSaidasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
                 outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
             } else { // todos
-                transacoesParaRelatorio = transacoes;
-                totalEntradasRelatorio = transacoes.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
-                totalSaidasRelatorio = transacoes.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                transacoesParaRelatorio = transacoesFiltradasPorData;
+                totalEntradasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                totalSaidasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
                 outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
                 outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
                 outputDiv.innerHTML += `<p><strong>Saldo Geral:</strong> ${(totalEntradasRelatorio - totalSaidasRelatorio).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
@@ -834,10 +993,11 @@
             if (transacoesParaRelatorio.length > 0) {
                 outputDiv.innerHTML += '<p><strong>Detalhes:</strong></p>';
                 transacoesParaRelatorio.forEach(t => {
-                    outputDiv.innerHTML += `<p>${new Date().toLocaleDateString('pt-BR')} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                    const transacaoDate = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : 'Data Indisp.';
+                    outputDiv.innerHTML += `<p>${transacaoDate} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
                 });
             } else {
-                outputDiv.innerHTML += '<p>Nenhuma transação encontrada para este tipo de relatório.</p>';
+                outputDiv.innerHTML += '<p>Nenhuma transação encontrada para este tipo ou período de relatório.</p>';
             }
         };
 
@@ -848,12 +1008,16 @@
 
             if (tipo === 'clientes') {
                 data = clientes;
-                headers = ['ID', 'Nome', 'Telefone', 'Email'];
+                headers = ['ID', 'Nome', 'Telefone', 'Email', 'HistoricoServicos', 'Observacoes'];
                 filename = 'clientes_espaco_tai_botelho.csv';
             } else if (tipo === 'agendamentos') {
                 data = agendamentos;
-                headers = ['ID', 'Cliente', 'Data/Hora', 'Servico'];
+                headers = ['ID', 'Cliente', 'DataHora', 'Servico', 'Observacoes'];
                 filename = 'agendamentos_espaco_tai_botelho.csv';
+            } else if (tipo === 'transacoes') {
+                data = transacoes;
+                headers = ['ID', 'Tipo', 'Descricao', 'Valor', 'DataCriacao'];
+                filename = 'transacoes_espaco_tai_botelho.csv';
             } else {
                 alert('Tipo de exportação não suportado.');
                 return;
@@ -864,21 +1028,23 @@
                 return;
             }
 
-            let csvContent = headers.join(';') + '\n'; // Cabeçalho CSV
+            let csvContent = headers.join(';') + '\n';
             data.forEach(item => {
                 const row = headers.map(header => {
-                    let value = item[header.replace('/', '').toLowerCase()]; // Ajusta para 'datahora', 'email' etc.
-                    if (header === 'Data/Hora' && value) {
+                    let value = item[header.charAt(0).toLowerCase() + header.slice(1)] || ''; // Ajusta para minúsculo inicial
+                    if (header === 'DataHora' && value) {
                         value = new Date(value).toLocaleString('pt-BR');
+                    } else if (header === 'DataCriacao' && value) {
+                         value = new Date(value).toLocaleString('pt-BR');
                     }
-                    return `"${value || ''}"`; // Garante que valores sejam tratados como string e envoltos em aspas
+                    return `"${String(value).replace(/"/g, '""')}"`; // Escapa aspas duplas no CSV
                 }).join(';');
                 csvContent += row + '\n';
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
-            if (link.download !== undefined) { // Feature detection for download attribute
+            if (link.download !== undefined) {
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
                 link.setAttribute('download', filename);
@@ -890,6 +1056,169 @@
                 alert('Seu navegador não suporta download automático. Por favor, copie o conteúdo abaixo:\n\n' + csvContent);
             }
             alert(`Dados de ${tipo} exportados com sucesso para ${filename}!`);
+        };
+
+        // --- Funções de Metas Financeiras ---
+        const carregarMetasFinanceiras = () => {
+            const metasSalvas = localStorage.getItem('financeiroMetasEspacoTaiBotelho');
+            if (metasSalvas) {
+                financeiroMetas = JSON.parse(metasSalvas);
+            }
+            document.getElementById('meta-entrada').value = financeiroMetas.entrada || '';
+            document.getElementById('meta-saida').value = financeiroMetas.saida || '';
+        };
+
+        const salvarMetasFinanceiras = () => {
+            const metaEntrada = parseFloat(document.getElementById('meta-entrada').value);
+            const metaSaida = parseFloat(document.getElementById('meta-saida').value);
+
+            financeiroMetas.entrada = isNaN(metaEntrada) ? 0 : metaEntrada;
+            financeiroMetas.saida = isNaN(metaSaida) ? 0 : metaSaida;
+
+            salvarDados('financeiroMetasEspacoTaiBotelho', financeiroMetas);
+            alert('Metas financeiras salvas com sucesso!');
+            renderizarTransacoes(); // Re-renderiza para atualizar o progresso
+        };
+
+        const atualizarMetasFinanceirasDisplay = (totalEntradas, totalSaidas) => {
+            document.getElementById('meta-entrada-valor').textContent = financeiroMetas.entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('meta-saida-valor').textContent = financeiroMetas.saida.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            const progressBarEntrada = document.getElementById('progress-bar-entrada');
+            const progressBarSaida = document.getElementById('progress-bar-saida');
+            const progressoEntradaValor = document.getElementById('progresso-entrada-valor');
+            const progressoSaidaValor = document.getElementById('progresso-saida-valor');
+
+            progressoEntradaValor.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            progressoSaidaValor.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            let percentEntrada = (financeiroMetas.entrada > 0) ? (totalEntradas / financeiroMetas.entrada) * 100 : 0;
+            let percentSaida = (financeiroMetas.saida > 0) ? (totalSaidas / financeiroMetas.saida) * 100 : 0;
+
+            percentEntrada = Math.min(percentEntrada, 100); // Não passa de 100% na barra
+            progressBarEntrada.style.width = `${percentEntrada}%`;
+            progressBarEntrada.classList.toggle('red', percentEntrada < 100); // Se não atingiu a meta, pode mostrar vermelho (opcional)
+
+            progressBarSaida.style.width = `${Math.min(percentSaida, 100)}%`; // Saída: quanto menor melhor, então percent é o que já gastou
+            progressBarSaida.classList.toggle('red', percentSaida > 100); // Se passou da meta de saída, fica vermelho
+
+            // Inverte a lógica de cor para a barra de saída para ser mais intuitiva
+            progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545'; // Verde se dentro da meta, vermelho se acima
+        };
+
+        // --- Funções de Notificação e Sugestões ---
+        const atualizarNotificacoesDashboard = () => {
+            const notificationsList = document.getElementById('notifications-list');
+            notificationsList.innerHTML = '';
+            const dashboardNotifications = document.getElementById('dashboard-notifications');
+            let hasNotifications = false;
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0); // Para comparar apenas a data
+
+            const agendamentosHoje = agendamentos.filter(agendamento => {
+                const dataAgendamento = new Date(agendamento.dataHora);
+                dataAgendamento.setHours(0, 0, 0, 0);
+                return dataAgendamento.getTime() === hoje.getTime();
+            }).sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+
+            if (agendamentosHoje.length > 0) {
+                hasNotifications = true;
+                agendamentosHoje.forEach(agendamento => {
+                    const li = document.createElement('li');
+                    const horaFormatada = new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    li.innerHTML = `<span class="material-icons">event</span>Agendamento HOJE: ${agendamento.cliente} às ${horaFormatada} para ${agendamento.servico}`;
+                    li.classList.add('notification-item');
+                    notificationsList.appendChild(li);
+                });
+            }
+
+            // Alertas de estoque baixo já são mostrados na seção de estoque, mas poderiam ser puxados para cá
+            const produtosBaixoEstoque = produtos.filter(p => p.quantidade < 5);
+            if (produtosBaixoEstoque.length > 0) {
+                hasNotifications = true;
+                productosBaixoEstoque.forEach(p => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="material-icons">warning</span>Estoque Baixo: ${p.nome} (${p.quantidade} unid.)`;
+                    li.style.color = 'orange'; // Alerta de cor para estoque
+                    notificationsList.appendChild(li);
+                });
+            }
+
+            dashboardNotifications.style.display = hasNotifications ? 'block' : 'none';
+        };
+
+        const gerarMensagemAgendamento = () => {
+            const clienteNome = document.getElementById('agenda-cliente-nome').value.trim();
+            const dataHora = document.getElementById('agenda-data-hora').value;
+            const servico = document.getElementById('agenda-servico').value;
+            const observacoes = document.getElementById('agenda-observacoes').value.trim();
+
+            if (!clienteNome || !dataHora || !servico) {
+                document.getElementById('agendamento-mensagem-pronta').value = 'Preencha o nome do cliente, data/hora e serviço para gerar a mensagem.';
+                return;
+            }
+
+            const dataObj = new Date(dataHora);
+            const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+            const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            let mensagem = `Olá ${clienteNome}! Seu agendamento no Espaço Tai Botelho foi confirmado para o dia ${dataFormatada} às ${horaFormatada} para o serviço de ${servico}.`;
+            if (observacoes) {
+                mensagem += `\nObservações: ${observacoes}`;
+            }
+            mensagem += `\nEstamos ansiosos para te receber! 😉`;
+            document.getElementById('agendamento-mensagem-pronta').value = mensagem;
+        };
+
+        const copiarMensagemAgendamento = () => {
+            const textarea = document.getElementById('agendamento-mensagem-pronta');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Para mobile
+            document.execCommand('copy');
+            alert('Mensagem copiada para a área de transferência!');
+        };
+
+        const preencherDatalistClientes = () => {
+            const datalist = document.getElementById('clientes-datalist');
+            const datalistAgendamento = document.getElementById('clientes-agendamento-datalist');
+            datalist.innerHTML = '';
+            datalistAgendamento.innerHTML = '';
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.nome;
+                datalist.appendChild(option);
+
+                const optionAgenda = document.createElement('option');
+                optionAgenda.value = cliente.nome;
+                datalistAgendamento.appendChild(optionAgenda);
+            });
+        };
+
+        const mostrarSugestaoInteligente = () => {
+            const nomeClienteInput = document.getElementById('agenda-cliente-nome').value.trim();
+            const sugestaoDiv = document.getElementById('sugestao-inteligente');
+            const sugestaoTexto = document.getElementById('sugestao-texto');
+            
+            const clienteEncontrado = clientes.find(c => c.nome.toLowerCase() === nomeClienteInput.toLowerCase());
+
+            if (clienteEncontrado) {
+                // Sugestão básica: "Parece que [cliente] está precisando de..."
+                // Ou podemos buscar no histórico do cliente (se tiver dados estruturados de serviços anteriores)
+                // Por agora, uma sugestão genérica ou baseada em observações.
+                if (clienteEncontrado.historicoServicos && clienteEncontrado.historicoServicos.includes('Coloracao')) {
+                     sugestaoTexto.textContent = 'Este cliente fez Coloração recentemente. Que tal oferecer um tratamento capilar ou um retoque de raiz?';
+                     sugestaoDiv.style.display = 'block';
+                } else if (clienteEncontrado.observacoes && clienteEncontrado.observacoes.includes('Unhas')) {
+                    sugestaoTexto.textContent = 'O cliente mencionou algo sobre unhas. Lembrar de Manicure/Pedicure?';
+                    sugestaoDiv.style.display = 'block';
+                } else {
+                    sugestaoTexto.textContent = 'Que bom ter este cliente de volta! Ofereça um serviço complementar.';
+                    sugestaoDiv.style.display = 'block';
+                }
+            } else {
+                sugestaoDiv.style.display = 'none';
+            }
         };
 
 
@@ -907,9 +1236,11 @@
                     splash.addEventListener(
                         "transitionend",
                         () => {
-                            splash.style.display = "block";
+                            splash.style.display = "block"; /* Continua visível mas em 0 opacidade */
                             main.style.display = "block";
                             document.body.style.overflow = "auto";
+                            // Forçar uma atualização das notificações ao carregar
+                            atualizarNotificacoesDashboard();
                         },
                         { once: true }
                     );
@@ -924,7 +1255,7 @@
             transacoes = carregarDados('transacoesEspacoTaiBotelho');
             produtos = carregarDados('produtosEspacoTaiBotelho');
             profissionais = carregarDados('profissionaisEspacoTaiBotelho');
-
+            carregarMetasFinanceiras(); // Carrega metas financeiras
 
             // --- Event Listeners para botões de SALVAR (Criar/Atualizar) ---
 
@@ -934,25 +1265,29 @@
                 const nome = document.getElementById('cliente-nome').value.trim();
                 const telefone = document.getElementById('cliente-telefone').value.trim();
                 const email = document.getElementById('cliente-email').value.trim();
+                const historicoServicos = document.getElementById('cliente-historico-servicos').value.trim();
+                const observacoes = document.getElementById('cliente-observacoes').value.trim();
 
                 if (nome && telefone) {
                     if (id) { // Modo de edição
                         const index = clientes.findIndex(c => c.id === id);
                         if (index !== -1) {
-                            clientes[index] = { ...clientes[index], nome, telefone, email };
+                            clientes[index] = { ...clientes[index], nome, telefone, email, historicoServicos, observacoes };
                             alert('Cliente atualizado com sucesso!');
                         }
                     } else { // Modo de novo cadastro
-                        clientes.push({ id: gerarIdUnico(), nome, telefone, email });
+                        clientes.push({ id: gerarIdUnico(), nome, telefone, email, historicoServicos, observacoes });
                         alert('Cliente cadastrado com sucesso!');
                     }
                     salvarDados('clientesEspacoTaiBotelho', clientes);
-                    renderizarClientes(); // Renderiza com a busca atual (vazia se não houver)
+                    renderizarClientes();
                     // Limpar formulário
                     document.getElementById('cliente-id-edit').value = '';
                     document.getElementById('cliente-nome').value = '';
                     document.getElementById('cliente-telefone').value = '';
                     document.getElementById('cliente-email').value = '';
+                    document.getElementById('cliente-historico-servicos').value = '';
+                    document.getElementById('cliente-observacoes').value = '';
                 } else {
                     alert('Por favor, preencha o nome e o telefone do cliente.');
                 }
@@ -964,16 +1299,17 @@
                 const cliente = document.getElementById('agenda-cliente-nome').value.trim();
                 const dataHora = document.getElementById('agenda-data-hora').value;
                 const servico = document.getElementById('agenda-servico').value;
+                const observacoes = document.getElementById('agenda-observacoes').value.trim();
 
                 if (cliente && dataHora && servico) {
                     if (id) { // Modo de edição
                         const index = agendamentos.findIndex(a => a.id === id);
                         if (index !== -1) {
-                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico };
+                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico, observacoes };
                             alert('Agendamento atualizado com sucesso!');
                         }
                     } else { // Modo de novo cadastro
-                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico });
+                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico, observacoes });
                         alert('Agendamento salvo com sucesso!');
                     }
                     salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
@@ -982,6 +1318,9 @@
                     document.getElementById('agenda-cliente-nome').value = '';
                     document.getElementById('agenda-data-hora').value = '';
                     document.getElementById('agenda-servico').value = '';
+                    document.getElementById('agenda-observacoes').value = '';
+                    document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa a mensagem pronta
+                    document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
                 } else {
                     alert('Por favor, preencha todos os campos do agendamento.');
                 }
@@ -993,6 +1332,7 @@
                 const tipo = document.getElementById('financeiro-tipo').value;
                 const descricao = document.getElementById('financeiro-descricao').value.trim();
                 const valor = parseFloat(document.getElementById('financeiro-valor').value);
+                const dataCriacao = new Date().toISOString(); // Adiciona data de criação da transação
 
                 if (tipo && descricao && !isNaN(valor) && valor > 0) {
                     if (id) { // Modo de edição
@@ -1002,7 +1342,7 @@
                             alert('Transação atualizada com sucesso!');
                         }
                     } else { // Modo de nova transação
-                        transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor });
+                        transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor, dataCriacao });
                         alert('Transação registrada com sucesso!');
                     }
                     salvarDados('transacoesEspacoTaiBotelho', transacoes);
@@ -1023,13 +1363,13 @@
                 const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
 
                 if (nomeProduto && !isNaN(quantidade) && quantidade >= 0) {
-                    if (id) { // Modo de edição
+                    if (id) {
                         const index = produtos.findIndex(p => p.id === id);
                         if (index !== -1) {
                             produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
                             alert('Produto atualizado no estoque!');
                         }
-                    } else { // Modo de novo produto ou adicionar ao existente
+                    } else {
                         const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
                         if (produtoExistente) {
                             produtoExistente.quantidade += quantidade;
@@ -1044,6 +1384,7 @@
                     document.getElementById('estoque-id-edit').value = '';
                     document.getElementById('estoque-nome-produto').value = '';
                     document.getElementById('estoque-quantidade').value = '';
+                    atualizarNotificacoesDashboard(); // Pode gerar alerta de estoque baixo
                 } else {
                     alert('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).');
                 }
@@ -1056,13 +1397,13 @@
                 const especialidade = document.getElementById('profissional-especialidade').value.trim();
 
                 if (nome && especialidade) {
-                    if (id) { // Modo de edição
+                    if (id) {
                         const index = profissionais.findIndex(p => p.id === id);
                         if (index !== -1) {
                             profissionais[index] = { ...profissionais[index], nome, especialidade };
                             alert('Profissional atualizado com sucesso!');
                         }
-                    } else { // Modo de novo cadastro
+                    } else {
                         profissionais.push({ id: gerarIdUnico(), nome, especialidade });
                         alert('Profissional cadastrado com sucesso!');
                     }
@@ -1086,7 +1427,6 @@
                     document.getElementById('btn-search-cliente').click();
                 }
             });
-            // Adicionado para limpar a busca ao apagar o texto
             document.getElementById('search-cliente').addEventListener('input', () => {
                 if (document.getElementById('search-cliente').value.trim() === '') {
                     renderizarClientes('');
@@ -1123,8 +1463,16 @@
                 }
             });
 
-            // --- Event Listener para Relatório Financeiro ---
+            // --- Event Listener para Relatório Financeiro e Metas ---
             document.getElementById('btn-gerar-relatorio').addEventListener('click', gerarRelatorioFinanceiro);
+            document.getElementById('btn-salvar-metas').addEventListener('click', salvarMetasFinanceiras);
+
+            // --- Event Listener para sugestão inteligente e mensagem de agendamento ---
+            document.getElementById('agenda-cliente-nome').addEventListener('input', mostrarSugestaoInteligente);
+            document.getElementById('btn-salvar-agendamento').addEventListener('click', gerarMensagemAgendamento); // Gera mensagem após salvar
+
+            // Inicializa datalists ao carregar a página
+            preencherDatalistClientes();
         }); // Fim do DOMContentLoaded
 
 
@@ -1148,27 +1496,31 @@
                 switch (id) {
                     case 'cliente-section':
                         renderizarClientes();
-                        document.getElementById('search-cliente').value = ''; // Limpa busca ao abrir
+                        document.getElementById('search-cliente').value = '';
                         break;
                     case 'agenda-section':
                         renderizarAgendamentos();
-                        document.getElementById('search-agendamento').value = ''; // Limpa busca ao abrir
+                        document.getElementById('search-agendamento').value = '';
+                        document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa mensagem ao abrir
+                        document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
                         break;
                     case 'financeiro-section':
                         renderizarTransacoes();
-                        // Gera um relatório inicial "todos" ao abrir o financeiro
                         document.getElementById('financeiro-relatorio-tipo').value = 'todos';
-                        gerarRelatorioFinanceiro();
+                        document.getElementById('relatorio-data-inicio').value = '';
+                        document.getElementById('relatorio-data-fim').value = '';
+                        gerarRelatorioFinanceiro(); // Gera um relatório inicial "todos" ao abrir o financeiro
                         break;
                     case 'estoque-section':
                         renderizarProdutos();
-                        document.getElementById('search-produto').value = ''; // Limpa busca ao abrir
+                        document.getElementById('search-produto').value = '';
                         break;
                     case 'profissional-section':
                         renderizarProfissionais();
                         break;
                 }
             }
+            atualizarNotificacoesDashboard(); // Garante que as notificações estejam sempre atualizadas
         }
     </script>
 </body>
