@@ -23,12 +23,16 @@
       display: flex; justify-content: space-around;
       background: #f28ab2; padding: 12px 0; position: sticky; top: 0;
       z-index: 10;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     nav button {
       background: none; border: none; color: white; font-size: 1rem;
       font-weight: bold; cursor: pointer; transition: transform 0.2s;
+      padding: 8px 12px;
+      border-radius: 6px;
     }
-    nav button:hover { transform: scale(1.05); }
+    nav button:hover { transform: scale(1.05); background: #e36a8a; }
 
     section {
       display: none; background: white; padding: 20px;
@@ -44,20 +48,25 @@
     input, select {
       width: 100%; padding: 10px; margin-bottom: 12px;
       border: 1px solid #ccc; border-radius: 8px;
+      font-size: 1rem;
     }
 
     button.save {
       background: #f28ab2; color: white; padding: 10px 20px;
       border: none; border-radius: 8px; cursor: pointer;
       font-weight: bold;
+      font-size: 1rem;
     }
 
     ul {
       margin-top: 10px; list-style: none; padding: 0;
+      max-height: 280px; overflow-y: auto;
     }
     ul li {
       background: #ffe6ec; margin-bottom: 8px; padding: 10px;
       border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.95rem;
     }
 
     .financeiro p {
@@ -66,6 +75,61 @@
     .financeiro span {
       font-weight: bold;
       color: #444;
+    }
+
+    .acoes {
+      display: flex;
+      gap: 6px;
+      min-width: 110px;
+      justify-content: flex-end;
+    }
+    .acoes button {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      user-select: none;
+    }
+    .editar {
+      background: #ffc107;
+      color: #222;
+    }
+    .excluir {
+      background: #dc3545;
+    }
+
+    .subtitulo {
+      margin-top: 20px; font-weight: bold; color: #444;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .em-falta {
+      color: #dc3545;
+      font-weight: bold;
+      font-style: italic;
+      margin-left: 8px;
+    }
+
+    #buscaPedidos, #buscaEstoque {
+      margin-bottom: 12px;
+      font-size: 1rem;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+
+    /* Scrollbar estilizada */
+    ul::-webkit-scrollbar {
+      width: 8px;
+    }
+    ul::-webkit-scrollbar-thumb {
+      background-color: #f28ab2;
+      border-radius: 10px;
     }
   </style>
 </head>
@@ -85,28 +149,35 @@
     <button onclick="mostrar('financeiro')">📊 Financeiro</button>
   </nav>
 
+  <!-- Clientes -->
   <section id="clientes" class="active">
     <h2>Cadastro de Cliente</h2>
-    <input id="clienteNome" placeholder="Nome do cliente">
-    <input id="clienteTelefone" placeholder="Telefone">
-    <input id="clienteEndereco" placeholder="Endereço">
+    <input id="clienteNome" placeholder="Nome do cliente" />
+    <input id="clienteTelefone" placeholder="Telefone" />
+    <input id="clienteEndereco" placeholder="Endereço" />
     <button class="save" onclick="salvarCliente()">Salvar</button>
     <ul id="listaClientes"></ul>
   </section>
 
+  <!-- Pedidos -->
   <section id="pedidos">
     <h2>Pedidos</h2>
-    <input id="pedidoCliente" placeholder="Nome do cliente">
-    <input id="tipoProduto" placeholder="Tipo de produto">
-    <input id="valorPedido" type="number" placeholder="Valor (R$)">
+    <input id="pedidoCliente" placeholder="Nome do cliente" />
+    <input id="tipoProduto" placeholder="Tipo de produto" />
+    <input id="valorPedido" type="number" step="0.01" placeholder="Valor (R$)" />
     <select id="formaEntrega">
       <option value="Entregar">Entregar</option>
       <option value="Retirar">Retirar</option>
     </select>
     <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
+
+    <div class="subtitulo">Buscar pedido</div>
+    <input id="buscaPedidos" placeholder="Digite para buscar pedidos" oninput="buscarPedidos()" />
+
     <ul id="listaPedidos"></ul>
   </section>
 
+  <!-- Despesas -->
   <section id="despesas">
     <h2>Despesas</h2>
     <select id="tipoDespesa">
@@ -114,49 +185,113 @@
       <option>Loja</option>
       <option>Pessoais</option>
     </select>
-    <input id="valorDespesa" type="number" placeholder="Valor (R$)">
+    <input id="valorDespesa" type="number" step="0.01" placeholder="Valor (R$)" />
     <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
     <ul id="listaDespesas"></ul>
   </section>
 
+  <!-- Estoque -->
   <section id="estoque">
     <h2>Estoque</h2>
-    <input id="produtoNome" placeholder="Nome do Produto">
-    <input id="produtoQtd" type="number" placeholder="Quantidade">
+    <input id="produtoNome" placeholder="Nome do Produto" />
+    <input id="produtoQtd" type="number" placeholder="Quantidade" />
     <button class="save" onclick="adicionarProduto()">Adicionar Produto</button>
+
+    <div class="subtitulo">Buscar produto</div>
+    <input id="buscaEstoque" placeholder="Digite para buscar produtos" oninput="buscarEstoque()" />
+
     <ul id="listaEstoque"></ul>
   </section>
 
+  <!-- Financeiro -->
   <section id="financeiro" class="financeiro">
     <h2>Financeiro</h2>
     <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
     <p><strong>Gastos:</strong> R$ <span id="gastos">0.00</span></p>
     <p><strong>Lucros:</strong> R$ <span id="lucros">0.00</span></p>
-    <p><em>Relatórios diário, mensal e anual em breve!</em></p>
+
+    <div class="subtitulo">Relatórios</div>
+    <label for="relatorioData">Escolha a data para relatório:</label>
+    <input type="date" id="relatorioData" onchange="gerarRelatorio()" />
+
+    <div id="relatorioResultado" style="margin-top: 12px; font-weight: bold;"></div>
   </section>
 </div>
 
 <script>
-  function entrar() {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    atualizarTudo();
-  }
+  // Elementos globais
+  const clienteNome = document.getElementById('clienteNome');
+  const clienteTelefone = document.getElementById('clienteTelefone');
+  const clienteEndereco = document.getElementById('clienteEndereco');
 
+  const pedidoCliente = document.getElementById('pedidoCliente');
+  const tipoProduto = document.getElementById('tipoProduto');
+  const valorPedido = document.getElementById('valorPedido');
+  const formaEntrega = document.getElementById('formaEntrega');
+  const buscaPedidosInput = document.getElementById('buscaPedidos');
+
+  const tipoDespesa = document.getElementById('tipoDespesa');
+  const valorDespesa = document.getElementById('valorDespesa');
+
+  const produtoNome = document.getElementById('produtoNome');
+  const produtoQtd = document.getElementById('produtoQtd');
+  const buscaEstoqueInput = document.getElementById('buscaEstoque');
+
+  const ganhosSpan = document.getElementById('ganhos');
+  const gastosSpan = document.getElementById('gastos');
+  const lucrosSpan = document.getElementById('lucros');
+
+  const relatorioDataInput = document.getElementById('relatorioData');
+  const relatorioResultado = document.getElementById('relatorioResultado');
+
+  // Estado de edição
+  let clienteEditando = null;
+  let pedidoEditando = null;
+  let produtoEditando = null;
+
+  // Mostrar seção
   function mostrar(secao) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.getElementById(secao).classList.add('active');
+    // Atualiza dados ao trocar aba
+    if(secao === 'clientes') listarClientes();
+    else if(secao === 'pedidos') listarPedidos();
+    else if(secao === 'estoque') listarEstoque();
+    else if(secao === 'despesas') listarDespesas();
+    else if(secao === 'financeiro') {
+      atualizarFinanceiro();
+      relatorioResultado.innerHTML = '';
+      relatorioDataInput.value = '';
+    }
   }
 
+  // Entrar (splash)
+  function entrar() {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    mostrar('clientes');
+  }
+
+  // ---------- CLIENTES ----------
   function salvarCliente() {
     const nome = clienteNome.value.trim();
     const telefone = clienteTelefone.value.trim();
     const endereco = clienteEndereco.value.trim();
-    if (!nome || !telefone || !endereco) return alert('Preencha todos os campos');
+    if (!nome || !telefone || !endereco) {
+      alert('Preencha todos os campos');
+      return;
+    }
 
-    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-    clientes.push({ nome, telefone, endereco });
+    let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+
+    if (clienteEditando !== null) {
+      clientes[clienteEditando] = { nome, telefone, endereco };
+      clienteEditando = null;
+    } else {
+      clientes.push({ nome, telefone, endereco });
+    }
     localStorage.setItem('clientes', JSON.stringify(clientes));
+
     clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
     listarClientes();
   }
@@ -165,54 +300,117 @@
     const lista = document.getElementById('listaClientes');
     lista.innerHTML = '';
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-    clientes.forEach(c => {
+
+    clientes.forEach((c, i) => {
       const li = document.createElement('li');
       li.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
       lista.appendChild(li);
     });
   }
 
+  // ---------- PEDIDOS ----------
   function salvarPedido() {
     const nome = pedidoCliente.value.trim();
     const produto = tipoProduto.value.trim();
     const valor = parseFloat(valorPedido.value);
     const entrega = formaEntrega.value;
-    if (!nome || !produto || isNaN(valor)) return alert('Preencha todos os campos');
+    if (!nome || !produto || isNaN(valor)) {
+      alert('Preencha todos os campos corretamente');
+      return;
+    }
 
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    pedidos.push({ nome, produto, valor, entrega });
+    let pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+
+    // Incluindo data atual no pedido para relatórios
+    const data = new Date().toISOString();
+
+    if (pedidoEditando !== null) {
+      pedidos[pedidoEditando] = { nome, produto, valor, entrega, data };
+      pedidoEditando = null;
+    } else {
+      pedidos.push({ nome, produto, valor, entrega, data });
+    }
+
     localStorage.setItem('pedidos', JSON.stringify(pedidos));
+
     pedidoCliente.value = tipoProduto.value = valorPedido.value = '';
-    listarPedidos(); atualizarFinanceiro();
+    formaEntrega.value = 'Entregar';
+    buscaPedidosInput.value = '';
+    listarPedidos();
+    atualizarFinanceiro();
   }
 
-  function listarPedidos() {
+  function listarPedidos(filtrar = '') {
     const lista = document.getElementById('listaPedidos');
     lista.innerHTML = '';
     const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    pedidos.forEach(p => {
+
+    pedidos.forEach((p, i) => {
+      if(filtrar && !p.nome.toLowerCase().includes(filtrar.toLowerCase()) && !p.produto.toLowerCase().includes(filtrar.toLowerCase())) return;
+
       const li = document.createElement('li');
-      li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} (${p.entrega})`;
+
+      li.innerHTML = `
+        ${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} (${p.entrega})
+        <div class="acoes">
+          <button class="editar" onclick="editarPedido(${i})">Editar</button>
+          <button class="excluir" onclick="excluirPedido(${i})">Excluir</button>
+        </div>
+      `;
+
       lista.appendChild(li);
     });
   }
 
+  function buscarPedidos() {
+    const termo = buscaPedidosInput.value.trim();
+    listarPedidos(termo);
+  }
+
+  function editarPedido(index) {
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const p = pedidos[index];
+    pedidoCliente.value = p.nome;
+    tipoProduto.value = p.produto;
+    valorPedido.value = p.valor;
+    formaEntrega.value = p.entrega;
+    pedidoEditando = index;
+  }
+
+  function excluirPedido(index) {
+    if (!confirm('Deseja realmente excluir este pedido?')) return;
+    let pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    pedidos.splice(index, 1);
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    listarPedidos();
+    atualizarFinanceiro();
+  }
+
+  // ---------- DESPESAS ----------
   function salvarDespesa() {
     const tipo = tipoDespesa.value;
     const valor = parseFloat(valorDespesa.value);
-    if (!tipo || isNaN(valor)) return alert('Preencha todos os campos');
+    if (!tipo || isNaN(valor)) {
+      alert('Preencha todos os campos corretamente');
+      return;
+    }
 
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-    despesas.push({ tipo, valor });
+    const data = new Date().toISOString();
+
+    let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+    despesas.push({ tipo, valor, data });
     localStorage.setItem('despesas', JSON.stringify(despesas));
+
     valorDespesa.value = '';
-    listarDespesas(); atualizarFinanceiro();
+    listarDespesas();
+    atualizarFinanceiro();
   }
 
   function listarDespesas() {
     const lista = document.getElementById('listaDespesas');
     lista.innerHTML = '';
     const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
     despesas.forEach(d => {
       const li = document.createElement('li');
       li.textContent = `${d.tipo} - R$${d.valor.toFixed(2)}`;
@@ -220,49 +418,143 @@
     });
   }
 
+  // ---------- ESTOQUE ----------
   function adicionarProduto() {
     const nome = produtoNome.value.trim();
     const qtd = parseInt(produtoQtd.value);
-    if (!nome || isNaN(qtd)) return alert('Preencha todos os campos');
+    if (!nome || isNaN(qtd) || qtd < 0) {
+      alert('Preencha todos os campos corretamente');
+      return;
+    }
 
-    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    estoque.push({ nome, qtd });
+    let estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+
+    if (produtoEditando !== null) {
+      estoque[produtoEditando] = { nome, qtd };
+      produtoEditando = null;
+    } else {
+      // Se produto já existe, soma quantidade
+      const idx = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase());
+      if (idx >= 0) {
+        estoque[idx].qtd += qtd;
+      } else {
+        estoque.push({ nome, qtd });
+      }
+    }
+
     localStorage.setItem('estoque', JSON.stringify(estoque));
+
     produtoNome.value = produtoQtd.value = '';
+    buscaEstoqueInput.value = '';
     listarEstoque();
   }
 
-  function listarEstoque() {
+  function listarEstoque(filtrar = '') {
     const lista = document.getElementById('listaEstoque');
     lista.innerHTML = '';
     const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    estoque.forEach(e => {
+
+    estoque.forEach((p, i) => {
+      if(filtrar && !p.nome.toLowerCase().includes(filtrar.toLowerCase())) return;
+
       const li = document.createElement('li');
-      li.textContent = `${e.nome} - ${e.qtd} unidade(s)${e.qtd === 0 ? ' (Em falta)' : ''}`;
+      li.innerHTML = `
+        ${p.nome} - ${p.qtd} unidade(s)
+        ${p.qtd === 0 ? '<span class="em-falta"> (Em falta)</span>' : ''}
+        <div class="acoes">
+          <button class="editar" onclick="editarProduto(${i})">Editar</button>
+          <button class="excluir" onclick="excluirProduto(${i})">Excluir</button>
+        </div>
+      `;
+
       lista.appendChild(li);
     });
   }
 
+  function buscarEstoque() {
+    const termo = buscaEstoqueInput.value.trim();
+    listarEstoque(termo);
+  }
+
+  function editarProduto(index) {
+    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+    const p = estoque[index];
+    produtoNome.value = p.nome;
+    produtoQtd.value = p.qtd;
+    produtoEditando = index;
+  }
+
+  function excluirProduto(index) {
+    if (!confirm('Deseja realmente excluir este produto?')) return;
+    let estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+    estoque.splice(index, 1);
+    localStorage.setItem('estoque', JSON.stringify(estoque));
+    listarEstoque();
+  }
+
+  // ---------- FINANCEIRO ----------
   function atualizarFinanceiro() {
     const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
     const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
 
-    const ganhos = pedidos.reduce((soma, p) => soma + p.valor, 0);
-    const gastos = despesas.reduce((soma, d) => soma + d.valor, 0);
+    const ganhos = pedidos.reduce((sum, p) => sum + p.valor, 0);
+    const gastos = despesas.reduce((sum, d) => sum + d.valor, 0);
     const lucros = ganhos - gastos;
 
-    document.getElementById('ganhos').textContent = ganhos.toFixed(2);
-    document.getElementById('gastos').textContent = gastos.toFixed(2);
-    document.getElementById('lucros').textContent = lucros.toFixed(2);
+    ganhosSpan.textContent = ganhos.toFixed(2);
+    gastosSpan.textContent = gastos.toFixed(2);
+    lucrosSpan.textContent = lucros.toFixed(2);
   }
 
-  function atualizarTudo() {
-    listarClientes();
-    listarPedidos();
-    listarDespesas();
-    listarEstoque();
-    atualizarFinanceiro();
+  // Relatórios simples por data (dia, mês, ano)
+  function gerarRelatorio() {
+    const dataEscolhida = relatorioDataInput.value;
+    if (!dataEscolhida) {
+      relatorioResultado.textContent = '';
+      return;
+    }
+
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
+    // Formatar datas para comparar (YYYY-MM-DD)
+    const dataFiltro = new Date(dataEscolhida);
+    const ano = dataFiltro.getFullYear();
+    const mes = dataFiltro.getMonth();
+    const dia = dataFiltro.getDate();
+
+    // Função para extrair data do ISO
+    function extrairData(isoString) {
+      const d = new Date(isoString);
+      return { ano: d.getFullYear(), mes: d.getMonth(), dia: d.getDate() };
+    }
+
+    // Filtrar pedidos e despesas do dia selecionado
+    const pedidosFiltrados = pedidos.filter(p => {
+      const d = extrairData(p.data);
+      return d.ano === ano && d.mes === mes && d.dia === dia;
+    });
+    const despesasFiltradas = despesas.filter(d => {
+      const dt = extrairData(d.data);
+      return dt.ano === ano && dt.mes === mes && dt.dia === dia;
+    });
+
+    // Somar valores
+    const ganhos = pedidosFiltrados.reduce((s, p) => s + p.valor, 0);
+    const gastos = despesasFiltradas.reduce((s, d) => s + d.valor, 0);
+    const lucro = ganhos - gastos;
+
+    relatorioResultado.innerHTML = `
+      <p>Relatório para ${dataEscolhida}:</p>
+      <p>Ganhos: R$ ${ganhos.toFixed(2)}</p>
+      <p>Gastos: R$ ${gastos.toFixed(2)}</p>
+      <p>Lucros: R$ ${lucro.toFixed(2)}</p>
+    `;
   }
+
+  // Inicialização - listar tudo ao entrar
+  entrar();
+
 </script>
 
 </body>
