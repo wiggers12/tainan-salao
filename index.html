@@ -170,7 +170,7 @@
       font-style: italic;
       margin-left: 8px;
     }
-    #buscaPedidos, #buscaEstoque {
+    #buscaPedidos, #buscaEstoque, #buscaClientes {
       margin-bottom: 12px;
       font-size: 1rem;
       padding: 8px;
@@ -210,6 +210,10 @@
       <input id="clienteTelefone" placeholder="Telefone" />
       <input id="clienteEndereco" placeholder="Endereço" />
       <button class="save" onclick="salvarCliente()">Salvar</button>
+
+      <div class="subtitulo">Buscar clientes</div>
+      <input id="buscaClientes" placeholder="Buscar cliente pelo nome" oninput="buscarClientes()" />
+
       <ul id="listaClientes"></ul>
     </section>
 
@@ -277,6 +281,7 @@
     const clienteNome = document.getElementById('clienteNome');
     const clienteTelefone = document.getElementById('clienteTelefone');
     const clienteEndereco = document.getElementById('clienteEndereco');
+    const buscaClientesInput = document.getElementById('buscaClientes');
 
     const pedidoCliente = document.getElementById('pedidoCliente');
     const tipoProduto = document.getElementById('tipoProduto');
@@ -349,15 +354,18 @@
       localStorage.setItem('clientes', JSON.stringify(clientes));
 
       clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
+      buscaClientesInput.value = '';
       listarClientes();
     }
 
-    function listarClientes() {
+    function listarClientes(filtrar = '') {
       const lista = document.getElementById('listaClientes');
       lista.innerHTML = '';
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
 
       clientes.forEach((c,i) => {
+        if(filtrar && !c.nome.toLowerCase().includes(filtrar.toLowerCase())) return;
+
         const li = document.createElement('li');
         li.innerHTML = `
           ${c.nome} - ${c.telefone} (${c.endereco})
@@ -368,6 +376,11 @@
         `;
         lista.appendChild(li);
       });
+    }
+
+    function buscarClientes() {
+      const termo = buscaClientesInput.value.trim();
+      listarClientes(termo);
     }
 
     function editarCliente(index) {
@@ -590,7 +603,7 @@
       lucrosSpan.textContent = lucros.toFixed(2);
     }
 
-    // Relatório por data
+    // Relatório por data (dia, mês, ano)
     function gerarRelatorio() {
       const dataEscolhida = relatorioDataInput.value;
       if(!dataEscolhida) {
@@ -598,11 +611,11 @@
         return;
       }
 
-      // Formatar data para comparar (ano-mês-dia)
+      // pegar todos os pedidos e despesas
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
       const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
 
-      // Filtrar pedidos e despesas da data selecionada
+      // Filtrar por data escolhida (ano-mês-dia)
       const pedidosFiltrados = pedidos.filter(p => p.data.startsWith(dataEscolhida));
       const despesasFiltradas = despesas.filter(d => d.data.startsWith(dataEscolhida));
 
@@ -617,12 +630,9 @@
       `;
     }
 
-    // Inicializações
-    // NÃO chamar entrar() automaticamente para manter splash visível
-    listarClientes();
-    listarPedidos();
-    listarDespesas();
-    listarEstoque();
+    // Inicializações - mantém splash visível até entrar
+    // listarTodos();
+    mostrar('clientes');
   </script>
 
 </body>
