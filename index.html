@@ -156,11 +156,40 @@
             color: #FFD700;
             border: none;
             font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Estilo para botões de ação na lista (Editar/Excluir) */
+        .list-actions button {
+            width: auto;
+            padding: 4px 8px;
+            margin-left: 5px;
+            font-size: 0.85em;
+            border-radius: 4px;
+        }
+
+        .list-actions .edit-btn {
+            background-color: #007bff; /* Azul */
+        }
+
+        .list-actions .delete-btn {
+            background-color: #dc3545; /* Vermelho */
         }
 
         .list-fake {
             padding-left: 15px;
             color: #444;
+            list-style: none; /* Remove bullet points padrão */
+        }
+
+        .list-fake li {
+            background-color: #eee;
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         @media (max-width: 768px) {
@@ -203,11 +232,12 @@
                 <h2>Cliente</h2>
                 <button class="open-btn" onclick="toggleSection('cliente-section')">Abrir</button>
                 <div class="icon-content" id="cliente-section">
-                    <h3>Cadastrar Cliente</h3>
+                    <h3>Cadastrar/Atualizar Cliente</h3>
+                    <input type="hidden" id="cliente-id-edit">
                     <input type="text" id="cliente-nome" placeholder="Nome Completo">
                     <input type="text" id="cliente-telefone" placeholder="Telefone">
                     <input type="email" id="cliente-email" placeholder="E-mail">
-                    <button id="btn-cadastrar-cliente">Cadastrar</button>
+                    <button id="btn-salvar-cliente">Salvar Cliente</button>
                     <hr />
                     <h3>Lista de Clientes</h3>
                     <ul id="lista-clientes" class="list-fake">
@@ -221,20 +251,21 @@
                 <button class="open-btn" onclick="toggleSection('agenda-section')">Abrir</button>
                 <div class="icon-content" id="agenda-section">
                     <h3>Novo Agendamento</h3>
-                    <input type="text" placeholder="Nome do Cliente">
-                    <input type="datetime-local">
-                    <select>
-                        <option>Escova</option>
-                        <option>Coloração</option>
-                        <option>Corte</option>
+                    <input type="hidden" id="agenda-id-edit">
+                    <input type="text" id="agenda-cliente-nome" placeholder="Nome do Cliente">
+                    <input type="datetime-local" id="agenda-data-hora">
+                    <select id="agenda-servico">
+                        <option value="">Selecione um Serviço</option>
+                        <option value="Escova">Escova</option>
+                        <option value="Coloracao">Coloração</option>
+                        <option value="Corte">Corte</option>
+                        <option value="Hidratacao">Hidratação</option>
                     </select>
-                    <button>Agendar</button>
+                    <button id="btn-salvar-agendamento">Salvar Agendamento</button>
                     <hr />
                     <h3>Próximos Agendamentos</h3>
-                    <ul class="list-fake">
-                        <li>10/07 - Ana, Corte às 14h</li>
-                        <li>11/07 - Bruna, Mechas às 16h</li>
-                    </ul>
+                    <ul id="lista-agendamentos" class="list-fake">
+                        </ul>
                 </div>
             </div>
 
@@ -243,15 +274,25 @@
                 <h2>Financeiro</h2>
                 <button class="open-btn" onclick="toggleSection('financeiro-section')">Abrir</button>
                 <div class="icon-content" id="financeiro-section">
-                    <h3>Entradas</h3>
-                    <p>Total: R$ 2.300,00</p>
-                    <h3>Despesas</h3>
-                    <p>Total: R$ 1.200,00</p>
-                    <h3>Relatório Mensal</h3>
-                    <ul class="list-fake">
-                        <li>Janeiro: +R$ 500</li>
-                        <li>Fevereiro: +R$ 800</li>
-                    </ul>
+                    <h3>Registrar Transação</h3>
+                    <input type="hidden" id="financeiro-id-edit">
+                    <select id="financeiro-tipo">
+                        <option value="">Tipo de Transação</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                    <input type="text" id="financeiro-descricao" placeholder="Descrição">
+                    <input type="number" id="financeiro-valor" placeholder="Valor R$">
+                    <button id="btn-salvar-transacao">Salvar Transação</button>
+                    <hr />
+                    <h3>Balanço Mensal</h3>
+                    <p>Entradas: <span id="total-entradas">R$ 0,00</span></p>
+                    <p>Saídas: <span id="total-saidas">R$ 0,00</span></p>
+                    <p>Saldo: <span id="saldo-total">R$ 0,00</span></p>
+                    <hr />
+                    <h3>Histórico de Transações</h3>
+                    <ul id="lista-transacoes" class="list-fake">
+                        </ul>
                 </div>
             </div>
 
@@ -260,16 +301,19 @@
                 <h2>Estoque</h2>
                 <button class="open-btn" onclick="toggleSection('estoque-section')">Abrir</button>
                 <div class="icon-content" id="estoque-section">
-                    <h3>Cadastro de Produto</h3>
-                    <input type="text" placeholder="Nome do Produto">
-                    <input type="number" placeholder="Quantidade">
-                    <button>Adicionar</button>
+                    <h3>Cadastro/Atualizar Produto</h3>
+                    <input type="hidden" id="estoque-id-edit">
+                    <input type="text" id="estoque-nome-produto" placeholder="Nome do Produto">
+                    <input type="number" id="estoque-quantidade" placeholder="Quantidade">
+                    <button id="btn-salvar-produto">Salvar Produto</button>
                     <hr />
-                    <h3>Alerta de Estoque Baixo</h3>
-                    <ul class="list-fake">
-                        <li>Shampoo Liso - 2 unid.</li>
-                        <li>Tinta Loira - 1 unid.</li>
-                    </ul>
+                    <h3>Produtos em Estoque</h3>
+                    <ul id="lista-produtos" class="list-fake">
+                        </ul>
+                    <hr />
+                    <h3>Alerta de Estoque Baixo (< 5 unidades)</h3>
+                    <ul id="lista-alerta-estoque" class="list-fake">
+                        </ul>
                 </div>
             </div>
 
@@ -278,12 +322,17 @@
                 <h2>Profissional</h2>
                 <button class="open-btn" onclick="toggleSection('profissional-section')">Abrir</button>
                 <div class="icon-content" id="profissional-section">
-                    <h3>Cadastrar Profissional</h3>
-                    <input type="text" placeholder="Nome Completo">
-                    <input type="text" placeholder="Especialidade">
-                    <button>Salvar</button>
+                    <h3>Cadastrar/Atualizar Profissional</h3>
+                    <input type="hidden" id="profissional-id-edit">
+                    <input type="text" id="profissional-nome" placeholder="Nome Completo">
+                    <input type="text" id="profissional-especialidade" placeholder="Especialidade">
+                    <button id="btn-salvar-profissional">Salvar Profissional</button>
                     <hr />
-                    <h3>Comissões do Mês</h3>
+                    <h3>Profissionais Cadastrados</h3>
+                    <ul id="lista-profissionais" class="list-fake">
+                        </ul>
+                    <hr />
+                    <h3>Comissões do Mês (Exemplo)</h3>
                     <ul class="list-fake">
                         <li>Jéssica: R$ 1.000</li>
                         <li>Carla: R$ 800</li>
@@ -295,39 +344,277 @@
     </div>
 
     <script>
-        // Variável global para armazenar os clientes
+        // --- Variáveis globais para armazenar os dados ---
         let clientes = [];
+        let agendamentos = [];
+        let transacoes = [];
+        let produtos = [];
+        let profissionais = [];
 
-        // Função para carregar clientes do localStorage
-        const carregarClientes = () => {
-            const clientesSalvos = localStorage.getItem('clientesEspacoTaiBotelho');
-            if (clientesSalvos) {
-                clientes = JSON.parse(clientesSalvos);
-            }
+        // --- Funções Genéricas para LocalStorage ---
+        // Pega dados do localStorage
+        const carregarDados = (chave) => {
+            const dadosSalvos = localStorage.getItem(chave);
+            return dadosSalvos ? JSON.parse(dadosSalvos) : [];
         };
 
-        // Função para salvar clientes no localStorage
-        const salvarClientes = () => {
-            localStorage.setItem('clientesEspacoTaiBotelho', JSON.stringify(clientes));
+        // Salva dados no localStorage
+        const salvarDados = (chave, dados) => {
+            localStorage.setItem(chave, JSON.stringify(dados));
         };
 
-        // Função para renderizar a lista de clientes na interface
+        // Função para gerar IDs únicos (simples, para este contexto)
+        const gerarIdUnico = () => '_' + Math.random().toString(36).substr(2, 9);
+
+        // --- Funções de Renderização (Read) ---
+
+        // Renderizar Clientes
         const renderizarClientes = () => {
             const listaClientesUl = document.getElementById('lista-clientes');
-            listaClientesUl.innerHTML = ''; // Limpa a lista existente
-
+            listaClientesUl.innerHTML = '';
             if (clientes.length === 0) {
                 listaClientesUl.innerHTML = '<li>Nenhum cliente cadastrado ainda.</li>';
                 return;
             }
-
             clientes.forEach(cliente => {
                 const li = document.createElement('li');
-                li.textContent = `${cliente.nome} - ${cliente.telefone}`;
+                li.innerHTML = `
+                    <span>${cliente.nome} - ${cliente.telefone} (${cliente.email || 'Não informado'})</span>
+                    <div class="list-actions">
+                        <button class="edit-btn" onclick="editarCliente('${cliente.id}')">Editar</button>
+                        <button class="delete-btn" onclick="excluirCliente('${cliente.id}')">Excluir</button>
+                    </div>
+                `;
                 listaClientesUl.appendChild(li);
             });
         };
 
+        // Renderizar Agendamentos
+        const renderizarAgendamentos = () => {
+            const listaAgendamentosUl = document.getElementById('lista-agendamentos');
+            listaAgendamentosUl.innerHTML = '';
+            if (agendamentos.length === 0) {
+                listaAgendamentosUl.innerHTML = '<li>Nenhum agendamento futuro.</li>';
+                return;
+            }
+            // Ordenar agendamentos por data
+            agendamentos.sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+            agendamentos.forEach(agendamento => {
+                const dataFormatada = new Date(agendamento.dataHora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${dataFormatada} - ${agendamento.cliente} (${agendamento.servico})</span>
+                    <div class="list-actions">
+                        <button class="edit-btn" onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+                        <button class="delete-btn" onclick="excluirAgendamento('${agendamento.id}')">Excluir</button>
+                    </div>
+                `;
+                listaAgendamentosUl.appendChild(li);
+            });
+        };
+
+        // Renderizar Transações Financeiras
+        const renderizarTransacoes = () => {
+            const listaTransacoesUl = document.getElementById('lista-transacoes');
+            const totalEntradasSpan = document.getElementById('total-entradas');
+            const totalSaidasSpan = document.getElementById('total-saidas');
+            const saldoTotalSpan = document.getElementById('saldo-total');
+
+            listaTransacoesUl.innerHTML = '';
+            let totalEntradas = 0;
+            let totalSaidas = 0;
+
+            if (transacoes.length === 0) {
+                listaTransacoesUl.innerHTML = '<li>Nenhuma transação registrada.</li>';
+            } else {
+                transacoes.forEach(transacao => {
+                    const li = document.createElement('li');
+                    const valorFormatado = parseFloat(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    li.innerHTML = `
+                        <span style="color: ${transacao.tipo === 'entrada' ? 'green' : 'red'};">${transacao.tipo === 'entrada' ? '+' : '-'} ${valorFormatado} - ${transacao.descricao}</span>
+                        <div class="list-actions">
+                            <button class="edit-btn" onclick="editarTransacao('${transacao.id}')">Editar</button>
+                            <button class="delete-btn" onclick="excluirTransacao('${transacao.id}')">Excluir</button>
+                        </div>
+                    `;
+                    listaTransacoesUl.appendChild(li);
+
+                    if (transacao.tipo === 'entrada') {
+                        totalEntradas += parseFloat(transacao.valor);
+                    } else {
+                        totalSaidas += parseFloat(transacao.valor);
+                    }
+                });
+            }
+
+            const saldo = totalEntradas - totalSaidas;
+            totalEntradasSpan.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            totalSaidasSpan.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            saldoTotalSpan.textContent = saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            saldoTotalSpan.style.color = saldo >= 0 ? 'green' : 'red';
+        };
+
+        // Renderizar Produtos (Estoque)
+        const renderizarProdutos = () => {
+            const listaProdutosUl = document.getElementById('lista-produtos');
+            const listaAlertaEstoqueUl = document.getElementById('lista-alerta-estoque');
+            listaProdutosUl.innerHTML = '';
+            listaAlertaEstoqueUl.innerHTML = '';
+
+            if (produtos.length === 0) {
+                listaProdutosUl.innerHTML = '<li>Nenhum produto em estoque.</li>';
+            } else {
+                produtos.forEach(produto => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${produto.nome} - ${produto.quantidade} unid.</span>
+                        <div class="list-actions">
+                            <button class="edit-btn" onclick="editarProduto('${produto.id}')">Editar</button>
+                            <button class="delete-btn" onclick="excluirProduto('${produto.id}')">Excluir</button>
+                        </div>
+                    `;
+                    listaProdutosUl.appendChild(li);
+
+                    if (produto.quantidade < 5) { // Alerta de estoque baixo
+                        const alertaLi = document.createElement('li');
+                        alertaLi.textContent = `${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
+                        alertaLi.style.color = 'orange';
+                        listaAlertaEstoqueUl.appendChild(alertaLi);
+                    }
+                });
+            }
+            if (listaAlertaEstoqueUl.innerHTML === '') {
+                listaAlertaEstoqueUl.innerHTML = '<li>Nenhum alerta de estoque.</li>';
+            }
+        };
+
+        // Renderizar Profissionais
+        const renderizarProfissionais = () => {
+            const listaProfissionaisUl = document.getElementById('lista-profissionais');
+            listaProfissionaisUl.innerHTML = '';
+            if (profissionais.length === 0) {
+                listaProfissionaisUl.innerHTML = '<li>Nenhum profissional cadastrado.</li>';
+                return;
+            }
+            profissionais.forEach(profissional => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${profissional.nome} - ${profissional.especialidade}</span>
+                    <div class="list-actions">
+                        <button class="edit-btn" onclick="editarProfissional('${profissional.id}')">Editar</button>
+                        <button class="delete-btn" onclick="excluirProfissional('${profissional.id}')">Excluir</button>
+                    </div>
+                `;
+                listaProfissionaisUl.appendChild(li);
+            });
+        };
+
+        // --- Funções de Edição (Update - Preenche o formulário) ---
+
+        const editarCliente = (id) => {
+            const cliente = clientes.find(c => c.id === id);
+            if (cliente) {
+                document.getElementById('cliente-id-edit').value = cliente.id;
+                document.getElementById('cliente-nome').value = cliente.nome;
+                document.getElementById('cliente-telefone').value = cliente.telefone;
+                document.getElementById('cliente-email').value = cliente.email;
+                alert('Cliente selecionado para edição. Altere os campos e clique em Salvar.');
+            }
+        };
+
+        const editarAgendamento = (id) => {
+            const agendamento = agendamentos.find(a => a.id === id);
+            if (agendamento) {
+                document.getElementById('agenda-id-edit').value = agendamento.id;
+                document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
+                // Formatar data para datetime-local
+                document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
+                document.getElementById('agenda-servico').value = agendamento.servico;
+                alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar.');
+            }
+        };
+
+        const editarTransacao = (id) => {
+            const transacao = transacoes.find(t => t.id === id);
+            if (transacao) {
+                document.getElementById('financeiro-id-edit').value = transacao.id;
+                document.getElementById('financeiro-tipo').value = transacao.tipo;
+                document.getElementById('financeiro-descricao').value = transacao.descricao;
+                document.getElementById('financeiro-valor').value = transacao.valor;
+                alert('Transação selecionada para edição. Altere os campos e clique em Salvar.');
+            }
+        };
+
+        const editarProduto = (id) => {
+            const produto = produtos.find(p => p.id === id);
+            if (produto) {
+                document.getElementById('estoque-id-edit').value = produto.id;
+                document.getElementById('estoque-nome-produto').value = produto.nome;
+                document.getElementById('estoque-quantidade').value = produto.quantidade;
+                alert('Produto selecionado para edição. Altere os campos e clique em Salvar.');
+            }
+        };
+
+        const editarProfissional = (id) => {
+            const profissional = profissionais.find(p => p.id === id);
+            if (profissional) {
+                document.getElementById('profissional-id-edit').value = profissional.id;
+                document.getElementById('profissional-nome').value = profissional.nome;
+                document.getElementById('profissional-especialidade').value = profissional.especialidade;
+                alert('Profissional selecionado para edição. Altere os campos e clique em Salvar.');
+            }
+        };
+
+
+        // --- Funções de Exclusão (Delete) ---
+
+        const excluirCliente = (id) => {
+            if (confirm('Tem certeza que deseja excluir este cliente?')) {
+                clientes = clientes.filter(c => c.id !== id);
+                salvarDados('clientesEspacoTaiBotelho', clientes);
+                renderizarClientes();
+                alert('Cliente excluído com sucesso!');
+            }
+        };
+
+        const excluirAgendamento = (id) => {
+            if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                agendamentos = agendamentos.filter(a => a.id !== id);
+                salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
+                renderizarAgendamentos();
+                alert('Agendamento excluído com sucesso!');
+            }
+        };
+
+        const excluirTransacao = (id) => {
+            if (confirm('Tem certeza que deseja excluir esta transação?')) {
+                transacoes = transacoes.filter(t => t.id !== id);
+                salvarDados('transacoesEspacoTaiBotelho', transacoes);
+                renderizarTransacoes();
+                alert('Transação excluída com sucesso!');
+            }
+        };
+
+        const excluirProduto = (id) => {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                produtos = produtos.filter(p => p.id !== id);
+                salvarDados('produtosEspacoTaiBotelho', produtos);
+                renderizarProdutos();
+                alert('Produto excluído com sucesso!');
+            }
+        };
+
+        const excluirProfissional = (id) => {
+            if (confirm('Tem certeza que deseja excluir este profissional?')) {
+                profissionais = profissionais.filter(p => p.id !== id);
+                salvarDados('profissionaisEspacoTaiBotelho', profissionais);
+                renderizarProfissionais();
+                alert('Profissional excluído com sucesso!');
+            }
+        };
+
+
+        // --- Funções de Inicialização e Event Listeners ---
         document.addEventListener("DOMContentLoaded", () => {
             document.body.style.visibility = "visible";
 
@@ -351,27 +638,41 @@
             };
 
             button.addEventListener("click", showMainContent);
-            // Removi o setTimeout para que a splash screen só suma com o clique no botão.
-            // Se quiser que ela suma automaticamente após 6 segundos, descomente a linha abaixo:
+            // Se quiser que a splash screen suma automaticamente após um tempo, descomente a linha abaixo:
             // setTimeout(showMainContent, 6000); 
 
-            // --- Lógica para Clientes (ao carregar a página) ---
-            carregarClientes();
-            renderizarClientes(); // Exibe os clientes salvos logo de início
+            // Carregar todos os dados do localStorage ao iniciar
+            clientes = carregarDados('clientesEspacoTaiBotelho');
+            agendamentos = carregarDados('agendamentosEspacoTaiBotelho');
+            transacoes = carregarDados('transacoesEspacoTaiBotelho');
+            produtos = carregarDados('produtosEspacoTaiBotelho');
+            profissionais = carregarDados('profissionaisEspacoTaiBotelho');
 
-            // Event listener para o botão de cadastro de cliente
-            const btnCadastrarCliente = document.getElementById('btn-cadastrar-cliente');
-            btnCadastrarCliente.addEventListener('click', () => {
+
+            // --- Event Listeners para botões de SALVAR (Criar/Atualizar) ---
+
+            // Cliente
+            document.getElementById('btn-salvar-cliente').addEventListener('click', () => {
+                const id = document.getElementById('cliente-id-edit').value;
                 const nome = document.getElementById('cliente-nome').value.trim();
                 const telefone = document.getElementById('cliente-telefone').value.trim();
                 const email = document.getElementById('cliente-email').value.trim();
 
                 if (nome && telefone) {
-                    clientes.push({ nome, telefone, email });
-                    salvarClientes();
+                    if (id) { // Modo de edição
+                        const index = clientes.findIndex(c => c.id === id);
+                        if (index !== -1) {
+                            clientes[index] = { ...clientes[index], nome, telefone, email };
+                            alert('Cliente atualizado com sucesso!');
+                        }
+                    } else { // Modo de novo cadastro
+                        clientes.push({ id: gerarIdUnico(), nome, telefone, email });
+                        alert('Cliente cadastrado com sucesso!');
+                    }
+                    salvarDados('clientesEspacoTaiBotelho', clientes);
                     renderizarClientes();
-                    alert('Cliente cadastrado com sucesso!');
-                    // Limpa os campos após o cadastro
+                    // Limpar formulário
+                    document.getElementById('cliente-id-edit').value = '';
                     document.getElementById('cliente-nome').value = '';
                     document.getElementById('cliente-telefone').value = '';
                     document.getElementById('cliente-email').value = '';
@@ -379,7 +680,127 @@
                     alert('Por favor, preencha o nome e o telefone do cliente.');
                 }
             });
-        });
+
+            // Agenda
+            document.getElementById('btn-salvar-agendamento').addEventListener('click', () => {
+                const id = document.getElementById('agenda-id-edit').value;
+                const cliente = document.getElementById('agenda-cliente-nome').value.trim();
+                const dataHora = document.getElementById('agenda-data-hora').value;
+                const servico = document.getElementById('agenda-servico').value;
+
+                if (cliente && dataHora && servico) {
+                    if (id) { // Modo de edição
+                        const index = agendamentos.findIndex(a => a.id === id);
+                        if (index !== -1) {
+                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico };
+                            alert('Agendamento atualizado com sucesso!');
+                        }
+                    } else { // Modo de novo cadastro
+                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico });
+                        alert('Agendamento salvo com sucesso!');
+                    }
+                    salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
+                    renderizarAgendamentos();
+                    document.getElementById('agenda-id-edit').value = '';
+                    document.getElementById('agenda-cliente-nome').value = '';
+                    document.getElementById('agenda-data-hora').value = '';
+                    document.getElementById('agenda-servico').value = '';
+                } else {
+                    alert('Por favor, preencha todos os campos do agendamento.');
+                }
+            });
+
+            // Financeiro
+            document.getElementById('btn-salvar-transacao').addEventListener('click', () => {
+                const id = document.getElementById('financeiro-id-edit').value;
+                const tipo = document.getElementById('financeiro-tipo').value;
+                const descricao = document.getElementById('financeiro-descricao').value.trim();
+                const valor = parseFloat(document.getElementById('financeiro-valor').value);
+
+                if (tipo && descricao && !isNaN(valor) && valor > 0) {
+                    if (id) { // Modo de edição
+                        const index = transacoes.findIndex(t => t.id === id);
+                        if (index !== -1) {
+                            transacoes[index] = { ...transacoes[index], tipo, descricao, valor };
+                            alert('Transação atualizada com sucesso!');
+                        }
+                    } else { // Modo de nova transação
+                        transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor });
+                        alert('Transação registrada com sucesso!');
+                    }
+                    salvarDados('transacoesEspacoTaiBotelho', transacoes);
+                    renderizarTransacoes();
+                    document.getElementById('financeiro-id-edit').value = '';
+                    document.getElementById('financeiro-tipo').value = '';
+                    document.getElementById('financeiro-descricao').value = '';
+                    document.getElementById('financeiro-valor').value = '';
+                } else {
+                    alert('Por favor, preencha todos os campos corretamente (tipo, descrição, valor numérico positivo).');
+                }
+            });
+
+            // Estoque
+            document.getElementById('btn-salvar-produto').addEventListener('click', () => {
+                const id = document.getElementById('estoque-id-edit').value;
+                const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
+                const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
+
+                if (nomeProduto && !isNaN(quantidade) && quantidade >= 0) { // Quantidade pode ser zero
+                    if (id) { // Modo de edição
+                        const index = produtos.findIndex(p => p.id === id);
+                        if (index !== -1) {
+                            produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
+                            alert('Produto atualizado no estoque!');
+                        }
+                    } else { // Modo de novo produto ou adicionar ao existente
+                        // Verificar se já existe um produto com o mesmo nome para evitar duplicidade
+                        const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
+                        if (produtoExistente) {
+                            produtoExistente.quantidade += quantidade; // Adiciona à quantidade existente
+                            alert('Quantidade de produto existente atualizada!');
+                        } else {
+                            produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
+                            alert('Produto cadastrado no estoque!');
+                        }
+                    }
+                    salvarDados('produtosEspacoTaiBotelho', produtos);
+                    renderizarProdutos();
+                    document.getElementById('estoque-id-edit').value = '';
+                    document.getElementById('estoque-nome-produto').value = '';
+                    document.getElementById('estoque-quantidade').value = '';
+                } else {
+                    alert('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).');
+                }
+            });
+
+            // Profissional
+            document.getElementById('btn-salvar-profissional').addEventListener('click', () => {
+                const id = document.getElementById('profissional-id-edit').value;
+                const nome = document.getElementById('profissional-nome').value.trim();
+                const especialidade = document.getElementById('profissional-especialidade').value.trim();
+
+                if (nome && especialidade) {
+                    if (id) { // Modo de edição
+                        const index = profissionais.findIndex(p => p.id === id);
+                        if (index !== -1) {
+                            profissionais[index] = { ...profissionais[index], nome, especialidade };
+                            alert('Profissional atualizado com sucesso!');
+                        }
+                    } else { // Modo de novo cadastro
+                        profissionais.push({ id: gerarIdUnico(), nome, especialidade });
+                        alert('Profissional cadastrado com sucesso!');
+                    }
+                    salvarDados('profissionaisEspacoTaiBotelho', profissionais);
+                    renderizarProfissionais();
+                    document.getElementById('profissional-id-edit').value = '';
+                    document.getElementById('profissional-nome').value = '';
+                    document.getElementById('profissional-especialidade').value = '';
+                } else {
+                    alert('Por favor, preencha o nome e a especialidade do profissional.');
+                }
+            });
+        }); // Fim do DOMContentLoaded
+
 
         // Função para alternar a visibilidade das seções
         function toggleSection(id) {
@@ -396,9 +817,25 @@
             // Alterna a visibilidade da seção clicada
             el.style.display = isCurrentlyVisible ? "none" : "block";
 
-            // Se a seção de cliente for aberta, atualiza a lista para garantir que os dados mais recentes são mostrados
-            if (id === 'cliente-section') {
-                renderizarClientes();
+            // Renderiza o conteúdo específico da seção quando ela é aberta
+            if (!isCurrentlyVisible) { // Se a seção está sendo aberta
+                switch (id) {
+                    case 'cliente-section':
+                        renderizarClientes();
+                        break;
+                    case 'agenda-section':
+                        renderizarAgendamentos();
+                        break;
+                    case 'financeiro-section':
+                        renderizarTransacoes();
+                        break;
+                    case 'estoque-section':
+                        renderizarProdutos();
+                        break;
+                    case 'profissional-section':
+                        renderizarProfissionais();
+                        break;
+                }
             }
         }
     </script>
