@@ -85,6 +85,16 @@
       color: white;
     }
     .table-wrapper { overflow-x: auto; }
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+    .action-buttons button {
+      width: auto;
+      padding: 8px 12px;
+      margin: 0;
+      font-size: 14px;
+    }
 
     /* Estilos para o Splash Screen */
     #splash-screen {
@@ -213,7 +223,9 @@
         <input type="number" id="gasto-quantidade" required />
         <label>Valor Total (R$):</label>
         <input type="number" id="gasto-valor" step="0.01" required />
-        <button type="submit" class="primary">Registrar Gasto</button>
+        <div id="gasto-form-actions">
+            <button type="submit" class="primary" id="btn-submit-gasto">Registrar Gasto</button>
+        </div>
       </form>
       <div class="table-wrapper">
         <table id="tabela-gastos"><thead>
@@ -265,14 +277,13 @@
             <td>${c.nome}</td>
             <td>${c.telefone}</td>
             <td>${c.observacoes}</td>
-            <td><button onclick="excluirItem('clientes', ${i}, carregarClientes)">Excluir</button></td>
+            <td><div class="action-buttons"><button onclick="excluirItem('clientes', ${i}, carregarClientes)">Excluir</button></div></td>
           </tr>`;
       });
     }
 
     formClientes.onsubmit = e => {
       e.preventDefault();
-      // Correção: Use document.getElementById para acessar os valores dos inputs
       const nome = document.getElementById("cliente-nome").value;
       const telefone = document.getElementById("cliente-telefone").value;
       const observacoes = document.getElementById("cliente-observacoes").value;
@@ -296,7 +307,7 @@
             <td>${a.tipo}</td>
             <td>${a.tamanho}</td>
             <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
-            <td><button onclick="excluirItem('agenda', ${i}, carregarAgenda)">Excluir</button></td>
+            <td><div class="action-buttons"><button onclick="excluirItem('agenda', ${i}, carregarAgenda)">Excluir</button></div></td>
           </tr>`;
       });
     }
@@ -304,7 +315,6 @@
     formAgenda.onsubmit = e => {
       e.preventDefault();
       const a = {
-        // Correção: Use document.getElementById para acessar os valores dos inputs
         cliente: document.getElementById("pedido-cliente").value,
         data: document.getElementById("pedido-data").value,
         tipo: document.getElementById("pedido-tipo").value,
@@ -328,14 +338,13 @@
           <tr>
             <td>${e.nome}</td>
             <td>${e.quantidade}</td>
-            <td><button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button></td>
+            <td><div class="action-buttons"><button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button></div></td>
           </tr>`;
       });
     }
 
     formEstoque.onsubmit = e => {
       e.preventDefault();
-      // Correção: Use document.getElementById para acessar os valores dos inputs
       const nome = document.getElementById("ingrediente-nome").value;
       const quantidade = document.getElementById("ingrediente-quantidade").value;
       const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
@@ -346,6 +355,9 @@
 
     const formGastos = document.getElementById("form-gastos");
     const tabelaGastos = document.querySelector("#tabela-gastos tbody");
+    const btnSubmitGasto = document.getElementById("btn-submit-gasto");
+    const gastoFormActions = document.getElementById("gasto-form-actions");
+    let editingGastoIndex = -1; // Variável para controlar qual item está sendo editado
 
     function carregarGastos() {
       const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
@@ -356,32 +368,83 @@
             <td>${g.produto}</td>
             <td>${g.quantidade}</td>
             <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
-            <td><button onclick="excluirItem('gastos', ${i}, carregarGastos)">Excluir</button></td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarGasto(${i})">Editar</button>
+                    <button onclick="excluirItem('gastos', ${i}, carregarGastos)">Excluir</button>
+                </div>
+            </td>
           </tr>`;
       });
+      resetGastoForm(); // Garante que o formulário esteja no modo de adição ao carregar
+    }
+
+    function editarGasto(index) {
+      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+      const gasto = gastos[index];
+      
+      document.getElementById("gasto-produto").value = gasto.produto;
+      document.getElementById("gasto-quantidade").value = gasto.quantidade;
+      document.getElementById("gasto-valor").value = gasto.valor;
+      
+      btnSubmitGasto.textContent = "Atualizar Gasto";
+      btnSubmitGasto.classList.add("edit-mode"); // Adiciona uma classe para estilização se necessário
+      
+      // Adiciona o botão de cancelar se não existir
+      if (!document.getElementById("btn-cancel-gasto")) {
+          const cancelButton = document.createElement("button");
+          cancelButton.textContent = "Cancelar";
+          cancelButton.type = "button";
+          cancelButton.id = "btn-cancel-gasto";
+          cancelButton.classList.add("primary"); // Pode adicionar uma classe diferente para estilo
+          cancelButton.style.backgroundColor = "#ccc"; // Cor cinza para cancelar
+          cancelButton.style.marginLeft = "10px";
+          cancelButton.onclick = resetGastoForm;
+          gastoFormActions.appendChild(cancelButton);
+      }
+
+      editingGastoIndex = index; // Salva o índice do item que está sendo editado
+    }
+
+    function resetGastoForm() {
+        formGastos.reset();
+        btnSubmitGasto.textContent = "Registrar Gasto";
+        btnSubmitGasto.classList.remove("edit-mode");
+        const cancelButton = document.getElementById("btn-cancel-gasto");
+        if (cancelButton) {
+            cancelButton.remove();
+        }
+        editingGastoIndex = -1; // Reseta o índice de edição
     }
 
     formGastos.onsubmit = e => {
       e.preventDefault();
-      // Correção: Use document.getElementById para acessar os valores dos inputs
       const produto = document.getElementById("gasto-produto").value;
       const quantidade = document.getElementById("gasto-quantidade").value;
       const valor = document.getElementById("gasto-valor").value;
-      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
-      gastos.push({ produto, quantidade, valor });
+      let gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+
+      if (editingGastoIndex !== -1) {
+        // Modo de edição
+        gastos[editingGastoIndex] = { produto, quantidade, valor };
+      } else {
+        // Modo de adição
+        gastos.push({ produto, quantidade, valor });
+      }
+      
       localStorage.setItem("gastos", JSON.stringify(gastos));
-      formGastos.reset(); carregarGastos();
+      carregarGastos(); // Recarrega a tabela e reseta o formulário
+      atualizarFinanceiro();
     }
 
     function atualizarFinanceiro() {
       const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
       const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
 
-      const ganhos = agenda.reduce((s, p) => s + parseFloat(p.valor), 0);
-      const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor), 0);
+      const ganhos = agenda.reduce((s, p) => s + parseFloat(p.valor || 0), 0);
+      const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor || 0), 0);
       const lucro = ganhos - despesas;
 
-      // Correções para garantir que os valores são números
       const ganhosFormatados = isNaN(ganhos) ? 0 : ganhos;
       const despesasFormatadas = isNaN(despesas) ? 0 : despesas;
       const lucroFormatado = isNaN(lucro) ? 0 : lucro;
@@ -402,7 +465,7 @@
     carregarClientes();
     carregarAgenda();
     carregarEstoque();
-    carregarGastos();
+    carregarGastos(); // Chamada para carregar os gastos e inicializar o formulário
     atualizarFinanceiro();
   </script>
 </body>
