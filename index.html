@@ -8,7 +8,323 @@
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
-            justify-content: center;
+            justify-content: <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Compras de Casa</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e0f2f7; /* Azul claro suave */
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #26a69a; /* Verde água */
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        .category-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .category-selector button {
+            background-color: #eceff1; /* Cinza claro */
+            color: #546e7a; /* Cinza azulado escuro */
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            flex: 1;
+            margin: 0 5px;
+        }
+
+        .category-selector button.active {
+            background-color: #26a69a; /* Verde água ativo */
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .category-selector button:hover:not(.active) {
+            background-color: #cfd8dc; /* Cinza um pouco mais escuro */
+        }
+
+        .add-item-section {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .add-item-section input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #b0bec5; /* Cinza azulado claro */
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .add-item-section button {
+            background-color: #42bd41; /* Verde botão adicionar */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-item-section button:hover {
+            background-color: #388e3c; /* Verde mais escuro */
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0;
+        }
+
+        .item-list li {
+            background-color: #e0f2f7; /* Cor de fundo para cada item */
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            border-left: 5px solid #26a69a; /* Barra colorida lateral */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .item-list li.purchased {
+            background-color: #c8e6c9; /* Verde claro para comprado */
+            text-decoration: line-through;
+            color: #757575;
+            border-left-color: #4caf50; /* Verde mais forte para comprado */
+        }
+
+        .item-list li span {
+            flex-grow: 1;
+            text-align: left;
+            cursor: pointer; /* Indica que pode ser clicado para marcar */
+        }
+
+        .item-list li .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .item-list li .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #ef5350; /* Vermelho para deletar */
+            transition: color 0.3s ease;
+        }
+
+        .item-list li .actions button:hover {
+            color: #c62828; /* Vermelho mais escuro */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .category-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .category-selector button {
+                flex-basis: 45%; /* Two buttons per row */
+                margin: 5px;
+            }
+            .add-item-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Minhas Compras de Casa</h1>
+
+        <div class="category-selector">
+            <button id="btn-mercado" class="active">Mercado</button>
+            <button id="btn-fruteira">Fruteira</button>
+            <button id="btn-acougue">Açougue</button>
+            <button id="btn-outros">Outros</button>
+        </div>
+
+        <div class="add-item-section">
+            <input type="text" id="item-input" placeholder="Adicionar novo item...">
+            <button id="add-item-btn">Adicionar</button>
+        </div>
+
+        <ul id="current-item-list" class="item-list">
+            <li>Nenhum item nesta lista ainda.</li>
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const categories = {
+                mercado: [],
+                fruteira: [],
+                acougue: [],
+                outros: []
+            };
+
+            let currentCategory = 'mercado'; // Categoria ativa inicial
+
+            const categoryButtons = document.querySelectorAll('.category-selector button');
+            const itemInput = document.getElementById('item-input');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const currentItemList = document.getElementById('current-item-list');
+
+            // --- Funções de Armazenamento (localStorage) ---
+            function saveCategories() {
+                localStorage.setItem('shoppingCategories', JSON.stringify(categories));
+            }
+
+            function loadCategories() {
+                const storedCategories = localStorage.getItem('shoppingCategories');
+                if (storedCategories) {
+                    Object.assign(categories, JSON.parse(storedCategories)); // Carrega os dados salvos
+                }
+            }
+
+            // --- Funções de Renderização da Interface ---
+            function renderItems() {
+                currentItemList.innerHTML = ''; // Limpa a lista atual
+
+                const items = categories[currentCategory];
+
+                if (items.length === 0) {
+                    const noItemMessage = document.createElement('li');
+                    noItemMessage.textContent = 'Nenhum item nesta lista ainda.';
+                    noItemMessage.style.textAlign = 'center';
+                    noItemMessage.style.fontStyle = 'italic';
+                    noItemMessage.style.backgroundColor = '#f5f5f5';
+                    noItemMessage.style.borderLeft = 'none';
+                    currentItemList.appendChild(noItemMessage);
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    const listItem = document.createElement('li');
+                    if (item.purchased) {
+                        listItem.classList.add('purchased');
+                    }
+
+                    const itemNameSpan = document.createElement('span');
+                    itemNameSpan.textContent = item.name;
+                    itemNameSpan.addEventListener('click', () => togglePurchased(index));
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.classList.add('actions');
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerHTML = '&#x2715;'; // X mark for delete
+                    deleteButton.title = 'Remover item';
+                    deleteButton.addEventListener('click', () => deleteItem(index));
+
+                    actionsDiv.appendChild(deleteButton);
+                    listItem.appendChild(itemNameSpan);
+                    listItem.appendChild(actionsDiv);
+                    currentItemList.appendChild(listItem);
+                });
+            }
+
+            function setActiveCategoryButton() {
+                categoryButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.id === `btn-${currentCategory}`) {
+                        button.classList.add('active');
+                    }
+                });
+            }
+
+            // --- Funções de Manipulação de Dados ---
+            function addItem() {
+                const itemName = itemInput.value.trim();
+                if (itemName) {
+                    categories[currentCategory].push({ name: itemName, purchased: false });
+                    itemInput.value = ''; // Limpa o input
+                    saveCategories();
+                    renderItems();
+                }
+            }
+
+            function deleteItem(index) {
+                categories[currentCategory].splice(index, 1); // Remove 1 item no índice especificado
+                saveCategories();
+                renderItems();
+            }
+
+            function togglePurchased(index) {
+                categories[currentCategory][index].purchased = !categories[currentCategory][index].purchased;
+                saveCategories();
+                renderItems();
+            }
+
+            // --- Event Listeners ---
+            addItemBtn.addEventListener('click', addItem);
+
+            itemInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addItem();
+                }
+            });
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    currentCategory = button.id.replace('btn-', ''); // Pega o nome da categoria do ID do botão
+                    setActiveCategoryButton();
+                    renderItems();
+                });
+            });
+
+            // --- Inicialização do App ---
+            loadCategories(); // Carrega os dados salvos ao iniciar
+            setActiveCategoryButton(); // Define o botão de categoria ativo
+            renderItems(); // Renderiza os itens da categoria inicial
+        });
+    </script>
+</body>
+</html>
+;
             align-items: center;
             min-height: 100vh;
             margin: 0;
