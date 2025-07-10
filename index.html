@@ -11,8 +11,9 @@
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            overflow: hidden; /* Esconde a barra de rolagem inicial */
+            overflow-x: hidden; /* Evita rolagem horizontal */
             visibility: hidden; /* Esconde o corpo até que o JS carregue */
+            background-color: #f8f8f8; /* Cor de fundo suave */
         }
 
         /* Splash Screen */
@@ -85,6 +86,17 @@
             min-height: 100vh;
             box-sizing: border-box;
             display: none; /* Inicia oculto, será mostrado pelo JS */
+            transition: all 0.5s ease-in-out; /* Transição suave */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 30px;
         }
 
         #dashboard-icons {
@@ -94,102 +106,224 @@
             gap: 30px;
             padding: 40px 20px;
             background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
         }
 
         .icon-card {
-            background: #f9f9f9;
+            background: #fff;
             border-radius: 15px;
-            padding: 20px;
-            width: 280px;
+            padding: 25px;
+            width: 300px; /* Aumentei um pouco */
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; /* Para centralizar conteúdo */
+            flex-direction: column;
+            justify-content: space-between; /* Espaça o botão do título */
         }
 
         .icon-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
         }
 
         .icon-card .material-icons {
-            font-size: 48px;
+            font-size: 52px; /* Aumentei o ícone */
             color: #DAA520;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .icon-card h2 {
-            font-size: 1.4em;
-            margin: 10px 0;
+            font-size: 1.6em; /* Aumentei o título */
+            margin: 10px 0 20px; /* Mais espaço abaixo do título */
             color: #333;
         }
 
         .open-btn {
-            background: #daa520;
+            background: linear-gradient(45deg, #DAA520, #B8860B); /* Gradiente para botões de abrir */
             color: #fff;
             border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 10px 25px; /* Mais padding */
+            border-radius: 25px; /* Mais arredondado */
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 10px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .open-btn:hover {
+            background: linear-gradient(45deg, #B8860B, #DAA520);
+            transform: translateY(-2px);
         }
 
         .icon-content {
             display: none; /* Conteúdo das seções inicia oculto */
             text-align: left;
-            margin-top: 10px;
+            margin-top: 20px; /* Mais espaço */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-content h3 {
+            color: #444;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
 
         .icon-content input,
-        .icon-content select,
-        .icon-content button {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 0.95em;
+        .icon-content select {
+            width: calc(100% - 20px); /* Ajuste para padding */
+            padding: 10px;
+            margin-bottom: 15px; /* Mais espaço */
+            border-radius: 8px; /* Mais arredondado */
+            border: 1px solid #ddd;
+            font-size: 0.98em;
+            box-sizing: border-box; /* Inclui padding na largura */
         }
 
         .icon-content button {
             background: #000;
             color: #FFD700;
             border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.3s ease;
+            width: auto; /* Permite que o botão se ajuste ao conteúdo */
+            margin-right: 10px; /* Espaço entre botões */
         }
+
+        .icon-content button:hover {
+            background: #333;
+        }
+
+        .icon-content .btn-action { /* Botões específicos de ação no form */
+            width: 100%;
+            margin-top: 15px;
+            background: #DAA520; /* Cor primária para ações principais */
+            color: #fff;
+            font-size: 1.1em;
+            padding: 12px;
+        }
+        .icon-content .btn-action:hover {
+            background: #B8860B;
+        }
+
 
         /* Estilo para botões de ação na lista (Editar/Excluir) */
         .list-actions button {
             width: auto;
-            padding: 4px 8px;
-            margin-left: 5px;
-            font-size: 0.85em;
-            border-radius: 4px;
+            padding: 6px 12px; /* Aumentei padding */
+            margin-left: 8px; /* Mais espaço */
+            font-size: 0.88em;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .list-actions .edit-btn {
             background-color: #007bff; /* Azul */
         }
 
+        .list-actions .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
         .list-actions .delete-btn {
             background-color: #dc3545; /* Vermelho */
+        }
+
+        .list-actions .delete-btn:hover {
+            background-color: #bd2130;
         }
 
         .list-fake {
             padding-left: 0; /* Remover padding padrão da UL */
             color: #444;
             list-style: none; /* Remove bullet points padrão */
+            margin-top: 20px;
         }
 
         .list-fake li {
-            background-color: #eee;
-            margin-bottom: 5px;
-            padding: 8px;
-            border-radius: 4px;
+            background-color: #f5f5f5;
+            margin-bottom: 8px; /* Mais espaço entre itens */
+            padding: 10px; /* Mais padding */
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+        .list-fake li:hover {
+            background-color: #ececec;
+        }
+
+        /* Campos de busca */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-container input {
+            flex-grow: 1;
+            margin-bottom: 0; /* Remove margin do input base */
+        }
+        .search-container button {
+            width: auto;
+            background: #4CAF50; /* Verde para busca */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .search-container button:hover {
+            background: #45a049;
+        }
+
+        /* Relatórios Financeiros */
+        #financeiro-relatorio-output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff; /* Azul claro */
+            border-left: 5px solid #DAA520;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        #financeiro-relatorio-output p {
+            margin: 5px 0;
+            color: #333;
+        }
+        #financeiro-relatorio-output strong {
+            color: #DAA520;
+        }
+
+        /* Estilo para exportação */
+        .export-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .export-buttons button {
+            background: #6c757d; /* Cinza para exportação */
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: normal;
+        }
+        .export-buttons button:hover {
+            background: #5a6268;
         }
 
         @media (max-width: 768px) {
@@ -209,6 +343,23 @@
 
             .icon-card {
                 width: 90%;
+                padding: 20px;
+            }
+            .icon-card h2 {
+                font-size: 1.3em;
+            }
+            .icon-card .material-icons {
+                font-size: 48px;
+            }
+
+            .icon-content input,
+            .icon-content select,
+            .icon-content button {
+                width: 100%;
+            }
+            .list-actions button {
+                padding: 4px 8px;
+                font-size: 0.8em;
             }
         }
     </style>
@@ -237,11 +388,18 @@
                     <input type="text" id="cliente-nome" placeholder="Nome Completo">
                     <input type="text" id="cliente-telefone" placeholder="Telefone">
                     <input type="email" id="cliente-email" placeholder="E-mail">
-                    <button id="btn-salvar-cliente">Salvar Cliente</button>
+                    <button id="btn-salvar-cliente" class="btn-action">Salvar Cliente</button>
                     <hr />
                     <h3>Lista de Clientes</h3>
+                    <div class="search-container">
+                        <input type="text" id="search-cliente" placeholder="Buscar cliente por nome...">
+                        <button id="btn-search-cliente">Buscar</button>
+                    </div>
                     <ul id="lista-clientes" class="list-fake">
                         </ul>
+                    <div class="export-buttons">
+                        <button onclick="exportarDados('clientes')">Exportar Clientes (CSV)</button>
+                    </div>
                 </div>
             </div>
 
@@ -260,12 +418,22 @@
                         <option value="Coloracao">Coloração</option>
                         <option value="Corte">Corte</option>
                         <option value="Hidratacao">Hidratação</option>
+                        <option value="Manicure">Manicure</option>
+                        <option value="Pedicure">Pedicure</option>
+                        <option value="Sobrancelha">Sobrancelha</option>
                     </select>
-                    <button id="btn-salvar-agendamento">Salvar Agendamento</button>
+                    <button id="btn-salvar-agendamento" class="btn-action">Salvar Agendamento</button>
                     <hr />
                     <h3>Próximos Agendamentos</h3>
+                    <div class="search-container">
+                        <input type="text" id="search-agendamento" placeholder="Buscar agendamento por cliente/serviço...">
+                        <button id="btn-search-agendamento">Buscar</button>
+                    </div>
                     <ul id="lista-agendamentos" class="list-fake">
                         </ul>
+                    <div class="export-buttons">
+                        <button onclick="exportarDados('agendamentos')">Exportar Agendamentos (CSV)</button>
+                    </div>
                 </div>
             </div>
 
@@ -283,11 +451,23 @@
                     </select>
                     <input type="text" id="financeiro-descricao" placeholder="Descrição">
                     <input type="number" id="financeiro-valor" placeholder="Valor R$">
-                    <button id="btn-salvar-transacao">Salvar Transação</button> <hr />
+                    <button id="btn-salvar-transacao" class="btn-action">Salvar Transação</button>
+                    <hr />
                     <h3>Balanço Mensal</h3>
                     <p>Entradas: <span id="total-entradas">R$ 0,00</span></p>
                     <p>Saídas: <span id="total-saidas">R$ 0,00</span></p>
                     <p>Saldo: <span id="saldo-total">R$ 0,00</span></p>
+                    <hr />
+                    <h3>Relatórios Financeiros</h3>
+                    <select id="financeiro-relatorio-tipo">
+                        <option value="todos">Todas as Transações</option>
+                        <option value="entradas">Apenas Entradas</option>
+                        <option value="saidas">Apenas Saídas</option>
+                    </select>
+                    <button id="btn-gerar-relatorio">Gerar Relatório</button>
+                    <div id="financeiro-relatorio-output">
+                        <p>Selecione uma opção e clique em "Gerar Relatório".</p>
+                    </div>
                     <hr />
                     <h3>Histórico de Transações</h3>
                     <ul id="lista-transacoes" class="list-fake">
@@ -304,9 +484,13 @@
                     <input type="hidden" id="estoque-id-edit">
                     <input type="text" id="estoque-nome-produto" placeholder="Nome do Produto">
                     <input type="number" id="estoque-quantidade" placeholder="Quantidade">
-                    <button id="btn-salvar-produto">Salvar Produto</button>
+                    <button id="btn-salvar-produto" class="btn-action">Salvar Produto</button>
                     <hr />
                     <h3>Produtos em Estoque</h3>
+                    <div class="search-container">
+                        <input type="text" id="search-produto" placeholder="Buscar produto por nome...">
+                        <button id="btn-search-produto">Buscar</button>
+                    </div>
                     <ul id="lista-produtos" class="list-fake">
                         </ul>
                     <hr />
@@ -325,7 +509,7 @@
                     <input type="hidden" id="profissional-id-edit">
                     <input type="text" id="profissional-nome" placeholder="Nome Completo">
                     <input type="text" id="profissional-especialidade" placeholder="Especialidade">
-                    <button id="btn-salvar-profissional">Salvar Profissional</button>
+                    <button id="btn-salvar-profissional" class="btn-action">Salvar Profissional</button>
                     <hr />
                     <h3>Profissionais Cadastrados</h3>
                     <ul id="lista-profissionais" class="list-fake">
@@ -351,31 +535,33 @@
         let profissionais = [];
 
         // --- Funções Genéricas para LocalStorage ---
-        // Pega dados do localStorage
         const carregarDados = (chave) => {
             const dadosSalvos = localStorage.getItem(chave);
             return dadosSalvos ? JSON.parse(dadosSalvos) : [];
         };
 
-        // Salva dados no localStorage
         const salvarDados = (chave, dados) => {
             localStorage.setItem(chave, JSON.stringify(dados));
         };
 
-        // Função para gerar IDs únicos (simples, para este contexto)
         const gerarIdUnico = () => '_' + Math.random().toString(36).substr(2, 9);
 
         // --- Funções de Renderização (Read) ---
 
-        // Renderizar Clientes
-        const renderizarClientes = () => {
+        const renderizarClientes = (filtro = '') => {
             const listaClientesUl = document.getElementById('lista-clientes');
             listaClientesUl.innerHTML = '';
-            if (clientes.length === 0) {
-                listaClientesUl.innerHTML = '<li>Nenhum cliente cadastrado ainda.</li>';
+            const clientesFiltrados = clientes.filter(cliente => 
+                cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+                cliente.telefone.includes(filtro) ||
+                (cliente.email && cliente.email.toLowerCase().includes(filtro.toLowerCase()))
+            );
+
+            if (clientesFiltrados.length === 0) {
+                listaClientesUl.innerHTML = `<li>Nenhum cliente ${filtro ? 'encontrado com o filtro' : 'cadastrado ainda'}.</li>`;
                 return;
             }
-            clientes.forEach(cliente => {
+            clientesFiltrados.forEach(cliente => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <span>${cliente.nome} - ${cliente.telefone} (${cliente.email || 'Não informado'})</span>
@@ -388,17 +574,23 @@
             });
         };
 
-        // Renderizar Agendamentos
-        const renderizarAgendamentos = () => {
+        const renderizarAgendamentos = (filtro = '') => {
             const listaAgendamentosUl = document.getElementById('lista-agendamentos');
             listaAgendamentosUl.innerHTML = '';
-            if (agendamentos.length === 0) {
-                listaAgendamentosUl.innerHTML = '<li>Nenhum agendamento futuro.</li>';
+            // Ordenar agendamentos por data, filtrando depois
+            const agendamentosOrdenados = agendamentos.sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+            
+            const agendamentosFiltrados = agendamentosOrdenados.filter(agendamento => 
+                agendamento.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
+                agendamento.servico.toLowerCase().includes(filtro.toLowerCase()) ||
+                new Date(agendamento.dataHora).toLocaleDateString('pt-BR').includes(filtro)
+            );
+
+            if (agendamentosFiltrados.length === 0) {
+                listaAgendamentosUl.innerHTML = `<li>Nenhum agendamento ${filtro ? 'encontrado com o filtro' : 'futuro'}.</li>`;
                 return;
             }
-            // Ordenar agendamentos por data
-            agendamentos.sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
-            agendamentos.forEach(agendamento => {
+            agendamentosFiltrados.forEach(agendamento => {
                 const dataFormatada = new Date(agendamento.dataHora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
                 const li = document.createElement('li');
                 li.innerHTML = `
@@ -412,7 +604,6 @@
             });
         };
 
-        // Renderizar Transações Financeiras
         const renderizarTransacoes = () => {
             const listaTransacoesUl = document.getElementById('lista-transacoes');
             const totalEntradasSpan = document.getElementById('total-entradas');
@@ -453,17 +644,20 @@
             saldoTotalSpan.style.color = saldo >= 0 ? 'green' : 'red';
         };
 
-        // Renderizar Produtos (Estoque)
-        const renderizarProdutos = () => {
+        const renderizarProdutos = (filtro = '') => {
             const listaProdutosUl = document.getElementById('lista-produtos');
             const listaAlertaEstoqueUl = document.getElementById('lista-alerta-estoque');
             listaProdutosUl.innerHTML = '';
             listaAlertaEstoqueUl.innerHTML = '';
 
-            if (produtos.length === 0) {
-                listaProdutosUl.innerHTML = '<li>Nenhum produto em estoque.</li>';
+            const produtosFiltrados = produtos.filter(produto => 
+                produto.nome.toLowerCase().includes(filtro.toLowerCase())
+            );
+
+            if (produtosFiltrados.length === 0) {
+                listaProdutosUl.innerHTML = `<li>Nenhum produto ${filtro ? 'encontrado com o filtro' : 'em estoque'}.</li>`;
             } else {
-                produtos.forEach(produto => {
+                produtosFiltrados.forEach(produto => {
                     const li = document.createElement('li');
                     li.innerHTML = `
                         <span>${produto.nome} - ${produto.quantidade} unid.</span>
@@ -487,8 +681,7 @@
             }
         };
 
-        // Renderizar Profissionais
-        const renderizarProfissionais = () => {
+        const renderizarProfissionais = () => { // Profissionais não terão busca para simplificar, se precisar é só adicionar
             const listaProfissionaisUl = document.getElementById('lista-profissionais');
             listaProfissionaisUl.innerHTML = '';
             if (profissionais.length === 0) {
@@ -526,7 +719,6 @@
             if (agendamento) {
                 document.getElementById('agenda-id-edit').value = agendamento.id;
                 document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
-                // Formatar data para datetime-local
                 document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
                 document.getElementById('agenda-servico').value = agendamento.servico;
                 alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar Agendamento.');
@@ -611,6 +803,96 @@
             }
         };
 
+        // --- Funções de Relatórios e Exportação ---
+
+        const gerarRelatorioFinanceiro = () => {
+            const tipoRelatorio = document.getElementById('financeiro-relatorio-tipo').value;
+            const outputDiv = document.getElementById('financeiro-relatorio-output');
+            outputDiv.innerHTML = '';
+
+            let transacoesParaRelatorio = [];
+            let totalEntradasRelatorio = 0;
+            let totalSaidasRelatorio = 0;
+
+            if (tipoRelatorio === 'entradas') {
+                transacoesParaRelatorio = transacoes.filter(t => t.tipo === 'entrada');
+                totalEntradasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+            } else if (tipoRelatorio === 'saidas') {
+                transacoesParaRelatorio = transacoes.filter(t => t.tipo === 'saida');
+                totalSaidasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+            } else { // todos
+                transacoesParaRelatorio = transacoes;
+                totalEntradasRelatorio = transacoes.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                totalSaidasRelatorio = transacoes.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                outputDiv.innerHTML += `<p><strong>Saldo Geral:</strong> ${(totalEntradasRelatorio - totalSaidasRelatorio).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+            }
+
+            if (transacoesParaRelatorio.length > 0) {
+                outputDiv.innerHTML += '<p><strong>Detalhes:</strong></p>';
+                transacoesParaRelatorio.forEach(t => {
+                    outputDiv.innerHTML += `<p>${new Date().toLocaleDateString('pt-BR')} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                });
+            } else {
+                outputDiv.innerHTML += '<p>Nenhuma transação encontrada para este tipo de relatório.</p>';
+            }
+        };
+
+        const exportarDados = (tipo) => {
+            let data = [];
+            let headers = [];
+            let filename = '';
+
+            if (tipo === 'clientes') {
+                data = clientes;
+                headers = ['ID', 'Nome', 'Telefone', 'Email'];
+                filename = 'clientes_espaco_tai_botelho.csv';
+            } else if (tipo === 'agendamentos') {
+                data = agendamentos;
+                headers = ['ID', 'Cliente', 'Data/Hora', 'Servico'];
+                filename = 'agendamentos_espaco_tai_botelho.csv';
+            } else {
+                alert('Tipo de exportação não suportado.');
+                return;
+            }
+
+            if (data.length === 0) {
+                alert(`Não há ${tipo} para exportar.`);
+                return;
+            }
+
+            let csvContent = headers.join(';') + '\n'; // Cabeçalho CSV
+            data.forEach(item => {
+                const row = headers.map(header => {
+                    let value = item[header.replace('/', '').toLowerCase()]; // Ajusta para 'datahora', 'email' etc.
+                    if (header === 'Data/Hora' && value) {
+                        value = new Date(value).toLocaleString('pt-BR');
+                    }
+                    return `"${value || ''}"`; // Garante que valores sejam tratados como string e envoltos em aspas
+                }).join(';');
+                csvContent += row + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) { // Feature detection for download attribute
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('Seu navegador não suporta download automático. Por favor, copie o conteúdo abaixo:\n\n' + csvContent);
+            }
+            alert(`Dados de ${tipo} exportados com sucesso para ${filename}!`);
+        };
+
+
         // --- Funções de Inicialização e Event Listeners ---
         document.addEventListener("DOMContentLoaded", () => {
             document.body.style.visibility = "visible";
@@ -625,7 +907,7 @@
                     splash.addEventListener(
                         "transitionend",
                         () => {
-                            splash.style.display = "none";
+                            splash.style.display = "block";
                             main.style.display = "block";
                             document.body.style.overflow = "auto";
                         },
@@ -635,8 +917,6 @@
             };
 
             button.addEventListener("click", showMainContent);
-            // Se quiser que a splash screen suma automaticamente após um tempo, descomente a linha abaixo:
-            // setTimeout(showMainContent, 6000); 
 
             // Carregar todos os dados do localStorage ao iniciar
             clientes = carregarDados('clientesEspacoTaiBotelho');
@@ -667,7 +947,7 @@
                         alert('Cliente cadastrado com sucesso!');
                     }
                     salvarDados('clientesEspacoTaiBotelho', clientes);
-                    renderizarClientes();
+                    renderizarClientes(); // Renderiza com a busca atual (vazia se não houver)
                     // Limpar formulário
                     document.getElementById('cliente-id-edit').value = '';
                     document.getElementById('cliente-nome').value = '';
@@ -742,7 +1022,7 @@
                 const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
                 const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
 
-                if (nomeProduto && !isNaN(quantidade) && quantidade >= 0) { // Quantidade pode ser zero
+                if (nomeProduto && !isNaN(quantidade) && quantidade >= 0) {
                     if (id) { // Modo de edição
                         const index = produtos.findIndex(p => p.id === id);
                         if (index !== -1) {
@@ -750,10 +1030,9 @@
                             alert('Produto atualizado no estoque!');
                         }
                     } else { // Modo de novo produto ou adicionar ao existente
-                        // Verificar se já existe um produto com o mesmo nome para evitar duplicidade
                         const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
                         if (produtoExistente) {
-                            produtoExistente.quantidade += quantidade; // Adiciona à quantidade existente
+                            produtoExistente.quantidade += quantidade;
                             alert('Quantidade de produto existente atualizada!');
                         } else {
                             produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
@@ -796,6 +1075,56 @@
                     alert('Por favor, preencha o nome e a especialidade do profissional.');
                 }
             });
+
+            // --- Event Listeners para Busca ---
+            document.getElementById('btn-search-cliente').addEventListener('click', () => {
+                const termo = document.getElementById('search-cliente').value.trim();
+                renderizarClientes(termo);
+            });
+            document.getElementById('search-cliente').addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    document.getElementById('btn-search-cliente').click();
+                }
+            });
+            // Adicionado para limpar a busca ao apagar o texto
+            document.getElementById('search-cliente').addEventListener('input', () => {
+                if (document.getElementById('search-cliente').value.trim() === '') {
+                    renderizarClientes('');
+                }
+            });
+
+            document.getElementById('btn-search-agendamento').addEventListener('click', () => {
+                const termo = document.getElementById('search-agendamento').value.trim();
+                renderizarAgendamentos(termo);
+            });
+            document.getElementById('search-agendamento').addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    document.getElementById('btn-search-agendamento').click();
+                }
+            });
+             document.getElementById('search-agendamento').addEventListener('input', () => {
+                if (document.getElementById('search-agendamento').value.trim() === '') {
+                    renderizarAgendamentos('');
+                }
+            });
+
+            document.getElementById('btn-search-produto').addEventListener('click', () => {
+                const termo = document.getElementById('search-produto').value.trim();
+                renderizarProdutos(termo);
+            });
+            document.getElementById('search-produto').addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    document.getElementById('btn-search-produto').click();
+                }
+            });
+            document.getElementById('search-produto').addEventListener('input', () => {
+                if (document.getElementById('search-produto').value.trim() === '') {
+                    renderizarProdutos('');
+                }
+            });
+
+            // --- Event Listener para Relatório Financeiro ---
+            document.getElementById('btn-gerar-relatorio').addEventListener('click', gerarRelatorioFinanceiro);
         }); // Fim do DOMContentLoaded
 
 
@@ -819,15 +1148,21 @@
                 switch (id) {
                     case 'cliente-section':
                         renderizarClientes();
+                        document.getElementById('search-cliente').value = ''; // Limpa busca ao abrir
                         break;
                     case 'agenda-section':
                         renderizarAgendamentos();
+                        document.getElementById('search-agendamento').value = ''; // Limpa busca ao abrir
                         break;
                     case 'financeiro-section':
                         renderizarTransacoes();
+                        // Gera um relatório inicial "todos" ao abrir o financeiro
+                        document.getElementById('financeiro-relatorio-tipo').value = 'todos';
+                        gerarRelatorioFinanceiro();
                         break;
                     case 'estoque-section':
                         renderizarProdutos();
+                        document.getElementById('search-produto').value = ''; // Limpa busca ao abrir
                         break;
                     case 'profissional-section':
                         renderizarProfissionais();
