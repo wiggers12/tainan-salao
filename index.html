@@ -1,331 +1,339 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minhas Compras de Casa</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #e0f2f7; /* Azul claro suave */
-            color: #333;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Espaço Tai Botelho</title>
 
-        .container {
-            background-color: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
-        h1 {
-            color: #26a69a; /* Verde água */
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 2.2em;
-        }
+  <!-- Fontes e Ícones -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 
-        .category-selector {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            background-color: #f5f5f5;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      visibility: hidden;
+      background: #f0f0f0;
+    }
 
-        .category-selector button {
-            background-color: #eceff1; /* Cinza claro */
-            color: #546e7a; /* Cinza azulado escuro */
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            flex: 1;
-            margin: 0 5px;
-        }
+    #splash-screen {
+      position: fixed; top: 0; left: 0;
+      width:100vw; height:100vh;
+      background:#000;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      z-index:9999; opacity:1;
+      transition: opacity 1s ease-out;
+    }
 
-        .category-selector button.active {
-            background-color: #26a69a; /* Verde água ativo */
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+    #splash-screen.hidden { opacity:0; pointer-events:none; }
 
-        .category-selector button:hover:not(.active) {
-            background-color: #cfd8dc; /* Cinza um pouco mais escuro */
-        }
+    #splash-logo {
+      max-width: 250px;
+      width: 80%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
 
-        .add-item-section {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
+    .splash-full-name {
+      color: #FFD700;
+      font-size: 2.5em;
+      font-weight: 600;
+      margin-top: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      letter-spacing: 1px;
+    }
 
-        .add-item-section input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #b0bec5; /* Cinza azulado claro */
-            border-radius: 8px;
-            font-size: 1em;
-        }
+    #splash-enter-button {
+      background: linear-gradient(45deg, #FFD700, #DAA520);
+      color: #000;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2em;
+      font-weight: 700;
+      margin-top: 40px;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+    }
 
-        .add-item-section button {
-            background-color: #42bd41; /* Verde botão adicionar */
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
+    #auth-container, #main-content {
+      display: none;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-        .add-item-section button:hover {
-            background-color: #388e3c; /* Verde mais escuro */
-        }
+    #auth-container {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .item-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 0;
-        }
+    #auth-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
 
-        .item-list li {
-            background-color: #e0f2f7; /* Cor de fundo para cada item */
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1em;
-            border-left: 5px solid #26a69a; /* Barra colorida lateral */
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
+    #auth-box input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
 
-        .item-list li.purchased {
-            background-color: #c8e6c9; /* Verde claro para comprado */
-            text-decoration: line-through;
-            color: #757575;
-            border-left-color: #4caf50; /* Verde mais forte para comprado */
-        }
+    #auth-box button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #DAA520;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 30px;
+      margin-top: 5px;
+    }
 
-        .item-list li span {
-            flex-grow: 1;
-            text-align: left;
-            cursor: pointer; /* Indica que pode ser clicado para marcar */
-        }
+    #msg { color: crimson; margin-top: 10px; }
 
-        .item-list li .actions {
-            display: flex;
-            gap: 8px;
-        }
+    #main-content h1 {
+      margin-top: 0;
+    }
 
-        .item-list li .actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #ef5350; /* Vermelho para deletar */
-            transition: color 0.3s ease;
-        }
+    #dashboard-icons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 30px 0;
+    }
 
-        .item-list li .actions button:hover {
-            color: #c62828; /* Vermelho mais escuro */
-        }
+    .icon-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
 
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .category-selector {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .category-selector button {
-                flex-basis: 45%; /* Two buttons per row */
-                margin: 5px;
-            }
-            .add-item-section {
-                flex-direction: column;
-            }
-        }
-    </style>
+    .icon-card .material-icons {
+      font-size: 48px;
+      color: #DAA520;
+    }
+
+    .open-btn {
+      background: #DAA520;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+
+    .icon-content {
+      display: none;
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    .icon-content input,
+    .icon-content select,
+    .icon-content button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .icon-content button {
+      background: #000;
+      color: #FFD700;
+      border: none;
+      font-weight: bold;
+    }
+
+    .list-fake {
+      padding-left: 15px;
+    }
+
+    #logout {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      margin-top: 30px;
+    }
+
+    @media(max-width: 768px) {
+      .icon-card {
+        width: 90%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Minhas Compras de Casa</h1>
 
-        <div class="category-selector">
-            <button id="btn-mercado" class="active">Mercado</button>
-            <button id="btn-fruteira">Fruteira</button>
-            <button id="btn-acougue">Açougue</button>
-            <button id="btn-outros">Outros</button>
-        </div>
+  <!-- Splash -->
+  <div id="splash-screen">
+    <img id="splash-logo" src="assets/logo.png" alt="Logo Tai Botelho" />
+    <p class="splash-full-name">Espaço Tai Botelho</p>
+    <button id="splash-enter-button">Comece aqui</button>
+  </div>
 
-        <div class="add-item-section">
-            <input type="text" id="item-input" placeholder="Adicionar novo item...">
-            <button id="add-item-btn">Adicionar</button>
-        </div>
-
-        <ul id="current-item-list" class="item-list">
-            <li>Nenhum item nesta lista ainda.</li>
-        </ul>
+  <!-- Login -->
+  <div id="auth-container">
+    <div id="auth-box">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="E-mail" />
+      <input type="password" id="password" placeholder="Senha" />
+      <button onclick="login()">Entrar</button>
+      <button onclick="signup()">Criar conta</button>
+      <p id="msg"></p>
     </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const categories = {
-                mercado: [],
-                fruteira: [],
-                acougue: [],
-                outros: []
-            };
+  <!-- Painel -->
+  <div id="main-content">
+    <h1>Bem-vindo!</h1>
+    <p>Escolha uma funcionalidade:</p>
 
-            let currentCategory = 'mercado'; // Categoria ativa inicial
+    <section id="dashboard-icons">
+      <!-- Ícones -->
+      <div class="icon-card">
+        <span class="material-icons">person</span>
+        <h2>Cliente</h2>
+        <button class="open-btn" onclick="toggleSection('cliente')">Abrir</button>
+        <div class="icon-content" id="cliente">
+          <input type="text" placeholder="Nome" />
+          <input type="tel" placeholder="Telefone" />
+          <input type="email" placeholder="E-mail" />
+          <button>Salvar Cliente</button>
+        </div>
+      </div>
 
-            const categoryButtons = document.querySelectorAll('.category-selector button');
-            const itemInput = document.getElementById('item-input');
-            const addItemBtn = document.getElementById('add-item-btn');
-            const currentItemList = document.getElementById('current-item-list');
+      <div class="icon-card">
+        <span class="material-icons">event</span>
+        <h2>Agenda</h2>
+        <button class="open-btn" onclick="toggleSection('agenda')">Abrir</button>
+        <div class="icon-content" id="agenda">
+          <input type="text" placeholder="Cliente" />
+          <input type="datetime-local" />
+          <select>
+            <option>Escova</option><option>Coloração</option><option>Corte</option>
+          </select>
+          <button>Agendar</button>
+        </div>
+      </div>
 
-            // --- Funções de Armazenamento (localStorage) ---
-            // A CHAVE DO LOCALSTORAGE FOI ALTERADA AQUI!
-            const localStorageKey = 'homeShoppingAppCategories'; 
+      <div class="icon-card">
+        <span class="material-icons">attach_money</span>
+        <h2>Financeiro</h2>
+        <button class="open-btn" onclick="toggleSection('financeiro')">Abrir</button>
+        <div class="icon-content" id="financeiro">
+          <p>Entradas: R$ 2.300</p>
+          <p>Saídas: R$ 1.200</p>
+          <button>Gerar Relatório</button>
+        </div>
+      </div>
 
-            function saveCategories() {
-                localStorage.setItem(localStorageKey, JSON.stringify(categories));
-            }
+      <div class="icon-card">
+        <span class="material-icons">inventory_2</span>
+        <h2>Estoque</h2>
+        <button class="open-btn" onclick="toggleSection('estoque')">Abrir</button>
+        <div class="icon-content" id="estoque">
+          <input type="text" placeholder="Produto" />
+          <input type="number" placeholder="Quantidade" />
+          <button>Adicionar</button>
+        </div>
+      </div>
 
-            function loadCategories() {
-                const storedCategories = localStorage.getItem(localStorageKey);
-                if (storedCategories) {
-                    // O Object.assign é usado para mesclar os dados carregados
-                    // com a estrutura inicial 'categories', evitando problemas
-                    // se novas categorias forem adicionadas no futuro.
-                    const parsedCategories = JSON.parse(storedCategories);
-                    for (const key in categories) {
-                        if (parsedCategories.hasOwnProperty(key)) {
-                            categories[key] = parsedCategories[key];
-                        } else {
-                            // Se uma nova categoria foi adicionada no código, mas não nos dados salvos,
-                            // ela é inicializada como vazia.
-                            categories[key] = [];
-                        }
-                    }
-                }
-            }
+      <div class="icon-card">
+        <span class="material-icons">people</span>
+        <h2>Profissional</h2>
+        <button class="open-btn" onclick="toggleSection('profissional')">Abrir</button>
+        <div class="icon-content" id="profissional">
+          <input type="text" placeholder="Nome" />
+          <input type="text" placeholder="Especialidade" />
+          <button>Cadastrar</button>
+        </div>
+      </div>
+    </section>
 
-            // --- Funções de Renderização da Interface ---
-            function renderItems() {
-                currentItemList.innerHTML = ''; // Limpa a lista atual
+    <button id="logout" onclick="logout()">Sair</button>
+  </div>
 
-                const items = categories[currentCategory];
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      // SUA CONFIG DO FIREBASE AQUI
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-                if (items.length === 0) {
-                    const noItemMessage = document.createElement('li');
-                    noItemMessage.textContent = 'Nenhum item nesta lista ainda.';
-                    noItemMessage.style.textAlign = 'center';
-                    noItemMessage.style.fontStyle = 'italic';
-                    noItemMessage.style.backgroundColor = '#f5f5f5';
-                    noItemMessage.style.borderLeft = 'none';
-                    currentItemList.appendChild(noItemMessage);
-                    return;
-                }
+    // Splash
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.style.visibility = "visible";
+      const splash = document.getElementById("splash-screen");
+      const authBox = document.getElementById("auth-container");
 
-                items.forEach((item, index) => {
-                    const listItem = document.createElement('li');
-                    if (item.purchased) {
-                        listItem.classList.add('purchased');
-                    }
+      const next = () => {
+        splash.classList.add("hidden");
+        splash.addEventListener("transitionend", () => {
+          splash.style.display = "none";
+          authBox.style.display = "flex";
+        }, { once: true });
+      };
 
-                    const itemNameSpan = document.createElement('span');
-                    itemNameSpan.textContent = item.name;
-                    itemNameSpan.addEventListener('click', () => togglePurchased(index));
+      document.getElementById("splash-enter-button").addEventListener("click", next);
+      setTimeout(next, 6000);
+    });
 
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.classList.add('actions');
+    // Auth
+    auth.onAuthStateChanged(user => {
+      document.getElementById("auth-container").style.display = user ? "none" : "flex";
+      document.getElementById("main-content").style.display = user ? "block" : "none";
+    });
 
-                    const deleteButton = document.createElement('button');
-                    deleteButton.innerHTML = '&#x2715;'; // X mark for delete
-                    deleteButton.title = 'Remover item';
-                    deleteButton.addEventListener('click', () => deleteItem(index));
+    function login() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .catch(err => document.getElementById("msg").textContent = err.message);
+    }
 
-                    actionsDiv.appendChild(deleteButton);
-                    listItem.appendChild(itemNameSpan);
-                    listItem.appendChild(actionsDiv);
-                    currentItemList.appendChild(listItem);
-                });
-            }
+    function signup() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      auth.createUserWithEmailAndPassword(email, pass)
+        .catch(err => document.getElementById("msg").textContent = err.message);
+    }
 
-            function setActiveCategoryButton() {
-                categoryButtons.forEach(button => {
-                    button.classList.remove('active');
-                    if (button.id === `btn-${currentCategory}`) {
-                        button.classList.add('active');
-                    }
-                });
-            }
+    function logout() {
+      auth.signOut();
+    }
 
-            // --- Funções de Manipulação de Dados ---
-            function addItem() {
-                const itemName = itemInput.value.trim();
-                if (itemName) {
-                    categories[currentCategory].push({ name: itemName, purchased: false });
-                    itemInput.value = ''; // Limpa o input
-                    saveCategories();
-                    renderItems();
-                }
-            }
-
-            function deleteItem(index) {
-                categories[currentCategory].splice(index, 1); // Remove 1 item no índice especificado
-                saveCategories();
-                renderItems();
-            }
-
-            function togglePurchased(index) {
-                categories[currentCategory][index].purchased = !categories[currentCategory][index].purchased;
-                saveCategories();
-                renderItems();
-            }
-
-            // --- Event Listeners ---
-            addItemBtn.addEventListener('click', addItem);
-
-            itemInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    addItem();
-                }
-            });
-
-            categoryButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    currentCategory = button.id.replace('btn-', ''); // Pega o nome da categoria do ID do botão
-                    setActiveCategoryButton();
-                    renderItems();
-                });
-            });
-
-            // --- Inicialização do App ---
-            loadCategories(); // Carrega os dados salvos ao iniciar
-            setActiveCategoryButton(); // Define o botão de categoria ativo
-            renderItems(); // Renderiza os itens da categoria inicial
-        });
-    </script>
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </body>
 </html>
