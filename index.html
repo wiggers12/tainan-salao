@@ -401,6 +401,36 @@
             font-size: 0.9em;
         }
 
+        /* Detalhes do Profissional */
+        .profissional-detail-box {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .profissional-detail-box h5 {
+            margin-top: 0;
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .profissional-detail-box p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #666;
+        }
+        .profissional-detail-box ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding-left: 0;
+            color: #666;
+        }
+        .profissional-detail-box li {
+            margin-bottom: 3px;
+        }
+
         @media (max-width: 768px) {
             .splash-initials {
                 font-size: 5em;
@@ -517,6 +547,10 @@
                         <option value="Sobrancelha">Sobrancelha</option>
                         <option value="Outro">Outro (especifique nas observações)</option>
                     </select>
+                    <input type="number" id="agenda-valor-servico" placeholder="Valor do Serviço R$" min="0" step="0.01">
+                    <select id="agenda-profissional-responsavel">
+                        <option value="">Selecione o Profissional</option>
+                        </select>
                     <div id="sugestao-inteligente" style="display:none;">
                         <p>Sugestão para este cliente: <span id="sugestao-texto"></span></p>
                     </div>
@@ -640,17 +674,25 @@
                     <input type="hidden" id="profissional-id-edit">
                     <input type="text" id="profissional-nome" placeholder="Nome Completo">
                     <input type="text" id="profissional-especialidade" placeholder="Especialidade">
+                    <textarea id="profissional-disponibilidade" placeholder="Disponibilidade (Ex: Seg-Sex 9h-18h, Sáb 9h-13h)"></textarea>
                     <button id="btn-salvar-profissional" class="btn-action">Salvar Profissional</button>
                     <hr />
                     <h3>Profissionais Cadastrados</h3>
                     <ul id="lista-profissionais" class="list-fake">
                         </ul>
                     <hr />
-                    <h3>Comissões do Mês (Exemplo)</h3>
-                    <ul class="list-fake">
-                        <li>Jéssica: R$ 1.000</li>
-                        <li>Carla: R$ 800</li>
-                    </ul>
+                    <h3>Relatório de Desempenho e Comissões</h3>
+                    <div class="finance-section-group">
+                        <h4>Período do Relatório</h4>
+                        <label for="relatorio-prof-data-inicio">Data Início:</label>
+                        <input type="date" id="relatorio-prof-data-inicio">
+                        <label for="relatorio-prof-data-fim">Data Fim:</label>
+                        <input type="date" id="relatorio-prof-data-fim">
+                        <button id="btn-gerar-relatorio-profissionais">Gerar Relatório</button>
+                    </div>
+                    <div id="relatorio-profissionais-output">
+                        <p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>
+                        </div>
                 </div>
             </div>
 
@@ -665,6 +707,9 @@
         let produtos = [];
         let profissionais = [];
         let financeiroMetas = { entrada: 0, saida: 0 }; // Nova variável para metas
+
+        // --- Constante para taxa de comissão (30%) ---
+        const TAXA_COMISSAO_PADRAO = 0.30;
 
         // --- Funções Genéricas para LocalStorage ---
         const carregarDados = (chave) => {
@@ -716,6 +761,7 @@
             const agendamentosFiltrados = agendamentosOrdenados.filter(agendamento =>
                 agendamento.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
                 agendamento.servico.toLowerCase().includes(filtro.toLowerCase()) ||
+                (agendamento.profissionalResponsavel && agendamento.profissionalResponsavel.toLowerCase().includes(filtro.toLowerCase())) || // Filtra por profissional
                 new Date(agendamento.dataHora).toLocaleDateString('pt-BR').includes(filtro)
             );
 
@@ -727,7 +773,7 @@
                 const dataFormatada = new Date(agendamento.dataHora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <span>${dataFormatada} - ${agendamento.cliente} (${agendamento.servico})</span>
+                    <span>${dataFormatada} - ${agendamento.cliente} (${agendamento.servico}) - Prof.: ${agendamento.profissionalResponsavel || 'Não Atribuído'}</span>
                     <div class="list-actions">
                         <button class="edit-btn" onclick="editarAgendamento('${agendamento.id}')">Editar</button>
                         <button class="delete-btn" onclick="excluirAgendamento('${agendamento.id}')">Excluir</button>
@@ -806,8 +852,8 @@
 
                     if (produto.quantidade < 5) { // Alerta de estoque baixo
                         const alertaLi = document.createElement('li');
-                        alertaLi.textContent = `${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
-                        alertaLi.style.color = 'orange';
+                        alertaLi.innerHTML = `<span class="material-icons" style="font-size: 1em; vertical-align: middle; margin-right: 5px; color: orange;">warning</span>${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
+                        alertaLi.style.color = 'orange'; // Alerta de cor para estoque
                         listaAlertaEstoqueUl.appendChild(alertaLi);
                     }
                 });
@@ -832,9 +878,19 @@
                         <button class="edit-btn" onclick="editarProfissional('${profissional.id}')">Editar</button>
                         <button class="delete-btn" onclick="excluirProfissional('${profissional.id}')">Excluir</button>
                     </div>
+                    <div class="profissional-detail-box">
+                        <h5>Detalhes e Desempenho:</h5>
+                        <p><strong>Disponibilidade:</strong> ${profissional.disponibilidade || 'Não informada'}</p>
+                        <p><strong>Agendamentos Realizados:</strong> <span id="prof-agendamentos-${profissional.id}">Calculando...</span></p>
+                        <p><strong>Comissão Estimada:</strong> <span id="prof-comissao-${profissional.id}">Calculando...</span></p>
+                        <h5>Histórico de Serviços:</h5>
+                        <ul id="prof-historico-${profissional.id}"><li>Carregando...</li></ul>
+                    </div>
                 `;
                 listaProfissionaisUl.appendChild(li);
+                atualizarDetalhesProfissional(profissional.id); // Atualiza os detalhes de desempenho
             });
+            preencherDatalistProfissionais(); // Atualiza o datalist de profissionais na Agenda
         };
 
         // --- Funções de Edição (Update - Preenche o formulário) ---
@@ -859,6 +915,8 @@
                 document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
                 document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
                 document.getElementById('agenda-servico').value = agendamento.servico;
+                document.getElementById('agenda-valor-servico').value = agendamento.valorServico || ''; // Novo campo de valor
+                document.getElementById('agenda-profissional-responsavel').value = agendamento.profissionalResponsavel || ''; // Novo campo de profissional
                 document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
                 alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar Agendamento.');
             }
@@ -891,6 +949,7 @@
                 document.getElementById('profissional-id-edit').value = profissional.id;
                 document.getElementById('profissional-nome').value = profissional.nome;
                 document.getElementById('profissional-especialidade').value = profissional.especialidade;
+                document.getElementById('profissional-disponibilidade').value = profissional.disponibilidade || ''; // Campo de disponibilidade
                 alert('Profissional selecionado para edição. Altere os campos e clique em Salvar Profissional.');
             }
         };
@@ -911,6 +970,9 @@
                 agendamentos = agendamentos.filter(a => a.id !== id);
                 salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
                 renderizarAgendamentos();
+                // Também pode ser necessário atualizar os relatórios de profissional após exclusão
+                profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
+                atualizarNotificacoesDashboard();
                 alert('Agendamento excluído com sucesso!');
             }
         };
@@ -929,15 +991,25 @@
                 produtos = produtos.filter(p => p.id !== id);
                 salvarDados('produtosEspacoTaiBotelho', produtos);
                 renderizarProdutos();
+                atualizarNotificacoesDashboard(); // Pode remover alerta de estoque baixo
                 alert('Produto excluído com sucesso!');
             }
         };
 
         const excluirProfissional = (id) => {
-            if (confirm('Tem certeza que deseja excluir este profissional?')) {
+            if (confirm('Tem certeza que deseja excluir este profissional? Todos os agendamentos vinculados a ele PERDERÃO a referência do profissional.')) {
                 profissionais = profissionais.filter(p => p.id !== id);
+                // Remover referência do profissional em agendamentos
+                agendamentos = agendamentos.map(a => {
+                    if (a.profissionalId === id) {
+                        return { ...a, profissionalId: null, profissionalResponsavel: 'Não Atribuído' };
+                    }
+                    return a;
+                });
                 salvarDados('profissionaisEspacoTaiBotelho', profissionais);
+                salvarDados('agendamentosEspacoTaiBotelho', agendamentos); // Salva agendamentos alterados
                 renderizarProfissionais();
+                renderizarAgendamentos(); // Atualiza agendamentos na tela
                 alert('Profissional excluído com sucesso!');
             }
         };
@@ -956,11 +1028,7 @@
                 const dataInicio = new Date(dataInicioStr + 'T00:00:00');
                 const dataFim = new Date(dataFimStr + 'T23:59:59'); // Inclui o dia inteiro
                 transacoesFiltradasPorData = transacoes.filter(t => {
-                    // Adicionei a data de criação para cada transação na hora de salvar, caso contrário,
-                    // precisamos de uma propriedade de data para filtrar.
-                    // Para fins de demonstração, se não tiver data, vou pular.
-                    if (!t.dataCriacao) return true; // Se não tem data, inclui tudo (comportamento de compatibilidade)
-                    const transacaoDate = new Date(t.dataCriacao);
+                    const transacaoDate = new Date(t.dataCriacao); // Assume que dataCriacao existe
                     return transacaoDate >= dataInicio && transacaoDate <= dataFim;
                 });
             } else if (dataInicioStr || dataFimStr) {
@@ -1012,7 +1080,8 @@
                 filename = 'clientes_espaco_tai_botelho.csv';
             } else if (tipo === 'agendamentos') {
                 data = agendamentos;
-                headers = ['ID', 'Cliente', 'DataHora', 'Servico', 'Observacoes'];
+                // Adiciona o valor do serviço e o profissional ao cabeçalho de exportação
+                headers = ['ID', 'Cliente', 'DataHora', 'Servico', 'ValorServico', 'ProfissionalResponsavel', 'Observacoes'];
                 filename = 'agendamentos_espaco_tai_botelho.csv';
             } else if (tipo === 'transacoes') {
                 data = transacoes;
@@ -1031,7 +1100,9 @@
             let csvContent = headers.join(';') + '\n';
             data.forEach(item => {
                 const row = headers.map(header => {
-                    let value = item[header.charAt(0).toLowerCase() + header.slice(1)] || ''; // Ajusta para minúsculo inicial
+                    // Mapeia o nome do cabeçalho para a chave real no objeto (ex: HistoricoServicos -> historicoServicos)
+                    const key = header.charAt(0).toLowerCase() + header.slice(1);
+                    let value = item[key] || '';
                     if (header === 'DataHora' && value) {
                         value = new Date(value).toLocaleString('pt-BR');
                     } else if (header === 'DataCriacao' && value) {
@@ -1099,11 +1170,9 @@
             progressBarEntrada.style.width = `${percentEntrada}%`;
             progressBarEntrada.classList.toggle('red', percentEntrada < 100); // Se não atingiu a meta, pode mostrar vermelho (opcional)
 
+            // Inverte a lógica de cor para a barra de saída para ser mais intuitiva: Verde se dentro da meta, vermelho se acima
+            progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545';
             progressBarSaida.style.width = `${Math.min(percentSaida, 100)}%`; // Saída: quanto menor melhor, então percent é o que já gastou
-            progressBarSaida.classList.toggle('red', percentSaida > 100); // Se passou da meta de saída, fica vermelho
-
-            // Inverte a lógica de cor para a barra de saída para ser mais intuitiva
-            progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545'; // Verde se dentro da meta, vermelho se acima
         };
 
         // --- Funções de Notificação e Sugestões ---
@@ -1127,20 +1196,20 @@
                 agendamentosHoje.forEach(agendamento => {
                     const li = document.createElement('li');
                     const horaFormatada = new Date(agendamento.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                    li.innerHTML = `<span class="material-icons">event</span>Agendamento HOJE: ${agendamento.cliente} às ${horaFormatada} para ${agendamento.servico}`;
+                    const profInfo = agendamento.profissionalResponsavel ? ` (Prof.: ${agendamento.profissionalResponsavel})` : '';
+                    li.innerHTML = `<span class="material-icons">event</span>Agendamento HOJE: ${agendamento.cliente} às ${horaFormatada} para ${agendamento.servico}${profInfo}`;
                     li.classList.add('notification-item');
                     notificationsList.appendChild(li);
                 });
             }
 
-            // Alertas de estoque baixo já são mostrados na seção de estoque, mas poderiam ser puxados para cá
             const produtosBaixoEstoque = produtos.filter(p => p.quantidade < 5);
             if (produtosBaixoEstoque.length > 0) {
                 hasNotifications = true;
-                productosBaixoEstoque.forEach(p => {
+                produtosBaixoEstoque.forEach(p => {
                     const li = document.createElement('li');
                     li.innerHTML = `<span class="material-icons">warning</span>Estoque Baixo: ${p.nome} (${p.quantidade} unid.)`;
-                    li.style.color = 'orange'; // Alerta de cor para estoque
+                    li.style.color = 'orange';
                     notificationsList.appendChild(li);
                 });
             }
@@ -1152,6 +1221,7 @@
             const clienteNome = document.getElementById('agenda-cliente-nome').value.trim();
             const dataHora = document.getElementById('agenda-data-hora').value;
             const servico = document.getElementById('agenda-servico').value;
+            const profissional = document.getElementById('agenda-profissional-responsavel').value.trim();
             const observacoes = document.getElementById('agenda-observacoes').value.trim();
 
             if (!clienteNome || !dataHora || !servico) {
@@ -1164,6 +1234,9 @@
             const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
             let mensagem = `Olá ${clienteNome}! Seu agendamento no Espaço Tai Botelho foi confirmado para o dia ${dataFormatada} às ${horaFormatada} para o serviço de ${servico}.`;
+            if (profissional) {
+                mensagem += `\nSeu profissional será: ${profissional}.`;
+            }
             if (observacoes) {
                 mensagem += `\nObservações: ${observacoes}`;
             }
@@ -1195,6 +1268,18 @@
             });
         };
 
+        const preencherDatalistProfissionais = () => {
+            const selectProfissional = document.getElementById('agenda-profissional-responsavel');
+            selectProfissional.innerHTML = '<option value="">Selecione o Profissional</option>';
+            profissionais.forEach(profissional => {
+                const option = document.createElement('option');
+                option.value = profissional.nome; // Usamos o nome como valor
+                option.textContent = profissional.nome;
+                option.dataset.profId = profissional.id; // Guardamos o ID no dataset para referência
+                selectProfissional.appendChild(option);
+            });
+        };
+
         const mostrarSugestaoInteligente = () => {
             const nomeClienteInput = document.getElementById('agenda-cliente-nome').value.trim();
             const sugestaoDiv = document.getElementById('sugestao-inteligente');
@@ -1203,9 +1288,6 @@
             const clienteEncontrado = clientes.find(c => c.nome.toLowerCase() === nomeClienteInput.toLowerCase());
 
             if (clienteEncontrado) {
-                // Sugestão básica: "Parece que [cliente] está precisando de..."
-                // Ou podemos buscar no histórico do cliente (se tiver dados estruturados de serviços anteriores)
-                // Por agora, uma sugestão genérica ou baseada em observações.
                 if (clienteEncontrado.historicoServicos && clienteEncontrado.historicoServicos.includes('Coloracao')) {
                      sugestaoTexto.textContent = 'Este cliente fez Coloração recentemente. Que tal oferecer um tratamento capilar ou um retoque de raiz?';
                      sugestaoDiv.style.display = 'block';
@@ -1219,6 +1301,124 @@
             } else {
                 sugestaoDiv.style.display = 'none';
             }
+        };
+
+        // --- Funções da Área Profissional ---
+        const atualizarDetalhesProfissional = (profissionalId) => {
+            const agendamentosDoProfissional = agendamentos.filter(ag => ag.profissionalId === profissionalId);
+            const profAgendamentosSpan = document.getElementById(`prof-agendamentos-${profissionalId}`);
+            const profComissaoSpan = document.getElementById(`prof-comissao-${profissionalId}`);
+            const profHistoricoUl = document.getElementById(`prof-historico-${profissionalId}`);
+
+            let totalComissao = 0;
+            profHistoricoUl.innerHTML = ''; // Limpa o histórico anterior
+
+            if (agendamentosDoProfissional.length === 0) {
+                profAgendamentosSpan.textContent = 'Nenhum.';
+                profComissaoSpan.textContent = 'R$ 0,00';
+                profHistoricoUl.innerHTML = '<li>Nenhum serviço registrado.</li>';
+                return;
+            }
+
+            agendamentosDoProfissional.forEach(ag => {
+                const valorServico = parseFloat(ag.valorServico || 0);
+                totalComissao += valorServico * TAXA_COMISSAO_PADRAO;
+
+                const li = document.createElement('li');
+                const dataFormatada = new Date(ag.dataHora).toLocaleDateString('pt-BR');
+                const valorFormatado = valorServico.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                li.textContent = `${dataFormatada} - ${ag.servico} (Cliente: ${ag.cliente}) - ${valorFormatado}`;
+                profHistoricoUl.appendChild(li);
+            });
+
+            profAgendamentosSpan.textContent = `${agendamentosDoProfissional.length} agendamento(s).`;
+            profComissaoSpan.textContent = totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        };
+
+        const gerarRelatorioProfissionais = () => {
+            const dataInicioStr = document.getElementById('relatorio-prof-data-inicio').value;
+            const dataFimStr = document.getElementById('relatorio-prof-data-fim').value;
+            const outputDiv = document.getElementById('relatorio-profissionais-output');
+            outputDiv.innerHTML = '';
+
+            let agendamentosFiltrados = agendamentos;
+
+            if (dataInicioStr && dataFimStr) {
+                const dataInicio = new Date(dataInicioStr + 'T00:00:00');
+                const dataFim = new Date(dataFimStr + 'T23:59:59');
+                agendamentosFiltrados = agendamentos.filter(ag => {
+                    const agendamentoDate = new Date(ag.dataHora);
+                    return agendamentoDate >= dataInicio && agendamentoDate <= dataFim;
+                });
+            } else if (dataInicioStr || dataFimStr) {
+                 alert('Por favor, preencha AMBAS as datas de início e fim para filtrar o relatório de profissionais.');
+                 return;
+            }
+
+            if (profissionais.length === 0) {
+                outputDiv.innerHTML = '<p>Nenhum profissional cadastrado.</p>';
+                return;
+            }
+
+            if (agendamentosFiltrados.length === 0) {
+                 outputDiv.innerHTML = '<p>Nenhum agendamento encontrado no período selecionado.</p>';
+                 return;
+            }
+
+            const relatorioPorProfissional = {};
+
+            profissionais.forEach(prof => {
+                relatorioPorProfissional[prof.id] = {
+                    nome: prof.nome,
+                    totalAgendamentos: 0,
+                    totalServicosValor: 0,
+                    comissaoTotal: 0,
+                    servicos: []
+                };
+            });
+
+            agendamentosFiltrados.forEach(ag => {
+                if (ag.profissionalId && relatorioPorProfissional[ag.profissionalId]) {
+                    const valorServico = parseFloat(ag.valorServico || 0);
+                    relatorioPorProfissional[ag.profissionalId].totalAgendamentos++;
+                    relatorioPorProfissional[ag.profissionalId].totalServicosValor += valorServico;
+                    relatorioPorProfissional[ag.profissionalId].comissaoTotal += valorServico * TAXA_COMISSAO_PADRAO;
+                    relatorioPorProfissional[ag.profissionalId].servicos.push({
+                        cliente: ag.cliente,
+                        servico: ag.servico,
+                        dataHora: new Date(ag.dataHora).toLocaleString('pt-BR'),
+                        valor: valorServico
+                    });
+                }
+            });
+
+            let htmlOutput = '<h4>Relatório Detalhado por Profissional</h4>';
+            profissionais.forEach(prof => {
+                const dados = relatorioPorProfissional[prof.id];
+                if (dados) {
+                    htmlOutput += `
+                        <div class="profissional-detail-box">
+                            <h5>${dados.nome} (${prof.especialidade})</h5>
+                            <p><strong>Total de Agendamentos:</strong> ${dados.totalAgendamentos}</p>
+                            <p><strong>Valor Total dos Serviços:</strong> ${dados.totalServicosValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                            <p><strong>Comissão Estimada (${TAXA_COMISSAO_PADRAO * 100}%):</strong> ${dados.comissaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                            <h6>Serviços Realizados no Período:</h6>
+                            <ul>
+                    `;
+                    if (dados.servicos.length > 0) {
+                        dados.servicos.forEach(serv => {
+                            htmlOutput += `<li>${serv.dataHora} - ${serv.servico} (Cliente: ${serv.cliente}) - ${serv.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</li>`;
+                        });
+                    } else {
+                        htmlOutput += `<li>Nenhum serviço realizado por ${dados.nome} no período.</li>`;
+                    }
+                    htmlOutput += `
+                            </ul>
+                        </div>
+                    `;
+                }
+            });
+            outputDiv.innerHTML = htmlOutput;
         };
 
 
@@ -1236,7 +1436,7 @@
                     splash.addEventListener(
                         "transitionend",
                         () => {
-                            splash.style.display = "block"; /* Continua visível mas em 0 opacidade */
+                            splash.style.display = "none"; /* Esconde completamente após transição */
                             main.style.display = "block";
                             document.body.style.overflow = "auto";
                             // Forçar uma atualização das notificações ao carregar
@@ -1299,30 +1499,43 @@
                 const cliente = document.getElementById('agenda-cliente-nome').value.trim();
                 const dataHora = document.getElementById('agenda-data-hora').value;
                 const servico = document.getElementById('agenda-servico').value;
+                const valorServico = parseFloat(document.getElementById('agenda-valor-servico').value) || 0; // Novo
+                const profissionalResponsavel = document.getElementById('agenda-profissional-responsavel').value.trim(); // Novo
                 const observacoes = document.getElementById('agenda-observacoes').value.trim();
+
+                // Para vincular o profissional pelo ID
+                const profissionalObj = profissionais.find(p => p.nome === profissionalResponsavel);
+                const profissionalId = profissionalObj ? profissionalObj.id : null;
+
 
                 if (cliente && dataHora && servico) {
                     if (id) { // Modo de edição
                         const index = agendamentos.findIndex(a => a.id === id);
                         if (index !== -1) {
-                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico, observacoes };
+                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes };
                             alert('Agendamento atualizado com sucesso!');
                         }
                     } else { // Modo de novo cadastro
-                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico, observacoes });
+                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes });
                         alert('Agendamento salvo com sucesso!');
                     }
                     salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
                     renderizarAgendamentos();
+                    // Limpar formulário
                     document.getElementById('agenda-id-edit').value = '';
                     document.getElementById('agenda-cliente-nome').value = '';
                     document.getElementById('agenda-data-hora').value = '';
                     document.getElementById('agenda-servico').value = '';
+                    document.getElementById('agenda-valor-servico').value = ''; // Limpa valor
+                    document.getElementById('agenda-profissional-responsavel').value = ''; // Limpa profissional
                     document.getElementById('agenda-observacoes').value = '';
                     document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa a mensagem pronta
                     document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
+                    // Atualiza detalhes dos profissionais, caso tenha havido mudança em agendamentos
+                    profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
+
                 } else {
-                    alert('Por favor, preencha todos os campos do agendamento.');
+                    alert('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).');
                 }
             });
 
@@ -1395,23 +1608,26 @@
                 const id = document.getElementById('profissional-id-edit').value;
                 const nome = document.getElementById('profissional-nome').value.trim();
                 const especialidade = document.getElementById('profissional-especialidade').value.trim();
+                const disponibilidade = document.getElementById('profissional-disponibilidade').value.trim(); // Novo campo
 
                 if (nome && especialidade) {
                     if (id) {
                         const index = profissionais.findIndex(p => p.id === id);
                         if (index !== -1) {
-                            profissionais[index] = { ...profissionais[index], nome, especialidade };
+                            profissionais[index] = { ...profissionais[index], nome, especialidade, disponibilidade };
                             alert('Profissional atualizado com sucesso!');
                         }
                     } else {
-                        profissionais.push({ id: gerarIdUnico(), nome, especialidade });
+                        profissionais.push({ id: gerarIdUnico(), nome, especialidade, disponibilidade });
                         alert('Profissional cadastrado com sucesso!');
                     }
                     salvarDados('profissionaisEspacoTaiBotelho', profissionais);
-                    renderizarProfissionais();
+                    renderizarProfissionais(); // Re-renderiza para atualizar a lista e os detalhes
                     document.getElementById('profissional-id-edit').value = '';
                     document.getElementById('profissional-nome').value = '';
                     document.getElementById('profissional-especialidade').value = '';
+                    document.getElementById('profissional-disponibilidade').value = '';
+                    preencherDatalistProfissionais(); // Atualiza select de profissionais na agenda
                 } else {
                     alert('Por favor, preencha o nome e a especialidade do profissional.');
                 }
@@ -1471,8 +1687,12 @@
             document.getElementById('agenda-cliente-nome').addEventListener('input', mostrarSugestaoInteligente);
             document.getElementById('btn-salvar-agendamento').addEventListener('click', gerarMensagemAgendamento); // Gera mensagem após salvar
 
-            // Inicializa datalists ao carregar a página
+            // --- Event Listener para Relatório de Profissionais ---
+            document.getElementById('btn-gerar-relatorio-profissionais').addEventListener('click', gerarRelatorioProfissionais);
+
+            // Inicializa datalists e selects ao carregar a página
             preencherDatalistClientes();
+            preencherDatalistProfissionais();
         }); // Fim do DOMContentLoaded
 
 
@@ -1503,6 +1723,7 @@
                         document.getElementById('search-agendamento').value = '';
                         document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa mensagem ao abrir
                         document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
+                        preencherDatalistProfissionais(); // Garante que a lista de profissionais esteja atualizada
                         break;
                     case 'financeiro-section':
                         renderizarTransacoes();
@@ -1517,6 +1738,9 @@
                         break;
                     case 'profissional-section':
                         renderizarProfissionais();
+                        document.getElementById('relatorio-prof-data-inicio').value = '';
+                        document.getElementById('relatorio-prof-data-fim').value = '';
+                        document.getElementById('relatorio-profissionais-output').innerHTML = '<p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>';
                         break;
                 }
             }
