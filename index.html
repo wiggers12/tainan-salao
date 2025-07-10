@@ -159,6 +159,18 @@
             transform: translateY(-2px);
         }
 
+        /* Estilo para botão de seção ATIVA */
+        .open-btn.active {
+            background: linear-gradient(45deg, #0056b3, #007bff); /* Azul mais escuro ou outra cor de destaque */
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+        .open-btn.active:hover {
+             background: linear-gradient(45deg, #007bff, #0056b3);
+        }
+
+
         .icon-content {
             display: none;
             text-align: left;
@@ -167,6 +179,18 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            /* Novas propriedades para transição */
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-out, opacity 0.7s ease-out, padding 0.7s ease-out;
+        }
+
+        .icon-content.active {
+            display: block; /* Mantém o display block para a transição de max-height */
+            max-height: 1000px; /* Um valor grande o suficiente para o conteúdo */
+            opacity: 1;
+            padding: 20px; /* Restaura o padding */
         }
 
         .icon-content h3 {
@@ -213,10 +237,22 @@
             color: #fff;
             font-size: 1.1em;
             padding: 12px;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
         .icon-content .btn-action:hover {
             background: #B8860B;
+            transform: translateY(-1px);
         }
+        .icon-content .btn-action:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        /* Estado de carregamento do botão */
+        .icon-content .btn-action.loading {
+            background: #6c757d;
+            cursor: wait;
+        }
+
 
         /* Estilo para botões de ação na lista (Editar/Excluir) */
         .list-actions button {
@@ -431,6 +467,52 @@
             margin-bottom: 3px;
         }
 
+        /* Mensagens de Feedback Flutuantes (Toast) */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none; /* Permite cliques através */
+        }
+        .toast {
+            background-color: #333;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(-20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            background-color: #4CAF50; /* Verde */
+        }
+        .toast.error {
+            background-color: #f44336; /* Vermelho */
+        }
+        .toast.info {
+            background-color: #2196F3; /* Azul */
+        }
+        .toast .material-icons {
+            margin-right: 10px;
+        }
+
+
         @media (max-width: 768px) {
             .splash-initials {
                 font-size: 5em;
@@ -475,6 +557,9 @@
             .search-container button {
                 width: 100%;
             }
+            #toast-container {
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -485,6 +570,8 @@
         <p class="splash-full-name">Espaço Tai Botelho</p>
         <button id="splash-enter-button" aria-label="Entrar no site" role="button">Comece aqui</button>
     </div>
+
+    <div id="toast-container"></div>
 
     <div id="main-content">
         <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
@@ -501,7 +588,7 @@
             <div class="icon-card">
                 <span class="material-icons">person</span>
                 <h2>Cliente</h2>
-                <button class="open-btn" onclick="toggleSection('cliente-section')">Abrir</button>
+                <button class="open-btn" data-section-id="cliente-section" data-first-field="cliente-nome">Abrir</button>
                 <div class="icon-content" id="cliente-section">
                     <h3>Cadastrar/Atualizar Cliente</h3>
                     <input type="hidden" id="cliente-id-edit">
@@ -529,7 +616,7 @@
             <div class="icon-card">
                 <span class="material-icons">event</span>
                 <h2>Agenda</h2>
-                <button class="open-btn" onclick="toggleSection('agenda-section')">Abrir</button>
+                <button class="open-btn" data-section-id="agenda-section" data-first-field="agenda-cliente-nome">Abrir</button>
                 <div class="icon-content" id="agenda-section">
                     <h3>Novo Agendamento</h3>
                     <input type="hidden" id="agenda-id-edit">
@@ -581,7 +668,7 @@
             <div class="icon-card">
                 <span class="material-icons">attach_money</span>
                 <h2>Financeiro</h2>
-                <button class="open-btn" onclick="toggleSection('financeiro-section')">Abrir</button>
+                <button class="open-btn" data-section-id="financeiro-section" data-first-field="financeiro-tipo">Abrir</button>
                 <div class="icon-content" id="financeiro-section">
                     <h3>Registrar Transação</h3>
                     <input type="hidden" id="financeiro-id-edit">
@@ -643,7 +730,7 @@
             <div class="icon-card">
                 <span class="material-icons">inventory_2</span>
                 <h2>Estoque</h2>
-                <button class="open-btn" onclick="toggleSection('estoque-section')">Abrir</button>
+                <button class="open-btn" data-section-id="estoque-section" data-first-field="estoque-nome-produto">Abrir</button>
                 <div class="icon-content" id="estoque-section">
                     <h3>Cadastro/Atualizar Produto</h3>
                     <input type="hidden" id="estoque-id-edit">
@@ -668,7 +755,7 @@
             <div class="icon-card">
                 <span class="material-icons">people</span>
                 <h2>Profissional</h2>
-                <button class="open-btn" onclick="toggleSection('profissional-section')">Abrir</button>
+                <button class="open-btn" data-section-id="profissional-section" data-first-field="profissional-nome">Abrir</button>
                 <div class="icon-content" id="profissional-section">
                     <h3>Cadastrar/Atualizar Profissional</h3>
                     <input type="hidden" id="profissional-id-edit">
@@ -722,6 +809,66 @@
         };
 
         const gerarIdUnico = () => '_' + Math.random().toString(36).substr(2, 9);
+
+        // --- Funções de UX e Feedback ---
+
+        // Função para exibir toasts (mensagens flutuantes)
+        const showToast = (message, type = 'info', duration = 3000) => {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.classList.add('toast', type);
+            let icon = '';
+            if (type === 'success') icon = 'check_circle';
+            else if (type === 'error') icon = 'error';
+            else icon = 'info';
+
+            toast.innerHTML = `<span class="material-icons">${icon}</span> ${message}`;
+            toastContainer.appendChild(toast);
+
+            // Força o reflow para a transição funcionar
+            void toast.offsetWidth;
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+            }, duration);
+        };
+
+        // Função para resetar formulários
+        const resetForm = (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            // Limpa inputs de texto, email, number, textarea
+            section.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea').forEach(input => {
+                input.value = '';
+            });
+            // Reseta selects para a primeira opção ou vazia
+            section.querySelectorAll('select').forEach(select => {
+                if (select.options.length > 0) {
+                    select.value = select.options[0].value;
+                }
+            });
+            // Limpa hidden inputs de edição
+            section.querySelectorAll('input[type="hidden"]').forEach(input => {
+                input.value = '';
+            });
+        };
+
+        // Função para focar no primeiro campo de um formulário
+        const focusFirstField = (sectionId) => {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            const firstFieldId = document.querySelector(`.open-btn[data-section-id="${sectionId}"]`).dataset.firstField;
+            if (firstFieldId) {
+                const firstField = document.getElementById(firstFieldId);
+                if (firstField) {
+                    firstField.focus();
+                }
+            }
+        };
 
         // --- Funções de Renderização (Read) ---
 
@@ -898,19 +1045,22 @@
         const editarCliente = (id) => {
             const cliente = clientes.find(c => c.id === id);
             if (cliente) {
+                resetForm('cliente-section'); // Limpa antes de preencher
                 document.getElementById('cliente-id-edit').value = cliente.id;
                 document.getElementById('cliente-nome').value = cliente.nome;
                 document.getElementById('cliente-telefone').value = cliente.telefone;
                 document.getElementById('cliente-email').value = cliente.email;
                 document.getElementById('cliente-historico-servicos').value = cliente.historicoServicos || '';
                 document.getElementById('cliente-observacoes').value = cliente.observacoes || '';
-                alert('Cliente selecionado para edição. Altere os campos e clique em Salvar Cliente.');
+                showToast('Cliente carregado para edição!', 'info');
+                document.getElementById('cliente-nome').focus();
             }
         };
 
         const editarAgendamento = (id) => {
             const agendamento = agendamentos.find(a => a.id === id);
             if (agendamento) {
+                resetForm('agenda-section'); // Limpa antes de preencher
                 document.getElementById('agenda-id-edit').value = agendamento.id;
                 document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
                 document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
@@ -918,39 +1068,46 @@
                 document.getElementById('agenda-valor-servico').value = agendamento.valorServico || ''; // Novo campo de valor
                 document.getElementById('agenda-profissional-responsavel').value = agendamento.profissionalResponsavel || ''; // Novo campo de profissional
                 document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
-                alert('Agendamento selecionado para edição. Altere os campos e clique em Salvar Agendamento.');
+                showToast('Agendamento carregado para edição!', 'info');
+                document.getElementById('agenda-cliente-nome').focus();
             }
         };
 
         const editarTransacao = (id) => {
             const transacao = transacoes.find(t => t.id === id);
             if (transacao) {
+                resetForm('financeiro-section'); // Limpa antes de preencher
                 document.getElementById('financeiro-id-edit').value = transacao.id;
                 document.getElementById('financeiro-tipo').value = transacao.tipo;
                 document.getElementById('financeiro-descricao').value = transacao.descricao;
                 document.getElementById('financeiro-valor').value = transacao.valor;
-                alert('Transação selecionada para edição. Altere os campos e clique em Salvar Transação.');
+                showToast('Transação carregada para edição!', 'info');
+                document.getElementById('financeiro-tipo').focus();
             }
         };
 
         const editarProduto = (id) => {
             const produto = produtos.find(p => p.id === id);
             if (produto) {
+                resetForm('estoque-section'); // Limpa antes de preencher
                 document.getElementById('estoque-id-edit').value = produto.id;
                 document.getElementById('estoque-nome-produto').value = produto.nome;
                 document.getElementById('estoque-quantidade').value = produto.quantidade;
-                alert('Produto selecionado para edição. Altere os campos e clique em Salvar Produto.');
+                showToast('Produto carregado para edição!', 'info');
+                document.getElementById('estoque-nome-produto').focus();
             }
         };
 
         const editarProfissional = (id) => {
             const profissional = profissionais.find(p => p.id === id);
             if (profissional) {
+                resetForm('profissional-section'); // Limpa antes de preencher
                 document.getElementById('profissional-id-edit').value = profissional.id;
                 document.getElementById('profissional-nome').value = profissional.nome;
                 document.getElementById('profissional-especialidade').value = profissional.especialidade;
                 document.getElementById('profissional-disponibilidade').value = profissional.disponibilidade || ''; // Campo de disponibilidade
-                alert('Profissional selecionado para edição. Altere os campos e clique em Salvar Profissional.');
+                showToast('Profissional carregado para edição!', 'info');
+                document.getElementById('profissional-nome').focus();
             }
         };
 
@@ -961,7 +1118,7 @@
                 clientes = clientes.filter(c => c.id !== id);
                 salvarDados('clientesEspacoTaiBotelho', clientes);
                 renderizarClientes();
-                alert('Cliente excluído com sucesso!');
+                showToast('Cliente excluído com sucesso!', 'success');
             }
         };
 
@@ -973,7 +1130,7 @@
                 // Também pode ser necessário atualizar os relatórios de profissional após exclusão
                 profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
                 atualizarNotificacoesDashboard();
-                alert('Agendamento excluído com sucesso!');
+                showToast('Agendamento excluído com sucesso!', 'success');
             }
         };
 
@@ -982,7 +1139,7 @@
                 transacoes = transacoes.filter(t => t.id !== id);
                 salvarDados('transacoesEspacoTaiBotelho', transacoes);
                 renderizarTransacoes();
-                alert('Transação excluída com sucesso!');
+                showToast('Transação excluída com sucesso!', 'success');
             }
         };
 
@@ -992,7 +1149,7 @@
                 salvarDados('produtosEspacoTaiBotelho', produtos);
                 renderizarProdutos();
                 atualizarNotificacoesDashboard(); // Pode remover alerta de estoque baixo
-                alert('Produto excluído com sucesso!');
+                showToast('Produto excluído com sucesso!', 'success');
             }
         };
 
@@ -1010,7 +1167,7 @@
                 salvarDados('agendamentosEspacoTaiBotelho', agendamentos); // Salva agendamentos alterados
                 renderizarProfissionais();
                 renderizarAgendamentos(); // Atualiza agendamentos na tela
-                alert('Profissional excluído com sucesso!');
+                showToast('Profissional excluído com sucesso!', 'success');
             }
         };
 
@@ -1032,7 +1189,7 @@
                     return transacaoDate >= dataInicio && transacaoDate <= dataFim;
                 });
             } else if (dataInicioStr || dataFimStr) {
-                 alert('Por favor, preencha AMBAS as datas de início e fim para filtrar por período.');
+                 showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar por período.', 'error');
                  return;
             }
 
@@ -1088,12 +1245,12 @@
                 headers = ['ID', 'Tipo', 'Descricao', 'Valor', 'DataCriacao'];
                 filename = 'transacoes_espaco_tai_botelho.csv';
             } else {
-                alert('Tipo de exportação não suportado.');
+                showToast('Tipo de exportação não suportado.', 'error');
                 return;
             }
 
             if (data.length === 0) {
-                alert(`Não há ${tipo} para exportar.`);
+                showToast(`Não há ${tipo} para exportar.`, 'info');
                 return;
             }
 
@@ -1124,9 +1281,10 @@
                 link.click();
                 document.body.removeChild(link);
             } else {
-                alert('Seu navegador não suporta download automático. Por favor, copie o conteúdo abaixo:\n\n' + csvContent);
+                showToast('Seu navegador não suporta download automático. Por favor, copie o conteúdo e salve como CSV.', 'info');
+                console.log(csvContent); // Mostra no console para copiar
             }
-            alert(`Dados de ${tipo} exportados com sucesso para ${filename}!`);
+            showToast(`Dados de ${tipo} exportados com sucesso para ${filename}!`, 'success');
         };
 
         // --- Funções de Metas Financeiras ---
@@ -1147,7 +1305,7 @@
             financeiroMetas.saida = isNaN(metaSaida) ? 0 : metaSaida;
 
             salvarDados('financeiroMetasEspacoTaiBotelho', financeiroMetas);
-            alert('Metas financeiras salvas com sucesso!');
+            showToast('Metas financeiras salvas com sucesso!', 'success');
             renderizarTransacoes(); // Re-renderiza para atualizar o progresso
         };
 
@@ -1226,6 +1384,7 @@
 
             if (!clienteNome || !dataHora || !servico) {
                 document.getElementById('agendamento-mensagem-pronta').value = 'Preencha o nome do cliente, data/hora e serviço para gerar a mensagem.';
+                showToast('Preencha os campos obrigatórios para gerar a mensagem.', 'error');
                 return;
             }
 
@@ -1249,7 +1408,7 @@
             textarea.select();
             textarea.setSelectionRange(0, 99999); // Para mobile
             document.execCommand('copy');
-            alert('Mensagem copiada para a área de transferência!');
+            showToast('Mensagem copiada para a área de transferência!', 'success');
         };
 
         const preencherDatalistClientes = () => {
@@ -1311,12 +1470,12 @@
             const profHistoricoUl = document.getElementById(`prof-historico-${profissionalId}`);
 
             let totalComissao = 0;
-            profHistoricoUl.innerHTML = ''; // Limpa o histórico anterior
+            if (profHistoricoUl) profHistoricoUl.innerHTML = ''; // Limpa o histórico anterior
 
             if (agendamentosDoProfissional.length === 0) {
-                profAgendamentosSpan.textContent = 'Nenhum.';
-                profComissaoSpan.textContent = 'R$ 0,00';
-                profHistoricoUl.innerHTML = '<li>Nenhum serviço registrado.</li>';
+                if (profAgendamentosSpan) profAgendamentosSpan.textContent = 'Nenhum.';
+                if (profComissaoSpan) profComissaoSpan.textContent = 'R$ 0,00';
+                if (profHistoricoUl) profHistoricoUl.innerHTML = '<li>Nenhum serviço registrado.</li>';
                 return;
             }
 
@@ -1328,11 +1487,11 @@
                 const dataFormatada = new Date(ag.dataHora).toLocaleDateString('pt-BR');
                 const valorFormatado = valorServico.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 li.textContent = `${dataFormatada} - ${ag.servico} (Cliente: ${ag.cliente}) - ${valorFormatado}`;
-                profHistoricoUl.appendChild(li);
+                if (profHistoricoUl) profHistoricoUl.appendChild(li);
             });
 
-            profAgendamentosSpan.textContent = `${agendamentosDoProfissional.length} agendamento(s).`;
-            profComissaoSpan.textContent = totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            if (profAgendamentosSpan) profAgendamentosSpan.textContent = `${agendamentosDoProfissional.length} agendamento(s).`;
+            if (profComissaoSpan) profComissaoSpan.textContent = totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         };
 
         const gerarRelatorioProfissionais = () => {
@@ -1351,7 +1510,7 @@
                     return agendamentoDate >= dataInicio && agendamentoDate <= dataFim;
                 });
             } else if (dataInicioStr || dataFimStr) {
-                 alert('Por favor, preencha AMBAS as datas de início e fim para filtrar o relatório de profissionais.');
+                 showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar o relatório de profissionais.', 'error');
                  return;
             }
 
@@ -1401,7 +1560,7 @@
                             <h5>${dados.nome} (${prof.especialidade})</h5>
                             <p><strong>Total de Agendamentos:</strong> ${dados.totalAgendamentos}</p>
                             <p><strong>Valor Total dos Serviços:</strong> ${dados.totalServicosValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                            <p><strong>Comissão Estimada (${TAXA_COMISSAO_PADRAO * 100}%):</strong> ${dados.comissaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                            <p><strong>Comissão Estimada (${(TAXA_COMISSAO_PADRAO * 100).toFixed(0)}%):</strong> ${dados.comissaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
                             <h6>Serviços Realizados no Período:</h6>
                             <ul>
                     `;
@@ -1458,9 +1617,27 @@
             carregarMetasFinanceiras(); // Carrega metas financeiras
 
             // --- Event Listeners para botões de SALVAR (Criar/Atualizar) ---
+            const setupSaveButton = (buttonId, sectionId, saveFunction) => {
+                document.getElementById(buttonId).addEventListener('click', async () => {
+                    const button = document.getElementById(buttonId);
+                    button.disabled = true;
+                    button.classList.add('loading');
+                    const originalText = button.textContent;
+                    button.textContent = 'Salvando...';
 
-            // Cliente
-            document.getElementById('btn-salvar-cliente').addEventListener('click', () => {
+                    try {
+                        await saveFunction(); // A função de salvar deve retornar uma Promise (ou ser async)
+                        resetForm(sectionId); // Limpa o formulário após salvar com sucesso
+                        focusFirstField(sectionId); // Foca no primeiro campo da seção novamente
+                    } finally {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                        button.classList.remove('loading');
+                    }
+                });
+            };
+
+            setupSaveButton('btn-salvar-cliente', 'cliente-section', async () => {
                 const id = document.getElementById('cliente-id-edit').value;
                 const nome = document.getElementById('cliente-nome').value.trim();
                 const telefone = document.getElementById('cliente-telefone').value.trim();
@@ -1469,108 +1646,85 @@
                 const observacoes = document.getElementById('cliente-observacoes').value.trim();
 
                 if (nome && telefone) {
-                    if (id) { // Modo de edição
+                    if (id) {
                         const index = clientes.findIndex(c => c.id === id);
                         if (index !== -1) {
                             clientes[index] = { ...clientes[index], nome, telefone, email, historicoServicos, observacoes };
-                            alert('Cliente atualizado com sucesso!');
+                            showToast('Cliente atualizado com sucesso!', 'success');
                         }
-                    } else { // Modo de novo cadastro
+                    } else {
                         clientes.push({ id: gerarIdUnico(), nome, telefone, email, historicoServicos, observacoes });
-                        alert('Cliente cadastrado com sucesso!');
+                        showToast('Cliente cadastrado com sucesso!', 'success');
                     }
                     salvarDados('clientesEspacoTaiBotelho', clientes);
                     renderizarClientes();
-                    // Limpar formulário
-                    document.getElementById('cliente-id-edit').value = '';
-                    document.getElementById('cliente-nome').value = '';
-                    document.getElementById('cliente-telefone').value = '';
-                    document.getElementById('cliente-email').value = '';
-                    document.getElementById('cliente-historico-servicos').value = '';
-                    document.getElementById('cliente-observacoes').value = '';
                 } else {
-                    alert('Por favor, preencha o nome e o telefone do cliente.');
+                    showToast('Por favor, preencha o nome e o telefone do cliente.', 'error');
+                    throw new Error('Campos obrigatórios vazios.'); // Lança erro para o finally
                 }
             });
 
-            // Agenda
-            document.getElementById('btn-salvar-agendamento').addEventListener('click', () => {
+            setupSaveButton('btn-salvar-agendamento', 'agenda-section', async () => {
                 const id = document.getElementById('agenda-id-edit').value;
                 const cliente = document.getElementById('agenda-cliente-nome').value.trim();
                 const dataHora = document.getElementById('agenda-data-hora').value;
                 const servico = document.getElementById('agenda-servico').value;
-                const valorServico = parseFloat(document.getElementById('agenda-valor-servico').value) || 0; // Novo
-                const profissionalResponsavel = document.getElementById('agenda-profissional-responsavel').value.trim(); // Novo
+                const valorServico = parseFloat(document.getElementById('agenda-valor-servico').value) || 0;
+                const profissionalResponsavel = document.getElementById('agenda-profissional-responsavel').value.trim();
                 const observacoes = document.getElementById('agenda-observacoes').value.trim();
 
-                // Para vincular o profissional pelo ID
                 const profissionalObj = profissionais.find(p => p.nome === profissionalResponsavel);
                 const profissionalId = profissionalObj ? profissionalObj.id : null;
 
-
                 if (cliente && dataHora && servico) {
-                    if (id) { // Modo de edição
+                    if (id) {
                         const index = agendamentos.findIndex(a => a.id === id);
                         if (index !== -1) {
                             agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes };
-                            alert('Agendamento atualizado com sucesso!');
+                            showToast('Agendamento atualizado com sucesso!', 'success');
                         }
-                    } else { // Modo de novo cadastro
+                    } else {
                         agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes });
-                        alert('Agendamento salvo com sucesso!');
+                        showToast('Agendamento salvo com sucesso!', 'success');
                     }
                     salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
                     renderizarAgendamentos();
-                    // Limpar formulário
-                    document.getElementById('agenda-id-edit').value = '';
-                    document.getElementById('agenda-cliente-nome').value = '';
-                    document.getElementById('agenda-data-hora').value = '';
-                    document.getElementById('agenda-servico').value = '';
-                    document.getElementById('agenda-valor-servico').value = ''; // Limpa valor
-                    document.getElementById('agenda-profissional-responsavel').value = ''; // Limpa profissional
-                    document.getElementById('agenda-observacoes').value = '';
-                    document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa a mensagem pronta
-                    document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
-                    // Atualiza detalhes dos profissionais, caso tenha havido mudança em agendamentos
+                    gerarMensagemAgendamento(); // Gera mensagem após salvar
+                    document.getElementById('sugestao-inteligente').style.display = 'none';
                     profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
-
                 } else {
-                    alert('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).');
+                    showToast('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
                 }
             });
 
-            // Financeiro
-            document.getElementById('btn-salvar-transacao').addEventListener('click', () => {
+            setupSaveButton('btn-salvar-transacao', 'financeiro-section', async () => {
                 const id = document.getElementById('financeiro-id-edit').value;
                 const tipo = document.getElementById('financeiro-tipo').value;
                 const descricao = document.getElementById('financeiro-descricao').value.trim();
                 const valor = parseFloat(document.getElementById('financeiro-valor').value);
-                const dataCriacao = new Date().toISOString(); // Adiciona data de criação da transação
+                const dataCriacao = new Date().toISOString();
 
                 if (tipo && descricao && !isNaN(valor) && valor > 0) {
-                    if (id) { // Modo de edição
+                    if (id) {
                         const index = transacoes.findIndex(t => t.id === id);
                         if (index !== -1) {
                             transacoes[index] = { ...transacoes[index], tipo, descricao, valor };
-                            alert('Transação atualizada com sucesso!');
+                            showToast('Transação atualizada com sucesso!', 'success');
                         }
-                    } else { // Modo de nova transação
+                    } else {
                         transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor, dataCriacao });
-                        alert('Transação registrada com sucesso!');
+                        showToast('Transação registrada com sucesso!', 'success');
                     }
                     salvarDados('transacoesEspacoTaiBotelho', transacoes);
                     renderizarTransacoes();
-                    document.getElementById('financeiro-id-edit').value = '';
-                    document.getElementById('financeiro-tipo').value = '';
-                    document.getElementById('financeiro-descricao').value = '';
-                    document.getElementById('financeiro-valor').value = '';
                 } else {
-                    alert('Por favor, selecione o tipo, preencha a descrição e um valor numérico positivo.');
+                    showToast('Por favor, selecione o tipo, preencha a descrição e um valor numérico positivo.', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
                 }
             });
 
-            // Estoque
-            document.getElementById('btn-salvar-produto').addEventListener('click', () => {
+            setupSaveButton('btn-salvar-produto', 'estoque-section', async () => {
                 const id = document.getElementById('estoque-id-edit').value;
                 const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
                 const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
@@ -1580,58 +1734,53 @@
                         const index = produtos.findIndex(p => p.id === id);
                         if (index !== -1) {
                             produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
-                            alert('Produto atualizado no estoque!');
+                            showToast('Produto atualizado no estoque!', 'success');
                         }
                     } else {
                         const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
                         if (produtoExistente) {
                             produtoExistente.quantidade += quantidade;
-                            alert('Quantidade de produto existente atualizada!');
+                            showToast('Quantidade de produto existente atualizada!', 'success');
                         } else {
                             produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
-                            alert('Produto cadastrado no estoque!');
+                            showToast('Produto cadastrado no estoque!', 'success');
                         }
                     }
                     salvarDados('produtosEspacoTaiBotelho', produtos);
                     renderizarProdutos();
-                    document.getElementById('estoque-id-edit').value = '';
-                    document.getElementById('estoque-nome-produto').value = '';
-                    document.getElementById('estoque-quantidade').value = '';
-                    atualizarNotificacoesDashboard(); // Pode gerar alerta de estoque baixo
+                    atualizarNotificacoesDashboard();
                 } else {
-                    alert('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).');
+                    showToast('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
                 }
             });
 
-            // Profissional
-            document.getElementById('btn-salvar-profissional').addEventListener('click', () => {
+            setupSaveButton('btn-salvar-profissional', 'profissional-section', async () => {
                 const id = document.getElementById('profissional-id-edit').value;
                 const nome = document.getElementById('profissional-nome').value.trim();
                 const especialidade = document.getElementById('profissional-especialidade').value.trim();
-                const disponibilidade = document.getElementById('profissional-disponibilidade').value.trim(); // Novo campo
+                const disponibilidade = document.getElementById('profissional-disponibilidade').value.trim();
 
                 if (nome && especialidade) {
                     if (id) {
                         const index = profissionais.findIndex(p => p.id === id);
                         if (index !== -1) {
                             profissionais[index] = { ...profissionais[index], nome, especialidade, disponibilidade };
-                            alert('Profissional atualizado com sucesso!');
+                            showToast('Profissional atualizado com sucesso!', 'success');
                         }
                     } else {
                         profissionais.push({ id: gerarIdUnico(), nome, especialidade, disponibilidade });
-                        alert('Profissional cadastrado com sucesso!');
+                        showToast('Profissional cadastrado com sucesso!', 'success');
                     }
                     salvarDados('profissionaisEspacoTaiBotelho', profissionais);
-                    renderizarProfissionais(); // Re-renderiza para atualizar a lista e os detalhes
-                    document.getElementById('profissional-id-edit').value = '';
-                    document.getElementById('profissional-nome').value = '';
-                    document.getElementById('profissional-especialidade').value = '';
-                    document.getElementById('profissional-disponibilidade').value = '';
-                    preencherDatalistProfissionais(); // Atualiza select de profissionais na agenda
+                    renderizarProfissionais();
+                    preencherDatalistProfissionais();
                 } else {
-                    alert('Por favor, preencha o nome e a especialidade do profissional.');
+                    showToast('Por favor, preencha o nome e a especialidade do profissional.', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
                 }
             });
+
 
             // --- Event Listeners para Busca ---
             document.getElementById('btn-search-cliente').addEventListener('click', () => {
@@ -1685,7 +1834,8 @@
 
             // --- Event Listener para sugestão inteligente e mensagem de agendamento ---
             document.getElementById('agenda-cliente-nome').addEventListener('input', mostrarSugestaoInteligente);
-            document.getElementById('btn-salvar-agendamento').addEventListener('click', gerarMensagemAgendamento); // Gera mensagem após salvar
+            // Removido o event listener do btn-salvar-agendamento para gerar mensagem, agora é chamado dentro do setupSaveButton
+            document.getElementById('agendamento-mensagem-pronta').addEventListener('click', copiarMensagemAgendamento); // Clicar no textarea copia a mensagem
 
             // --- Event Listener para Relatório de Profissionais ---
             document.getElementById('btn-gerar-relatorio-profissionais').addEventListener('click', gerarRelatorioProfissionais);
@@ -1697,23 +1847,30 @@
 
 
         // Função para alternar a visibilidade das seções
-        function toggleSection(id) {
-            const el = document.getElementById(id);
-            const isCurrentlyVisible = el.style.display === "block";
+        function toggleSection(button) {
+            const sectionId = button.dataset.sectionId;
+            const el = document.getElementById(sectionId);
+            const isCurrentlyActive = el.classList.contains('active');
 
-            // Fecha todas as outras seções abertas para evitar sobreposição
+            // Desativa todas as seções e botões
             document.querySelectorAll('.icon-content').forEach(section => {
-                if (section.id !== id) {
-                    section.style.display = 'none';
-                }
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.open-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
 
-            // Alterna a visibilidade da seção clicada
-            el.style.display = isCurrentlyVisible ? "none" : "block";
+            if (!isCurrentlyActive) {
+                // Ativa a seção clicada
+                el.classList.add('active');
+                button.classList.add('active'); // Destaca o botão
 
-            // Renderiza o conteúdo específico da seção quando ela é aberta
-            if (!isCurrentlyVisible) { // Se a seção está sendo aberta
-                switch (id) {
+                // Limpa e foca o formulário
+                resetForm(sectionId);
+                focusFirstField(sectionId);
+
+                // Renderiza o conteúdo específico da seção quando ela é aberta
+                switch (sectionId) {
                     case 'cliente-section':
                         renderizarClientes();
                         document.getElementById('search-cliente').value = '';
@@ -1746,6 +1903,11 @@
             }
             atualizarNotificacoesDashboard(); // Garante que as notificações estejam sempre atualizadas
         }
+
+        // Adiciona o event listener para todos os botões .open-btn
+        document.querySelectorAll('.open-btn').forEach(button => {
+            button.addEventListener('click', () => toggleSection(button));
+        });
     </script>
 </body>
 </html>
