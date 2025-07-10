@@ -9,7 +9,8 @@
     body { background: #fff0f5; color: #333; }
     .splash {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100vh; background: #f28ab2; color: white; text-align: center;
+      height: 100vh; background: #f28ab2;
+      color: white; text-align: center;
     }
     .splash h1 { font-size: 3rem; margin-bottom: 20px; }
     .splash button {
@@ -51,23 +52,21 @@
       font-weight: bold;
     }
 
-    ul { margin-top: 10px; list-style: none; padding: 0; }
+    ul {
+      margin-top: 10px; list-style: none; padding: 0;
+    }
     ul li {
       background: #ffe6ec; margin-bottom: 8px; padding: 10px;
       border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .cliente-info { flex: 1; }
-    .acoes button {
-      margin-left: 5px; padding: 4px 8px; font-size: 0.8rem;
-      border: none; border-radius: 4px; cursor: pointer;
+    .financeiro p {
+      font-size: 1.1rem; margin: 10px 0;
     }
-    .editar { background: #ffc107; color: #fff; }
-    .excluir { background: #dc3545; color: #fff; }
-    #buscaCliente { margin-top: 10px; }
-
-    .subtitulo { margin-top: 20px; font-weight: bold; color: #444; }
+    .financeiro span {
+      font-weight: bold;
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -80,7 +79,10 @@
 <div class="container" id="app">
   <nav>
     <button onclick="mostrar('clientes')">📋 Clientes</button>
-    <!-- Outras seções podem ser adicionadas aqui -->
+    <button onclick="mostrar('pedidos')">🧁 Pedidos</button>
+    <button onclick="mostrar('despesas')">💸 Despesas</button>
+    <button onclick="mostrar('estoque')">📦 Estoque</button>
+    <button onclick="mostrar('financeiro')">📊 Financeiro</button>
   </nav>
 
   <section id="clientes" class="active">
@@ -89,28 +91,56 @@
     <input id="clienteTelefone" placeholder="Telefone">
     <input id="clienteEndereco" placeholder="Endereço">
     <button class="save" onclick="salvarCliente()">Salvar</button>
-
-    <div class="subtitulo">Buscar Cliente</div>
-    <input id="buscaCliente" placeholder="Digite o nome para buscar" oninput="buscarCliente()">
-
-    <div class="subtitulo">Clientes Cadastrados</div>
     <ul id="listaClientes"></ul>
+  </section>
+
+  <section id="pedidos">
+    <h2>Pedidos</h2>
+    <input id="pedidoCliente" placeholder="Nome do cliente">
+    <input id="tipoProduto" placeholder="Tipo de produto">
+    <input id="valorPedido" type="number" placeholder="Valor (R$)">
+    <select id="formaEntrega">
+      <option value="Entregar">Entregar</option>
+      <option value="Retirar">Retirar</option>
+    </select>
+    <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
+    <ul id="listaPedidos"></ul>
+  </section>
+
+  <section id="despesas">
+    <h2>Despesas</h2>
+    <select id="tipoDespesa">
+      <option>Mercadorias</option>
+      <option>Loja</option>
+      <option>Pessoais</option>
+    </select>
+    <input id="valorDespesa" type="number" placeholder="Valor (R$)">
+    <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
+    <ul id="listaDespesas"></ul>
+  </section>
+
+  <section id="estoque">
+    <h2>Estoque</h2>
+    <input id="produtoNome" placeholder="Nome do Produto">
+    <input id="produtoQtd" type="number" placeholder="Quantidade">
+    <button class="save" onclick="adicionarProduto()">Adicionar Produto</button>
+    <ul id="listaEstoque"></ul>
+  </section>
+
+  <section id="financeiro" class="financeiro">
+    <h2>Financeiro</h2>
+    <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
+    <p><strong>Gastos:</strong> R$ <span id="gastos">0.00</span></p>
+    <p><strong>Lucros:</strong> R$ <span id="lucros">0.00</span></p>
+    <p><em>Relatórios diário, mensal e anual em breve!</em></p>
   </section>
 </div>
 
 <script>
-  let clienteEditando = null;
-
-  const clienteNome = document.getElementById('clienteNome');
-  const clienteTelefone = document.getElementById('clienteTelefone');
-  const clienteEndereco = document.getElementById('clienteEndereco');
-  const listaClientes = document.getElementById('listaClientes');
-  const buscaClienteInput = document.getElementById('buscaCliente');
-
   function entrar() {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    listarClientes();
+    atualizarTudo();
   }
 
   function mostrar(secao) {
@@ -122,81 +152,116 @@
     const nome = clienteNome.value.trim();
     const telefone = clienteTelefone.value.trim();
     const endereco = clienteEndereco.value.trim();
+    if (!nome || !telefone || !endereco) return alert('Preencha todos os campos');
 
-    if (!nome || !telefone || !endereco) {
-      alert('Preencha todos os campos');
-      return;
-    }
-
-    let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-
-    if (clienteEditando !== null) {
-      clientes[clienteEditando] = { nome, telefone, endereco };
-      clienteEditando = null;
-    } else {
-      clientes.push({ nome, telefone, endereco });
-    }
-
+    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+    clientes.push({ nome, telefone, endereco });
     localStorage.setItem('clientes', JSON.stringify(clientes));
     clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
     listarClientes();
   }
 
-  function listarClientes(filtrar = '') {
-    listaClientes.innerHTML = '';
+  function listarClientes() {
+    const lista = document.getElementById('listaClientes');
+    lista.innerHTML = '';
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-
-    clientes.forEach((c, i) => {
-      if (filtrar && !c.nome.toLowerCase().includes(filtrar.toLowerCase())) return;
-
+    clientes.forEach(c => {
       const li = document.createElement('li');
-      const div = document.createElement('div');
-      div.className = 'cliente-info';
-      div.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
-
-      const acoes = document.createElement('div');
-      acoes.className = 'acoes';
-
-      const btnEditar = document.createElement('button');
-      btnEditar.textContent = 'Editar';
-      btnEditar.className = 'editar';
-      btnEditar.onclick = () => editarCliente(i);
-
-      const btnExcluir = document.createElement('button');
-      btnExcluir.textContent = 'Excluir';
-      btnExcluir.className = 'excluir';
-      btnExcluir.onclick = () => excluirCliente(i);
-
-      acoes.appendChild(btnEditar);
-      acoes.appendChild(btnExcluir);
-
-      li.appendChild(div);
-      li.appendChild(acoes);
-      listaClientes.appendChild(li);
+      li.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
+      lista.appendChild(li);
     });
   }
 
-  function editarCliente(index) {
-    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-    const c = clientes[index];
-    clienteNome.value = c.nome;
-    clienteTelefone.value = c.telefone;
-    clienteEndereco.value = c.endereco;
-    clienteEditando = index;
+  function salvarPedido() {
+    const nome = pedidoCliente.value.trim();
+    const produto = tipoProduto.value.trim();
+    const valor = parseFloat(valorPedido.value);
+    const entrega = formaEntrega.value;
+    if (!nome || !produto || isNaN(valor)) return alert('Preencha todos os campos');
+
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    pedidos.push({ nome, produto, valor, entrega });
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    pedidoCliente.value = tipoProduto.value = valorPedido.value = '';
+    listarPedidos(); atualizarFinanceiro();
   }
 
-  function excluirCliente(index) {
-    if (confirm('Deseja realmente excluir este cliente?')) {
-      let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-      clientes.splice(index, 1);
-      localStorage.setItem('clientes', JSON.stringify(clientes));
-      listarClientes();
-    }
+  function listarPedidos() {
+    const lista = document.getElementById('listaPedidos');
+    lista.innerHTML = '';
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    pedidos.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} (${p.entrega})`;
+      lista.appendChild(li);
+    });
   }
 
-  function buscarCliente() {
-    const termo = buscaClienteInput.value.trim();
-    listarClientes(termo);
+  function salvarDespesa() {
+    const tipo = tipoDespesa.value;
+    const valor = parseFloat(valorDespesa.value);
+    if (!tipo || isNaN(valor)) return alert('Preencha todos os campos');
+
+    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+    despesas.push({ tipo, valor });
+    localStorage.setItem('despesas', JSON.stringify(despesas));
+    valorDespesa.value = '';
+    listarDespesas(); atualizarFinanceiro();
+  }
+
+  function listarDespesas() {
+    const lista = document.getElementById('listaDespesas');
+    lista.innerHTML = '';
+    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+    despesas.forEach(d => {
+      const li = document.createElement('li');
+      li.textContent = `${d.tipo} - R$${d.valor.toFixed(2)}`;
+      lista.appendChild(li);
+    });
+  }
+
+  function adicionarProduto() {
+    const nome = produtoNome.value.trim();
+    const qtd = parseInt(produtoQtd.value);
+    if (!nome || isNaN(qtd)) return alert('Preencha todos os campos');
+
+    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+    estoque.push({ nome, qtd });
+    localStorage.setItem('estoque', JSON.stringify(estoque));
+    produtoNome.value = produtoQtd.value = '';
+    listarEstoque();
+  }
+
+  function listarEstoque() {
+    const lista = document.getElementById('listaEstoque');
+    lista.innerHTML = '';
+    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+    estoque.forEach(e => {
+      const li = document.createElement('li');
+      li.textContent = `${e.nome} - ${e.qtd} unidade(s)${e.qtd === 0 ? ' (Em falta)' : ''}`;
+      lista.appendChild(li);
+    });
+  }
+
+  function atualizarFinanceiro() {
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
+    const ganhos = pedidos.reduce((soma, p) => soma + p.valor, 0);
+    const gastos = despesas.reduce((soma, d) => soma + d.valor, 0);
+    const lucros = ganhos - gastos;
+
+    document.getElementById('ganhos').textContent = ganhos.toFixed(2);
+    document.getElementById('gastos').textContent = gastos.toFixed(2);
+    document.getElementById('lucros').textContent = lucros.toFixed(2);
+  }
+
+  function atualizarTudo() {
+    listarClientes();
+    listarPedidos();
+    listarDespesas();
+    listarEstoque();
+    atualizarFinanceiro();
   }
 </script>
 
