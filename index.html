@@ -101,6 +101,12 @@
 <script>
   let clienteEditando = null;
 
+  const clienteNome = document.getElementById('clienteNome');
+  const clienteTelefone = document.getElementById('clienteTelefone');
+  const clienteEndereco = document.getElementById('clienteEndereco');
+  const listaClientes = document.getElementById('listaClientes');
+  const buscaClienteInput = document.getElementById('buscaCliente');
+
   function entrar() {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -137,8 +143,7 @@
   }
 
   function listarClientes(filtrar = '') {
-    const lista = document.getElementById('listaClientes');
-    lista.innerHTML = '';
+    listaClientes.innerHTML = '';
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
 
     clientes.forEach((c, i) => {
@@ -167,7 +172,7 @@
 
       li.appendChild(div);
       li.appendChild(acoes);
-      lista.appendChild(li);
+      listaClientes.appendChild(li);
     });
   }
 
@@ -190,7 +195,7 @@
   }
 
   function buscarCliente() {
-    const termo = document.getElementById('buscaCliente').value.trim();
+    const termo = buscaClienteInput.value.trim();
     listarClientes(termo);
   }
 </script>
