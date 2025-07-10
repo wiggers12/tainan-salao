@@ -158,6 +158,15 @@
         background-color: #e91e63;
         color: white;
     }
+    .action-buttons button.sold-button {
+        background-color: #4CAF50; /* Verde para "Vendido" */
+        color: white;
+        border-color: #4CAF50;
+    }
+    .action-buttons button.sold-button:hover {
+        background-color: #45a049;
+    }
+
 
     /* Estilos para o Splash Screen */
     #splash-screen {
@@ -260,7 +269,7 @@
   <nav>
     <button id="btn-clientes" class="active">Clientes</button>
     <button id="btn-agenda">Agenda de Pedidos</button>
-    <button id="btn-estoque">Estoque</button>
+    <button id="btn-pedidos-vendidos">Pedidos Vendidos</button> <button id="btn-estoque">Estoque</button>
     <button id="btn-gastos">Gastos com Produtos</button>
     <button id="btn-financeiro">Financeiro</button>
     <button id="btn-vendas-diarias">Vendas do Período</button>
@@ -321,6 +330,17 @@
       </div>
     </section>
 
+    <section id="pedidos-vendidos">
+        <h2>Pedidos Vendidos</h2>
+        <div class="table-wrapper">
+            <table id="tabela-pedidos-vendidos">
+                <thead>
+                    <tr><th>Cliente</th><th>Data da Venda</th><th>Tipo</th><th>Tamanho</th><th>Valor</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="tabela-pedidos-vendidos-body"></tbody>
+            </table>
+        </div>
+    </section>
     <section id="estoque">
       <h2>Estoque de Ingredientes</h2>
       <form id="form-estoque">
@@ -383,7 +403,7 @@
                 <h3>Vendas da Semana</h3>
                 <p>R$ <span id="vendas-semana">0.00</span></p>
             </div>
-            <div class="info-card">
+            <div class-="info-card">
                 <h3>Vendas do Mês</h3>
                 <p>R$ <span id="vendas-mes">0.00</span></p>
             </div>
@@ -402,6 +422,7 @@
     // --- Variáveis de Estado (para edição) ---
     let editingItemIndex = -1;
     let editingStorageKey = ''; // 'clientes', 'agenda', 'estoque', 'gastos'
+    let currentActiveSectionId = 'clientes'; // Para saber qual seção está ativa e resetar o form
 
     // --- Mapeamentos para formulários (ID do campo no formulário) ---
     const formMappings = {
@@ -409,7 +430,7 @@
             formId: 'form-clientes',
             tableBodyId: 'tabela-clientes-body',
             submitBtnId: 'btn-submit-cliente',
-            formActionsId: 'cliente-form-actions',
+            formActionsId: 'cliente-form-actions', // Note: Adicionei esse ID ao div.form-actions no HTML para o cliente
             itemSingularName: 'cliente',
             inputMap: {
                 nome: 'cliente-nome',
@@ -421,7 +442,7 @@
             formId: 'form-agenda',
             tableBodyId: 'tabela-agenda-body',
             submitBtnId: 'btn-submit-pedido',
-            formActionsId: 'pedido-form-actions',
+            formActionsId: 'pedido-form-actions', // Note: Adicionei esse ID ao div.form-actions no HTML para a agenda
             itemSingularName: 'pedido',
             inputMap: {
                 cliente: 'pedido-cliente',
@@ -429,13 +450,22 @@
                 tipo: 'pedido-tipo',
                 tamanho: 'pedido-tamanho',
                 valor: 'pedido-valor'
-            }
+            },
+            filter: (pedido) => !pedido.vendido, // Filtrar pedidos não vendidos
+            sort: (a, b) => new Date(a.data) - new Date(b.data) // Ordenar por data
+        },
+        'pedidos-vendidos': {
+            storageKey: 'pedidos-vendidos', // Nova chave de armazenamento
+            tableBodyId: 'tabela-pedidos-vendidos-body',
+            itemSingularName: 'pedido vendido',
+            sort: (a, b) => new Date(b.dataVenda || b.data) - new Date(a.dataVenda || a.data) // Ordenar por data da venda (mais recente primeiro)
+            // Não tem formulário de adição/edição direta, apenas visualização e exclusão
         },
         estoque: {
             formId: 'form-estoque',
             tableBodyId: 'tabela-estoque-body',
             submitBtnId: 'btn-submit-estoque',
-            formActionsId: 'estoque-form-actions',
+            formActionsId: 'estoque-form-actions', // Note: Adicionei esse ID ao div.form-actions no HTML para o estoque
             itemSingularName: 'ingrediente',
             inputMap: {
                 nome: 'ingrediente-nome',
@@ -446,7 +476,7 @@
             formId: 'form-gastos',
             tableBodyId: 'tabela-gastos-body',
             submitBtnId: 'btn-submit-gasto',
-            formActionsId: 'gasto-form-actions',
+            formActionsId: 'gasto-form-actions', // Note: Adicionei esse ID ao div.form-actions no HTML para gastos
             itemSingularName: 'gasto',
             inputMap: {
                 produto: 'gasto-produto',
@@ -473,6 +503,12 @@
         localStorage.setItem(key, JSON.stringify(data));
     };
 
+    // Formata a data para dd/mm/aaaa
+    const formatDate = (dateString) => {
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    };
+
     // --- Funções de UI/UX ---
 
     // Exibe o splash screen e o esconde após um tempo
@@ -487,6 +523,12 @@
 
     // Alterna a seção ativa
     const switchSection = (sectionId) => {
+        // Reseta o formulário da seção que estava ativa, se houver
+        const prevConfig = formMappings[currentActiveSectionId];
+        if (prevConfig && prevConfig.formId) {
+            resetForm(prevConfig);
+        }
+
         botoesNav.forEach(b => b.classList.remove("active"));
         secoes.forEach(s => s.classList.remove("active"));
         
@@ -496,6 +538,25 @@
         if (targetButton) targetButton.classList.add("active");
         if (targetSection) targetSection.classList.add("active");
         
+        currentActiveSectionId = sectionId; // Atualiza a seção ativa
+
+        // Carregar dados específicos da seção
+        const config = formMappings[sectionId];
+        if (config) {
+            carregarDados({ 
+                ...config, 
+                storageKey: config.storageKey || sectionId, // Usa storageKey se definido, senão o próprio ID
+                itemHtmlBuilder: (item, i) => {
+                    if (sectionId === 'clientes') return clienteHtmlBuilder(item, i);
+                    if (sectionId === 'agenda') return pedidoHtmlBuilder(item, i);
+                    if (sectionId === 'pedidos-vendidos') return pedidoVendidoHtmlBuilder(item, i);
+                    if (sectionId === 'estoque') return ingredienteHtmlBuilder(item, i);
+                    if (sectionId === 'gastos') return gastoHtmlBuilder(item, i);
+                    return '';
+                }
+            });
+        }
+        
         // Atualiza resumos ao trocar de seção
         atualizarFinanceiro();
         atualizarVendasPeriodo();
@@ -503,35 +564,64 @@
 
     // --- Funções Genéricas de CRUD ---
 
-    // Carrega dados e constrói a tabela
+    // Carrega dados e constrói a tabela (agora com filtro e ordenação opcionais)
     const carregarDados = (config) => {
-        const { storageKey, tableBodyId, itemHtmlBuilder } = config;
-        const dados = getLocalStorageData(storageKey);
+        const { storageKey, tableBodyId, itemHtmlBuilder, filter, sort } = config;
+        let dados = getLocalStorageData(storageKey);
+
+        if (filter && typeof filter === 'function') {
+            dados = dados.filter(filter);
+        }
+        if (sort && typeof sort === 'function') {
+            dados.sort(sort);
+        }
+
         const tableBody = document.getElementById(tableBodyId);
 
-        if (tableBody) { // Garante que o elemento exista antes de tentar manipulá-lo
+        if (tableBody) {
             tableBody.innerHTML = "";
             dados.forEach((item, i) => {
                 tableBody.innerHTML += itemHtmlBuilder(item, i);
             });
         }
-        resetForm(config); // Reseta o formulário após carregar
+        // Só reseta o formulário se a seção tiver um formulário associado E não estiver em modo de edição
+        if (config.formId && editingItemIndex === -1) {
+             resetForm(config); 
+        }
     };
 
     // Inicia o modo de edição
     const editarItem = (storageKey, index) => {
         const config = formMappings[storageKey];
-        if (!config) {
-            console.error('Configuração não encontrada para:', storageKey);
+        if (!config || !config.formId) { // Verifica se há um formulário para edição
+            console.error('Configuração ou formulário não encontrado para edição:', storageKey);
             return;
         }
 
-        const dados = getLocalStorageData(storageKey);
-        const item = dados[index];
-        const submitButton = document.getElementById(config.submitBtnId);
-        const formActions = document.querySelector(`#${config.formId} .form-actions`); // Pega o div de ações dentro do formulário
+        // Se estiver editando um item da agenda, precisamos considerar o filtro
+        let dataToEdit = getLocalStorageData(storageKey);
+        if (storageKey === 'agenda' && config.filter) {
+            const filteredData = dataToEdit.filter(config.filter);
+            // O `index` passado aqui é o índice na lista FILTRADA, não no array original
+            if (!filteredData[index]) {
+                console.error("Item não encontrado na lista filtrada para edição.");
+                return;
+            }
+            // Encontra o índice real no array original
+            const originalData = getLocalStorageData(storageKey);
+            index = originalData.findIndex(item => item === filteredData[index]);
+            dataToEdit = originalData; // Usa o array original para edição
+        }
 
-        // Preenche o formulário
+        const item = dataToEdit[index];
+        if (!item) {
+            console.error("Item não encontrado no array para edição.");
+            return;
+        }
+
+        const submitButton = document.getElementById(config.submitBtnId);
+        const formActions = document.querySelector(`#${config.formId} .form-actions`);
+
         for (const key in config.inputMap) {
             const inputElement = document.getElementById(config.inputMap[key]);
             if (inputElement) {
@@ -547,7 +637,6 @@
             submitButton.classList.add("edit-mode");
         }
         
-        // Adiciona o botão de cancelar se não existir
         const cancelButtonId = `btn-cancel-${config.formId.replace('form-', '')}`;
         if (formActions && !document.getElementById(cancelButtonId)) {
             const cancelButton = document.createElement("button");
@@ -561,6 +650,11 @@
 
         editingItemIndex = index; 
         editingStorageKey = storageKey;
+
+        // Garante que a seção correta esteja visível para edição
+        if (currentActiveSectionId !== storageKey) {
+            switchSection(storageKey);
+        }
     };
 
     // Reseta o formulário e sai do modo de edição
@@ -587,18 +681,38 @@
 
     // Exclui um item
     const excluirItem = (storageKey, index) => {
+        if (!confirm("Tem certeza que deseja excluir este item? Esta ação é irreversível.")) {
+            return; // Cancela se o usuário não confirmar
+        }
+
         const config = formMappings[storageKey];
         if (!config) {
             console.error('Configuração não encontrada para:', storageKey);
             return;
         }
-        const dados = getLocalStorageData(storageKey);
-        dados.splice(index, 1);
+        let dados = getLocalStorageData(storageKey);
+        
+        // Ajusta o índice se a tabela estiver filtrada (agenda)
+        let actualIndex = index; 
+        if (storageKey === 'agenda' && config.filter) {
+            const originalData = getLocalStorageData(storageKey);
+            const filteredData = originalData.filter(config.filter);
+            const itemToDelete = filteredData[index];
+            actualIndex = originalData.findIndex(item => item === itemToDelete);
+            dados = originalData; // Certifica que estamos modificando o array original
+        }
+
+        if (actualIndex === -1 || actualIndex >= dados.length) {
+            console.error("Item não encontrado ou índice inválido para exclusão.");
+            return;
+        }
+
+        dados.splice(actualIndex, 1);
         setLocalStorageData(storageKey, dados);
         
-        carregarDados(config); // Recarrega a tabela específica
-        atualizarFinanceiro(); // Atualiza financeiro
-        atualizarVendasPeriodo(); // Atualiza vendas do período
+        // Recarrega a tabela específica
+        // Chamar switchSection para garantir que a tabela seja recarregada com os filtros/ordenação corretos
+        switchSection(storageKey); 
     };
 
     // --- Funções Específicas de Conteúdo e Lógica ---
@@ -620,14 +734,29 @@
     const pedidoHtmlBuilder = (a, i) => `
         <tr>
             <td>${a.cliente}</td>
-            <td>${a.data}</td>
+            <td>${formatDate(a.data)}</td>
             <td>${a.tipo}</td>
             <td>${a.tamanho}</td>
             <td>R$ ${formatCurrency(a.valor)}</td>
             <td>
                 <div class="action-buttons">
                     <button onclick="editarItem('agenda', ${i})">Editar</button>
+                    <button class="sold-button" onclick="marcarPedidoComoVendido(${i})">Vendido</button>
                     <button onclick="excluirItem('agenda', ${i})">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+    
+    // Novo builder para Pedidos Vendidos
+    const pedidoVendidoHtmlBuilder = (a, i) => `
+        <tr>
+            <td>${a.cliente}</td>
+            <td>${formatDate(a.dataVenda)}</td> <td>${a.tipo}</td>
+            <td>${a.tamanho}</td>
+            <td>R$ ${formatCurrency(a.valor)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="excluirItem('pedidos-vendidos', ${i})">Excluir</button>
                 </div>
             </td>
         </tr>`;
@@ -660,7 +789,7 @@
     // --- Configuração dos Formulários ---
     const setupForm = (config) => {
         const formElement = document.getElementById(config.formId);
-        if (!formElement) return; // Garante que o formulário exista
+        if (!formElement) return;
 
         formElement.onsubmit = (e) => {
             e.preventDefault();
@@ -686,25 +815,95 @@
             let data = getLocalStorageData(config.storageKey);
 
             if (editingItemIndex !== -1 && editingStorageKey === config.storageKey) {
-                data[editingItemIndex] = newItem;
+                // Se estiver editando um pedido na agenda, mantenha o status 'vendido'
+                if (config.storageKey === 'agenda') {
+                    const originalAgenda = getLocalStorageData('agenda');
+                    // O item sendo editado pode estar filtrado, então precisamos do índice real
+                    const filteredAgenda = originalAgenda.filter(formMappings.agenda.filter);
+                    const itemBeingEditedInFilteredList = filteredAgenda[editingItemIndex];
+                    const realIndexInOriginalAgenda = originalAgenda.findIndex(item => item === itemBeingEditedInFilteredList);
+                    
+                    if (realIndexInOriginalAgenda !== -1) {
+                         newItem.vendido = originalAgenda[realIndexInOriginalAgenda].vendido;
+                    } else {
+                         newItem.vendido = false; // Default para novos, mas isso não deve acontecer aqui
+                    }
+                    data = originalAgenda; // Trabalha com o array original
+                    data[realIndexInOriginalAgenda] = newItem;
+
+                } else {
+                    data[editingItemIndex] = newItem;
+                }
             } else {
+                newItem.vendido = false; // Novos pedidos na agenda começam como não vendidos
                 data.push(newItem);
             }
             setLocalStorageData(config.storageKey, data);
             
-            carregarDados(config); // Recarrega a tabela e reseta o formulário
-            atualizarFinanceiro(); // Atualiza painéis de resumo
-            atualizarVendasPeriodo();
+            // Recarrega a tabela relevante chamando switchSection para aplicar filtros/ordenação
+            switchSection(config.storageKey); 
         };
+    };
+
+    // --- Nova Função: Marcar Pedido como Vendido ---
+    const marcarPedidoComoVendido = (index) => {
+        if (!confirm("Tem certeza que deseja marcar este pedido como VENDIDO?")) {
+            return; // Cancela se o usuário não confirmar
+        }
+
+        let agenda = getLocalStorageData("agenda");
+        let pedidosVendidos = getLocalStorageData("pedidos-vendidos");
+
+        // Encontra o pedido real no array de agenda (sem filtro)
+        // O `index` passado é o índice na lista FILTRADA
+        const originalAgenda = getLocalStorageData('agenda');
+        const filteredAgenda = originalAgenda.filter(formMappings.agenda.filter);
+        const itemToMark = filteredAgenda[index];
+        const originalIndex = originalAgenda.findIndex(item => item === itemToMark);
+
+        if (originalIndex === -1 || !originalAgenda[originalIndex]) {
+            console.error("Pedido não encontrado para marcar como vendido no array original.");
+            return;
+        }
+
+        // Pega a data atual do sistema para a data da venda
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Meses são 0-indexed
+        const dd = String(today.getDate()).padStart(2, '0');
+        const dataAtualFormatada = `${yyyy}-${mm}-${dd}`;
+
+
+        const pedidoVendido = { 
+            ...originalAgenda[originalIndex], 
+            vendido: true, 
+            dataVenda: dataAtualFormatada // Data real da venda
+        }; 
+        
+        pedidosVendidos.push(pedidoVendido);
+        setLocalStorageData("pedidos-vendidos", pedidosVendidos);
+
+        // Remove o pedido da agenda (array original)
+        originalAgenda.splice(originalIndex, 1);
+        setLocalStorageData("agenda", originalAgenda);
+
+        // Recarrega ambas as tabelas
+        switchSection('agenda'); // Recarrega a agenda
+        // A seção 'pedidos-vendidos' será recarregada por switchSection, se for a ativa
+        if (currentActiveSectionId === 'pedidos-vendidos') {
+            switchSection('pedidos-vendidos');
+        }
+
+        alert(`Pedido do cliente ${pedidoVendido.cliente} marcado como vendido e movido para "Pedidos Vendidos"!`);
     };
 
     // --- Funções de Resumo ---
 
     const atualizarFinanceiro = () => {
-        const agenda = getLocalStorageData("agenda");
+        const pedidosVendidos = getLocalStorageData("pedidos-vendidos"); 
         const gastos = getLocalStorageData("gastos");
 
-        const ganhos = agenda.reduce((s, p) => s + parseFloat(p.valor || 0), 0);
+        const ganhos = pedidosVendidos.reduce((s, p) => s + parseFloat(p.valor || 0), 0);
         const despesas = gastos.reduce((s, g) => s + parseFloat(g.valor || 0), 0);
         const lucro = ganhos - despesas;
 
@@ -714,17 +913,16 @@
     };
 
     const atualizarVendasPeriodo = () => {
-        const agenda = getLocalStorageData("agenda");
-        // Usando a data atual fixa: 10 de julho de 2025 para consistência nos testes
-        // Para usar a data real do sistema, substitua por `new Date()`
-        const hoje = new Date('2025-07-10T00:00:00'); 
+        const pedidosVendidos = getLocalStorageData("pedidos-vendidos"); 
+        // Para usar a data real do sistema, use `new Date()`
+        const hoje = new Date(); 
         hoje.setHours(0, 0, 0, 0); 
 
         // Vendas do Dia
-        const vendasDia = agenda.reduce((total, pedido) => {
-            const dataPedido = new Date(pedido.data + 'T00:00:00'); 
-            dataPedido.setHours(0, 0, 0, 0);
-            if (dataPedido.getTime() === hoje.getTime()) {
+        const vendasDia = pedidosVendidos.reduce((total, pedido) => {
+            const dataVenda = new Date((pedido.dataVenda) + 'T00:00:00'); // Sempre usa dataVenda
+            dataVenda.setHours(0, 0, 0, 0);
+            if (dataVenda.getTime() === hoje.getTime()) {
                 return total + parseFloat(pedido.valor || 0);
             }
             return total;
@@ -733,17 +931,17 @@
 
         // Vendas da Semana (Domingo a Sábado)
         const inicioSemana = new Date(hoje);
-        inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Define para o último domingo (0 = domingo)
+        inicioSemana.setDate(hoje.getDate() - hoje.getDay()); 
         inicioSemana.setHours(0, 0, 0, 0);
 
         const fimSemana = new Date(inicioSemana);
-        fimSemana.setDate(inicioSemana.getDate() + 6); // Define para o próximo sábado
+        fimSemana.setDate(inicioSemana.getDate() + 6); 
         fimSemana.setHours(23, 59, 59, 999);
 
-        const vendasSemana = agenda.reduce((total, pedido) => {
-            const dataPedido = new Date(pedido.data + 'T00:00:00');
-            dataPedido.setHours(0, 0, 0, 0);
-            if (dataPedido >= inicioSemana && dataPedido <= fimSemana) {
+        const vendasSemana = pedidosVendidos.reduce((total, pedido) => {
+            const dataVenda = new Date((pedido.dataVenda) + 'T00:00:00');
+            dataVenda.setHours(0, 0, 0, 0);
+            if (dataVenda >= inicioSemana && dataVenda <= fimSemana) {
                 return total + parseFloat(pedido.valor || 0);
             }
             return total;
@@ -752,13 +950,13 @@
 
         // Vendas do Mês
         const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-        const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0); // Último dia do mês
+        const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0); 
         fimMes.setHours(23, 59, 59, 999);
 
-        const vendasMes = agenda.reduce((total, pedido) => {
-            const dataPedido = new Date(pedido.data + 'T00:00:00');
-            dataPedido.setHours(0, 0, 0, 0);
-            if (dataPedido >= inicioMes && dataPedido <= fimMes) {
+        const vendasMes = pedidosVendidos.reduce((total, pedido) => {
+            const dataVenda = new Date((pedido.dataVenda) + 'T00:00:00');
+            dataVenda.setHours(0, 0, 0, 0);
+            if (dataVenda >= inicioMes && dataVenda <= fimMes) {
                 return total + parseFloat(pedido.valor || 0);
             }
             return total;
@@ -778,6 +976,13 @@
         // Anexa as funções genéricas ao objeto window para acesso global (onclick em HTML)
         window.editarItem = editarItem;
         window.excluirItem = excluirItem;
+        window.marcarPedidoComoVendido = marcarPedidoComoVendido; 
+
+        // Adiciona os IDs para os form-actions no HTML, se ainda não existirem:
+        // Ex: <div class="form-actions" id="cliente-form-actions">
+        // Ex: <div class="form-actions" id="pedido-form-actions">
+        // Ex: <div class="form-actions" id="estoque-form-actions">
+        // Ex: <div class="form-actions" id="gasto-form-actions">
 
         // Configura os formulários
         setupForm({ ...formMappings.clientes, storageKey: 'clientes' });
@@ -785,15 +990,8 @@
         setupForm({ ...formMappings.estoque, storageKey: 'estoque' });
         setupForm({ ...formMappings.gastos, storageKey: 'gastos' });
 
-        // Inicia o carregamento dos dados para todas as tabelas
-        carregarDados({ ...formMappings.clientes, storageKey: 'clientes', itemHtmlBuilder: clienteHtmlBuilder });
-        carregarDados({ ...formMappings.agenda, storageKey: 'agenda', itemHtmlBuilder: pedidoHtmlBuilder });
-        carregarDados({ ...formMappings.estoque, storageKey: 'estoque', itemHtmlBuilder: ingredienteHtmlBuilder });
-        carregarDados({ ...formMappings.gastos, storageKey: 'gastos', itemHtmlBuilder: gastoHtmlBuilder });
-
-        // Atualiza os painéis de resumo
-        atualizarFinanceiro();
-        atualizarVendasPeriodo();
+        // Carregamento inicial da primeira seção ativa
+        switchSection(currentActiveSectionId); 
     });
   </script>
 </body>
