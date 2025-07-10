@@ -338,17 +338,17 @@
     // --- Funções Genéricas para CRUD (Create, Read, Update, Delete) ---
 
     // Função para carregar dados na tabela
-    function carregarDados(storageKey, tabelaBody, itemHtmlBuilder, callback = null) {
+    function carregarDados(storageKey, tabelaBody, itemHtmlBuilder, resetFormCallback = null) {
       const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
       tabelaBody.innerHTML = "";
       dados.forEach((item, i) => {
         tabelaBody.innerHTML += itemHtmlBuilder(item, i);
       });
-      if (callback) callback(); // Reseta o formulário após carregar
+      if (resetFormCallback) resetFormCallback(); // Reseta o formulário após carregar
     }
 
     // Função para iniciar a edição
-    function editarItem(storageKey, index, formId, inputMapping, submitBtnId, formActionsId) {
+    function editarItem(storageKey, index, formId, inputMapping, submitBtnId, formActionsId, itemSingularName) {
         const dados = JSON.parse(localStorage.getItem(storageKey) || "[]");
         const item = dados[index];
         const formElement = document.getElementById(formId);
@@ -363,7 +363,7 @@
             }
         }
         
-        submitButton.textContent = `Atualizar ${storageKey.slice(0, -1)}`; // Ex: Atualizar cliente
+        submitButton.textContent = `Atualizar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
         submitButton.classList.add("edit-mode");
         
         // Adiciona o botão de cancelar se não existir
@@ -376,7 +376,7 @@
             cancelButton.classList.add("primary"); 
             cancelButton.style.backgroundColor = "#ccc"; 
             cancelButton.style.marginLeft = "10px";
-            cancelButton.onclick = () => resetForm(formId, submitBtnId, formActionsId, storageKey.slice(0, -1));
+            cancelButton.onclick = () => resetForm(formId, submitBtnId, formActionsId, itemSingularName);
             formActions.appendChild(cancelButton);
         }
 
@@ -388,9 +388,10 @@
     function resetForm(formId, submitBtnId, formActionsId, itemSingularName) {
         document.getElementById(formId).reset();
         const submitButton = document.getElementById(submitBtnId);
-        submitButton.textContent = `Adicionar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
-        if (itemSingularName === 'gasto') submitButton.textContent = "Registrar Gasto"; // Exceção para "Registrar Gasto"
-        if (itemSingularName === 'cliente') submitButton.textContent = "Salvar Cliente"; // Exceção para "Salvar Cliente"
+        let buttonText = `Adicionar ${itemSingularName.charAt(0).toUpperCase() + itemSingularName.slice(1)}`;
+        if (itemSingularName === 'gasto') buttonText = "Registrar Gasto"; 
+        if (itemSingularName === 'cliente') buttonText = "Salvar Cliente"; 
+        submitButton.textContent = buttonText;
 
         submitButton.classList.remove("edit-mode");
         const cancelButton = document.getElementById(`btn-cancel-${formId.replace('form-', '')}`);
@@ -419,6 +420,19 @@
         telefone: 'cliente-telefone', 
         observacoes: 'cliente-observacoes'
     };
+    const clienteHtmlBuilder = (c, i) => `
+        <tr>
+            <td>${c.nome}</td>
+            <td>${c.telefone}</td>
+            <td>${c.observacoes}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions', 'cliente')">Editar</button>
+                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente')))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
     formClientes.onsubmit = e => {
       e.preventDefault();
       const nome = document.getElementById("cliente-nome").value;
@@ -432,19 +446,7 @@
         clientes.push({ nome, telefone, observacoes });
       }
       localStorage.setItem("clientes", JSON.stringify(clientes));
-      carregarDados('clientes', tabelaClientes, (c, i) => `
-          <tr>
-            <td>${c.nome}</td>
-            <td>${c.telefone}</td>
-            <td>${c.observacoes}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions')">Editar</button>
-                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, (c, i) => this.innerHTML))">Excluir</button>
-                </div>
-            </td>
-          </tr>`
-      , () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
+      carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
     }
 
     // --- Seção Agenda de Pedidos ---
@@ -457,6 +459,21 @@
         tamanho: 'pedido-tamanho',
         valor: 'pedido-valor'
     };
+    const pedidoHtmlBuilder = (a, i) => `
+        <tr>
+            <td>${a.cliente}</td>
+            <td>${a.data}</td>
+            <td>${a.tipo}</td>
+            <td>${a.tamanho}</td>
+            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions', 'pedido')">Editar</button>
+                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido')))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
     formAgenda.onsubmit = e => {
       e.preventDefault();
       const a = {
@@ -474,21 +491,9 @@
         agenda.push(a);
       }
       localStorage.setItem("agenda", JSON.stringify(agenda));
-      carregarDados('agenda', tabelaAgenda, (a, i) => `
-          <tr>
-            <td>${a.cliente}</td>
-            <td>${a.data}</td>
-            <td>${a.tipo}</td>
-            <td>${a.tamanho}</td>
-            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions')">Editar</button>
-                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, (a, i) => this.innerHTML))">Excluir</button>
-                </div>
-            </td>
-          </tr>`
-      , () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
+      carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
+      atualizarFinanceiro(); 
+      atualizarVendasPeriodo();
     }
 
     // --- Seção Estoque ---
@@ -498,6 +503,18 @@
         nome: 'ingrediente-nome', 
         quantidade: 'ingrediente-quantidade'
     };
+    const ingredienteHtmlBuilder = (e, i) => `
+        <tr>
+            <td>${e.nome}</td>
+            <td>${e.quantidade}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente')">Editar</button>
+                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente')))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
     formEstoque.onsubmit = e => {
       e.preventDefault();
       const nome = document.getElementById("ingrediente-nome").value;
@@ -510,18 +527,7 @@
         estoque.push({ nome, quantidade });
       }
       localStorage.setItem("estoque", JSON.stringify(estoque));
-      carregarDados('estoque', tabelaEstoque, (e, i) => `
-          <tr>
-            <td>${e.nome}</td>
-            <td>${e.quantidade}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions')">Editar</button>
-                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, (e, i) => this.innerHTML))">Excluir</button>
-                </div>
-            </td>
-          </tr>`
-      , () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
+      carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
     }
 
     // --- Seção Gastos ---
@@ -532,6 +538,19 @@
         quantidade: 'gasto-quantidade', 
         valor: 'gasto-valor'
     };
+    const gastoHtmlBuilder = (g, i) => `
+        <tr>
+            <td>${g.produto}</td>
+            <td>${g.quantidade}</td>
+            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions', 'gasto')">Editar</button>
+                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto')))">Excluir</button>
+                </div>
+            </td>
+        </tr>`;
+
     formGastos.onsubmit = e => {
       e.preventDefault();
       const produto = document.getElementById("gasto-produto").value;
@@ -545,19 +564,8 @@
         gastos.push({ produto, quantidade, valor });
       }
       localStorage.setItem("gastos", JSON.stringify(gastos));
-      carregarDados('gastos', tabelaGastos, (g, i) => `
-          <tr>
-            <td>${g.produto}</td>
-            <td>${g.quantidade}</td>
-            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions')">Editar</button>
-                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, (g, i) => this.innerHTML))">Excluir</button>
-                </div>
-            </td>
-          </tr>`
-      , () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
+      carregarDados('gastos', tabelaGastos, gastoHtmlBuilder, () => resetForm('form-gastos', 'btn-submit-gasto', 'gasto-form-actions', 'gasto'));
+      atualizarFinanceiro(); 
     }
 
     // --- Seção Financeiro ---
@@ -577,12 +585,12 @@
     // --- Seção Vendas do Período ---
     function atualizarVendasPeriodo() {
         const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0); // Zera hora para comparação de data
+        const hoje = new Date('2025-07-10T00:00:00'); // Usando a data atual fixa: 10 de julho de 2025
+        hoje.setHours(0, 0, 0, 0); 
 
         // Vendas do Dia
         const vendasDia = agenda.reduce((total, pedido) => {
-            const dataPedido = new Date(pedido.data + 'T00:00:00'); // Adiciona T00:00:00 para evitar problemas de fuso horário
+            const dataPedido = new Date(pedido.data + 'T00:00:00'); 
             dataPedido.setHours(0, 0, 0, 0);
             if (dataPedido.getTime() === hoje.getTime()) {
                 return total + parseFloat(pedido.valor || 0);
@@ -593,7 +601,7 @@
 
         // Vendas da Semana (Domingo a Sábado)
         const inicioSemana = new Date(hoje);
-        inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Define para o último domingo
+        inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Define para o último domingo (0 = domingo)
         inicioSemana.setHours(0, 0, 0, 0);
 
         const fimSemana = new Date(inicioSemana);
@@ -628,64 +636,6 @@
 
 
     // --- Carregamento inicial de todas as seções e atualização dos resumos ---
-    // A função carregarDados agora precisa do builder de HTML para cada item.
-    // O ideal seria criar esses builders como funções separadas.
-
-    // Builders de HTML para carregarDados
-    const clienteHtmlBuilder = (c, i) => `
-        <tr>
-            <td>${c.nome}</td>
-            <td>${c.telefone}</td>
-            <td>${c.observacoes}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('clientes', ${i}, 'form-clientes', ${JSON.stringify(clienteInputMap)}, 'btn-submit-cliente', 'cliente-form-actions')">Editar</button>
-                    <button onclick="excluirItem('clientes', ${i}, () => carregarDados('clientes', tabelaClientes, clienteHtmlBuilder))">Excluir</button>
-                </div>
-            </td>
-        </tr>`;
-
-    const pedidoHtmlBuilder = (a, i) => `
-        <tr>
-            <td>${a.cliente}</td>
-            <td>${a.data}</td>
-            <td>${a.tipo}</td>
-            <td>${a.tamanho}</td>
-            <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('agenda', ${i}, 'form-agenda', ${JSON.stringify(pedidoInputMap)}, 'btn-submit-pedido', 'pedido-form-actions')">Editar</button>
-                    <button onclick="excluirItem('agenda', ${i}, () => carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder))">Excluir</button>
-                </div>
-            </td>
-        </tr>`;
-
-    const ingredienteHtmlBuilder = (e, i) => `
-        <tr>
-            <td>${e.nome}</td>
-            <td>${e.quantidade}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('estoque', ${i}, 'form-estoque', ${JSON.stringify(estoqueInputMap)}, 'btn-submit-estoque', 'estoque-form-actions')">Editar</button>
-                    <button onclick="excluirItem('estoque', ${i}, () => carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder))">Excluir</button>
-                </div>
-            </td>
-        </tr>`;
-
-    const gastoHtmlBuilder = (g, i) => `
-        <tr>
-            <td>${g.produto}</td>
-            <td>${g.quantidade}</td>
-            <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
-            <td>
-                <div class="action-buttons">
-                    <button onclick="editarItem('gastos', ${i}, 'form-gastos', ${JSON.stringify(gastoInputMap)}, 'btn-submit-gasto', 'gasto-form-actions')">Editar</button>
-                    <button onclick="excluirItem('gastos', ${i}, () => carregarDados('gastos', tabelaGastos, gastoHtmlBuilder))">Excluir</button>
-                </div>
-            </td>
-        </tr>`;
-
-    // Carregamento inicial
     carregarDados('clientes', tabelaClientes, clienteHtmlBuilder, () => resetForm('form-clientes', 'btn-submit-cliente', 'cliente-form-actions', 'cliente'));
     carregarDados('agenda', tabelaAgenda, pedidoHtmlBuilder, () => resetForm('form-agenda', 'btn-submit-pedido', 'pedido-form-actions', 'pedido'));
     carregarDados('estoque', tabelaEstoque, ingredienteHtmlBuilder, () => resetForm('form-estoque', 'btn-submit-estoque', 'estoque-form-actions', 'ingrediente'));
