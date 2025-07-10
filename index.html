@@ -45,7 +45,17 @@
       border: 1px solid #ccc; border-radius: 8px;
     }
 
-    button.save {
+    .linha-busca {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .linha-busca input {
+      flex: 1;
+    }
+
+    button.save, .linha-busca button {
       background: #f28ab2; color: white; padding: 10px 20px;
       border: none; border-radius: 8px; cursor: pointer;
       font-weight: bold;
@@ -65,8 +75,6 @@
     }
     .editar { background: #ffc107; color: #fff; }
     .excluir { background: #dc3545; color: #fff; }
-    #buscaCliente { margin-top: 10px; }
-
     .subtitulo { margin-top: 20px; font-weight: bold; color: #444; }
   </style>
 </head>
@@ -80,7 +88,7 @@
 <div class="container" id="app">
   <nav>
     <button onclick="mostrar('clientes')">📋 Clientes</button>
-    <!-- Outras seções podem ser adicionadas aqui -->
+    <!-- Aqui você pode adicionar outros botões: pedidos, estoque, financeiro... -->
   </nav>
 
   <section id="clientes" class="active">
@@ -91,9 +99,11 @@
     <button class="save" onclick="salvarCliente()">Salvar</button>
 
     <div class="subtitulo">Buscar Cliente</div>
-    <input id="buscaCliente" placeholder="Digite o nome para buscar" oninput="buscarCliente()">
+    <div class="linha-busca">
+      <input id="buscaCliente" placeholder="Digite o nome para buscar">
+      <button onclick="buscarCliente()">Buscar</button>
+    </div>
 
-    <div class="subtitulo">Clientes Cadastrados</div>
     <ul id="listaClientes"></ul>
   </section>
 </div>
@@ -104,12 +114,12 @@
   function entrar() {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    listarClientes();
   }
 
   function mostrar(secao) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.getElementById(secao).classList.add('active');
+    limparBusca();
   }
 
   function salvarCliente() {
@@ -132,43 +142,53 @@
     }
 
     localStorage.setItem('clientes', JSON.stringify(clientes));
-    clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
-    listarClientes();
+
+    clienteNome.value = '';
+    clienteTelefone.value = '';
+    clienteEndereco.value = '';
+
+    limparBusca();
   }
 
-  function listarClientes(filtrar = '') {
+  function buscarCliente() {
+    const termo = document.getElementById('buscaCliente').value.trim().toLowerCase();
     const lista = document.getElementById('listaClientes');
     lista.innerHTML = '';
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
 
     clientes.forEach((c, i) => {
-      if (filtrar && !c.nome.toLowerCase().includes(filtrar.toLowerCase())) return;
-
-      const li = document.createElement('li');
-      const div = document.createElement('div');
-      div.className = 'cliente-info';
-      div.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
-
-      const acoes = document.createElement('div');
-      acoes.className = 'acoes';
-
-      const btnEditar = document.createElement('button');
-      btnEditar.textContent = 'Editar';
-      btnEditar.className = 'editar';
-      btnEditar.onclick = () => editarCliente(i);
-
-      const btnExcluir = document.createElement('button');
-      btnExcluir.textContent = 'Excluir';
-      btnExcluir.className = 'excluir';
-      btnExcluir.onclick = () => excluirCliente(i);
-
-      acoes.appendChild(btnEditar);
-      acoes.appendChild(btnExcluir);
-
-      li.appendChild(div);
-      li.appendChild(acoes);
-      lista.appendChild(li);
+      if (c.nome.toLowerCase().includes(termo)) {
+        const li = criarItemCliente(c, i);
+        lista.appendChild(li);
+      }
     });
+  }
+
+  function criarItemCliente(c, index) {
+    const li = document.createElement('li');
+    const div = document.createElement('div');
+    div.className = 'cliente-info';
+    div.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
+
+    const acoes = document.createElement('div');
+    acoes.className = 'acoes';
+
+    const btnEditar = document.createElement('button');
+    btnEditar.textContent = 'Editar';
+    btnEditar.className = 'editar';
+    btnEditar.onclick = () => editarCliente(index);
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.textContent = 'Excluir';
+    btnExcluir.className = 'excluir';
+    btnExcluir.onclick = () => excluirCliente(index);
+
+    acoes.appendChild(btnEditar);
+    acoes.appendChild(btnExcluir);
+
+    li.appendChild(div);
+    li.appendChild(acoes);
+    return li;
   }
 
   function editarCliente(index) {
@@ -185,13 +205,13 @@
       let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
       clientes.splice(index, 1);
       localStorage.setItem('clientes', JSON.stringify(clientes));
-      listarClientes();
+      buscarCliente();
     }
   }
 
-  function buscarCliente() {
-    const termo = document.getElementById('buscaCliente').value.trim();
-    listarClientes(termo);
+  function limparBusca() {
+    document.getElementById('buscaCliente').value = '';
+    document.getElementById('listaClientes').innerHTML = '';
   }
 </script>
 
