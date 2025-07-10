@@ -179,4 +179,174 @@
       <p><strong>Total de Gastos:</strong> R$ <span id="gastos">0.00</span></p>
       <p><strong>Lucro:</strong> R$ <span id="lucro">0.00</span></p>
     </section>
-  </main>
+  </  <script>
+    // Alternância entre abas
+    const botoes = document.querySelectorAll("nav button");
+    const secoes = document.querySelectorAll("main section");
+
+    botoes.forEach(botao => {
+      botao.addEventListener("click", () => {
+        botoes.forEach(b => b.classList.remove("active"));
+        secoes.forEach(s => s.classList.remove("active"));
+        botao.classList.add("active");
+        document.getElementById(botao.id.replace("btn-", "")).classList.add("active");
+        atualizarFinanceiro(); // Atualiza sempre ao mudar de aba
+      });
+    });
+
+    // ------------------------- CLIENTES -------------------------
+    const formClientes = document.getElementById("form-clientes");
+    const tabelaClientes = document.querySelector("#tabela-clientes tbody");
+
+    function carregarClientes() {
+      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+      tabelaClientes.innerHTML = "";
+      clientes.forEach((c, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${c.nome}</td>
+          <td>${c.telefone}</td>
+          <td>${c.observacoes}</td>
+          <td><button onclick="excluirItem('clientes', ${i}, carregarClientes)">Excluir</button></td>`;
+        tabelaClientes.appendChild(tr);
+      });
+    }
+
+    formClientes.onsubmit = e => {
+      e.preventDefault();
+      const nome = document.getElementById("cliente-nome").value;
+      const telefone = document.getElementById("cliente-telefone").value;
+      const observacoes = document.getElementById("cliente-observacoes").value;
+      const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
+      clientes.push({ nome, telefone, observacoes });
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+      formClientes.reset();
+      carregarClientes();
+    }
+
+    // ------------------------ AGENDA --------------------------
+    const formAgenda = document.getElementById("form-agenda");
+    const tabelaAgenda = document.querySelector("#tabela-agenda tbody");
+
+    function carregarAgenda() {
+      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+      tabelaAgenda.innerHTML = "";
+      agenda.forEach((a, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${a.cliente}</td>
+          <td>${a.data}</td>
+          <td>${a.tipo}</td>
+          <td>${a.tamanho}</td>
+          <td>R$ ${parseFloat(a.valor).toFixed(2)}</td>
+          <td><button onclick="excluirItem('agenda', ${i}, carregarAgenda)">Excluir</button></td>`;
+        tabelaAgenda.appendChild(tr);
+      });
+    }
+
+    formAgenda.onsubmit = e => {
+      e.preventDefault();
+      const cliente = document.getElementById("pedido-cliente").value;
+      const data = document.getElementById("pedido-data").value;
+      const tipo = document.getElementById("pedido-tipo").value;
+      const tamanho = document.getElementById("pedido-tamanho").value;
+      const valor = document.getElementById("pedido-valor").value;
+      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+      agenda.push({ cliente, data, tipo, tamanho, valor });
+      localStorage.setItem("agenda", JSON.stringify(agenda));
+      formAgenda.reset();
+      carregarAgenda();
+    }
+
+    // ----------------------- ESTOQUE -------------------------
+    const formEstoque = document.getElementById("form-estoque");
+    const tabelaEstoque = document.querySelector("#tabela-estoque tbody");
+
+    function carregarEstoque() {
+      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
+      tabelaEstoque.innerHTML = "";
+      estoque.forEach((e, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${e.nome}</td>
+          <td>${e.quantidade}</td>
+          <td><button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button></td>`;
+        tabelaEstoque.appendChild(tr);
+      });
+    }
+
+    formEstoque.onsubmit = e => {
+      e.preventDefault();
+      const nome = document.getElementById("ingrediente-nome").value;
+      const quantidade = document.getElementById("ingrediente-quantidade").value;
+      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
+      estoque.push({ nome, quantidade });
+      localStorage.setItem("estoque", JSON.stringify(estoque));
+      formEstoque.reset();
+      carregarEstoque();
+    }
+
+    // ------------------- GASTOS COM PRODUTOS -------------------
+    const formGastos = document.getElementById("form-gastos");
+    const tabelaGastos = document.querySelector("#tabela-gastos tbody");
+
+    function carregarGastos() {
+      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+      tabelaGastos.innerHTML = "";
+      gastos.forEach((g, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${g.produto}</td>
+          <td>${g.quantidade}</td>
+          <td>R$ ${parseFloat(g.valor).toFixed(2)}</td>
+          <td><button onclick="excluirItem('gastos', ${i}, carregarGastos)">Excluir</button></td>`;
+        tabelaGastos.appendChild(tr);
+      });
+    }
+
+    formGastos.onsubmit = e => {
+      e.preventDefault();
+      const produto = document.getElementById("gasto-produto").value;
+      const quantidade = document.getElementById("gasto-quantidade").value;
+      const valor = document.getElementById("gasto-valor").value;
+      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+      gastos.push({ produto, quantidade, valor });
+      localStorage.setItem("gastos", JSON.stringify(gastos));
+      formGastos.reset();
+      carregarGastos();
+    }
+
+    // ------------------- FINANCEIRO --------------------------
+    function atualizarFinanceiro() {
+      const agenda = JSON.parse(localStorage.getItem("agenda") || "[]");
+      const gastos = JSON.parse(localStorage.getItem("gastos") || "[]");
+
+      const ganhos = agenda.reduce((soma, p) => soma + parseFloat(p.valor), 0);
+      const despesas = gastos.reduce((soma, g) => soma + parseFloat(g.valor), 0);
+      const lucro = ganhos - despesas;
+
+      document.getElementById("ganhos").textContent = ganhos.toFixed(2);
+      document.getElementById("gastos").textContent = despesas.toFixed(2);
+      document.getElementById("lucro").textContent = lucro.toFixed(2);
+    }
+
+    // ------------------- FUNÇÃO GERAL -------------------------
+    function excluirItem(chave, index, callback) {
+      const dados = JSON.parse(localStorage.getItem(chave) || "[]");
+      dados.splice(index, 1);
+      localStorage.setItem(chave, JSON.stringify(dados));
+      callback();
+      atualizarFinanceiro();
+    }
+
+    // ------------------- INICIALIZAÇÃO -------------------------
+    carregarClientes();
+    carregarAgenda();
+    carregarEstoque();
+    carregarGastos();
+    atualizarFinanceiro();
+  </script>
+</body>
+</html>
+  
+  
