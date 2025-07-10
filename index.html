@@ -5,256 +5,403 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
+  /* RESET */
+  * {
     margin: 0;
-    background: #f9f9f9;
-  }
-
-  header {
-    background: #d4af37;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-  }
-
-  .menu {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 20px 0;
-  }
-
-  .menu button {
-    padding: 15px 18px;
-    border: 2px solid #d4af37;
-    background: white;
-    color: #333;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  .menu button:hover,
-  .menu button.active {
-    background: #d4af37;
-    color: white;
-  }
-
-  .content {
-    max-width: 600px;
-    margin: 0 auto 40px;
-    padding: 0 20px;
-  }
-
-  .section {
-    display: none;
-  }
-
-  .section.active {
-    display: block;
-  }
-
-  input, textarea {
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 0;
     box-sizing: border-box;
   }
 
-  button.save-btn {
+  body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f8f6f1;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  /* SPLASH SCREEN */
+  #splash {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom:0;
+    background: linear-gradient(135deg, #d4af37 0%, #f2e1b3 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+    transition: opacity 0.6s ease;
+  }
+
+  #splash.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #splash h1 {
+    font-size: 3.5rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    font-family: 'Brush Script MT', cursive;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  }
+
+  #splash p {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* HEADER */
+  header {
     background: #d4af37;
     color: white;
-    border: none;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-family: 'Brush Script MT', cursive;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  /* MENU */
+  nav.menu {
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    padding: 15px 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+  }
+
+  nav.menu button {
+    background: #fff;
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    padding: 15px 25px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 130px;
+    text-transform: uppercase;
+    box-shadow: 0 3px 6px rgba(212,175,55,0.3);
+  }
+
+  nav.menu button:hover,
+  nav.menu button.active {
+    background: #d4af37;
+    color: white;
+    box-shadow: 0 4px 12px rgba(212,175,55,0.7);
+  }
+
+  /* CONTENT AREA */
+  main.content {
+    max-width: 700px;
+    margin: 30px auto 60px;
+    padding: 0 20px;
+    min-height: 400px;
+  }
+
+  /* SECTIONS */
+  section.section {
+    display: none;
+    background: white;
+    padding: 25px 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  section.section.active {
+    display: block;
+  }
+
+  /* TITLES */
+  section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #4a4a4a;
+    letter-spacing: 1px;
+  }
+
+  /* FORM ELEMENTS */
+  input, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    font-size: 15px;
+    border: 1.8px solid #ccc;
+    border-radius: 7px;
+    outline-color: #d4af37;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    resize: vertical;
+  }
+
+  input:focus, textarea:focus {
+    border-color: #b8932b;
+  }
+
+  /* BUTTONS */
+  button.save-btn {
+    background-color: #d4af37;
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
   }
 
   button.save-btn:hover {
-    background: #b8932b;
+    background-color: #b8932b;
+  }
+
+  /* ENTRIES LIST */
+  .entries {
+    margin-top: 25px;
+    max-height: 250px;
+    overflow-y: auto;
   }
 
   .entry {
-    background: white;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border-left: 4px solid #d4af37;
-    border-radius: 4px;
+    background-color: #faf8f1;
+    border-left: 6px solid #d4af37;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   .entry p {
-    margin: 5px 0;
+    margin-bottom: 6px;
+  }
+
+  /* Scrollbar for entries */
+  .entries::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .entries::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .entries::-webkit-scrollbar-thumb {
+    background: #d4af37;
+    border-radius: 10px;
+  }
+
+  /* Animation */
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    nav.menu {
+      gap: 12px;
+    }
+
+    nav.menu button {
+      min-width: 100px;
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+    main.content {
+      padding: 0 10px;
+      margin: 20px auto 40px;
+    }
   }
 </style>
 </head>
 <body>
 
-<header>Espaço Tai Botelho</header>
-
-<div class="menu">
-  <button class="active" data-section="cliente">Cliente</button>
-  <button data-section="agenda">Agenda</button>
-  <button data-section="financeiro">Financeiro</button>
-  <button data-section="estoque">Estoque</button>
-  <button data-section="profissional">Profissional</button>
-</div>
-
-<div class="content">
-
-  <div id="cliente" class="section active">
-    <h2>Cadastro de Cliente</h2>
-    <input type="text" id="clienteNome" placeholder="Nome do cliente" />
-    <input type="text" id="clienteTelefone" placeholder="Telefone" />
-    <button class="save-btn" onclick="salvar('cliente')">Salvar Cliente</button>
-    <div id="clienteLista"></div>
+  <!-- SPLASH SCREEN -->
+  <div id="splash">
+    <h1>Espaço Tai Botelho</h1>
+    <p>Carregando...</p>
   </div>
 
-  <div id="agenda" class="section">
-    <h2>Agendar Horário</h2>
-    <input type="text" id="agendaNome" placeholder="Nome da cliente" />
-    <input type="datetime-local" id="agendaHorario" />
-    <button class="save-btn" onclick="salvar('agenda')">Salvar Horário</button>
-    <div id="agendaLista"></div>
-  </div>
+  <!-- HEADER -->
+  <header>Espaço Tai Botelho</header>
 
-  <div id="financeiro" class="section">
-    <h2>Lançamento Financeiro</h2>
-    <input type="text" id="financeiroDescricao" placeholder="Descrição" />
-    <input type="number" id="financeiroValor" placeholder="Valor" />
-    <button class="save-btn" onclick="salvar('financeiro')">Salvar Lançamento</button>
-    <div id="financeiroLista"></div>
-  </div>
+  <!-- MENU -->
+  <nav class="menu">
+    <button class="active" data-section="cliente">Cliente</button>
+    <button data-section="agenda">Agenda</button>
+    <button data-section="financeiro">Financeiro</button>
+    <button data-section="estoque">Estoque</button>
+    <button data-section="profissional">Profissional</button>
+  </nav>
 
-  <div id="estoque" class="section">
-    <h2>Controle de Estoque</h2>
-    <input type="text" id="estoqueItem" placeholder="Produto" />
-    <input type="number" id="estoqueQuantidade" placeholder="Quantidade" />
-    <button class="save-btn" onclick="salvar('estoque')">Salvar Produto</button>
-    <div id="estoqueLista"></div>
-  </div>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="content">
 
-  <div id="profissional" class="section">
-    <h2>Cadastro de Profissional</h2>
-    <input type="text" id="profissionalNome" placeholder="Nome do profissional" />
-    <input type="text" id="profissionalEspecialidade" placeholder="Especialidade" />
-    <button class="save-btn" onclick="salvar('profissional')">Salvar Profissional</button>
-    <div id="profissionalLista"></div>
-  </div>
+    <section id="cliente" class="section active">
+      <h2>Cadastro de Cliente</h2>
+      <input type="text" id="clienteNome" placeholder="Nome do cliente" />
+      <input type="text" id="clienteTelefone" placeholder="Telefone" />
+      <button class="save-btn" onclick="salvar('cliente')">Salvar Cliente</button>
+      <div class="entries" id="clienteLista"></div>
+    </section>
 
-</div>
+    <section id="agenda" class="section">
+      <h2>Agendar Horário</h2>
+      <input type="text" id="agendaNome" placeholder="Nome da cliente" />
+      <input type="datetime-local" id="agendaHorario" />
+      <button class="save-btn" onclick="salvar('agenda')">Salvar Horário</button>
+      <div class="entries" id="agendaLista"></div>
+    </section>
 
-<script>
-  // Controle das abas
-  const buttons = document.querySelectorAll('.menu button');
-  const sections = document.querySelectorAll('.section');
+    <section id="financeiro" class="section">
+      <h2>Lançamento Financeiro</h2>
+      <input type="text" id="financeiroDescricao" placeholder="Descrição" />
+      <input type="number" id="financeiroValor" placeholder="Valor" />
+      <button class="save-btn" onclick="salvar('financeiro')">Salvar Lançamento</button>
+      <div class="entries" id="financeiroLista"></div>
+    </section>
 
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Remove active de todos os botões e seções
-      buttons.forEach(btn => btn.classList.remove('active'));
-      sections.forEach(sec => sec.classList.remove('active'));
+    <section id="estoque" class="section">
+      <h2>Controle de Estoque</h2>
+      <input type="text" id="estoqueItem" placeholder="Produto" />
+      <input type="number" id="estoqueQuantidade" placeholder="Quantidade" />
+      <button class="save-btn" onclick="salvar('estoque')">Salvar Produto</button>
+      <div class="entries" id="estoqueLista"></div>
+    </section>
 
-      // Ativa o botão e seção clicada
-      button.classList.add('active');
-      document.getElementById(button.dataset.section).classList.add('active');
+    <section id="profissional" class="section">
+      <h2>Cadastro de Profissional</h2>
+      <input type="text" id="profissionalNome" placeholder="Nome do profissional" />
+      <input type="text" id="profissionalEspecialidade" placeholder="Especialidade" />
+      <button class="save-btn" onclick="salvar('profissional')">Salvar Profissional</button>
+      <div class="entries" id="profissionalLista"></div>
+    </section>
 
-      // Carrega dados da seção
-      carregarDados(button.dataset.section);
+  </main>
+
+  <script>
+    // Splash screen controle
+    window.addEventListener('load', () => {
+      const splash = document.getElementById('splash');
+      setTimeout(() => {
+        splash.classList.add('hidden');
+      }, 2000); // splash some 2s
     });
-  });
 
-  // Função salvar dados no localStorage e atualizar lista
-  function salvar(tipo) {
-    let dados = JSON.parse(localStorage.getItem(tipo)) || [];
+    // Menu e navegação entre seções
+    const menuButtons = document.querySelectorAll('nav.menu button');
+    const sections = document.querySelectorAll('section.section');
 
-    let novo = {};
+    menuButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active classes
+        menuButtons.forEach(btn => btn.classList.remove('active'));
+        sections.forEach(sec => sec.classList.remove('active'));
 
-    if (tipo === 'cliente') {
-      const nome = document.getElementById('clienteNome').value.trim();
-      const telefone = document.getElementById('clienteTelefone').value.trim();
-      if (!nome || !telefone) {
-        alert('Preencha todos os campos!');
-        return;
+        // Add active to clicked button and section
+        button.classList.add('active');
+        const target = button.dataset.section;
+        document.getElementById(target).classList.add('active');
+
+        // Carregar dados da seção
+        carregarDados(target);
+      });
+    });
+
+    // Função salvar dados no localStorage e atualizar a lista
+    function salvar(tipo) {
+      let dados = JSON.parse(localStorage.getItem(tipo)) || [];
+
+      let novo = {};
+
+      if (tipo === 'cliente') {
+        const nome = document.getElementById('clienteNome').value.trim();
+        const telefone = document.getElementById('clienteTelefone').value.trim();
+        if (!nome || !telefone) {
+          alert('Preencha todos os campos!');
+          return;
+        }
+        novo = { Nome: nome, Telefone: telefone };
+      } else if (tipo === 'agenda') {
+        const nome = document.getElementById('agendaNome').value.trim();
+        const horario = document.getElementById('agendaHorario').value;
+        if (!nome || !horario) {
+          alert('Preencha todos os campos!');
+          return;
+        }
+        novo = { Nome: nome, Horário: new Date(horario).toLocaleString() };
+      } else if (tipo === 'financeiro') {
+        const descricao = document.getElementById('financeiroDescricao').value.trim();
+        const valor = document.getElementById('financeiroValor').value.trim();
+        if (!descricao || !valor) {
+          alert('Preencha todos os campos!');
+          return;
+        }
+        novo = { Descrição: descricao, Valor: `R$ ${parseFloat(valor).toFixed(2)}` };
+      } else if (tipo === 'estoque') {
+        const item = document.getElementById('estoqueItem').value.trim();
+        const quantidade = document.getElementById('estoqueQuantidade').value.trim();
+        if (!item || !quantidade) {
+          alert('Preencha todos os campos!');
+          return;
+        }
+        novo = { Produto: item, Quantidade: quantidade };
+      } else if (tipo === 'profissional') {
+        const nome = document.getElementById('profissionalNome').value.trim();
+        const especialidade = document.getElementById('profissionalEspecialidade').value.trim();
+        if (!nome || !especialidade) {
+          alert('Preencha todos os campos!');
+          return;
+        }
+        novo = { Nome: nome, Especialidade: especialidade };
       }
-      novo = { nome, telefone };
-    } else if (tipo === 'agenda') {
-      const nome = document.getElementById('agendaNome').value.trim();
-      const horario = document.getElementById('agendaHorario').value;
-      if (!nome || !horario) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-      novo = { nome, horario };
-    } else if (tipo === 'financeiro') {
-      const descricao = document.getElementById('financeiroDescricao').value.trim();
-      const valor = document.getElementById('financeiroValor').value.trim();
-      if (!descricao || !valor) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-      novo = { descricao, valor };
-    } else if (tipo === 'estoque') {
-      const item = document.getElementById('estoqueItem').value.trim();
-      const quantidade = document.getElementById('estoqueQuantidade').value.trim();
-      if (!item || !quantidade) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-      novo = { item, quantidade };
-    } else if (tipo === 'profissional') {
-      const nome = document.getElementById('profissionalNome').value.trim();
-      const especialidade = document.getElementById('profissionalEspecialidade').value.trim();
-      if (!nome || !especialidade) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-      novo = { nome, especialidade };
+
+      dados.push(novo);
+      localStorage.setItem(tipo, JSON.stringify(dados));
+      carregarDados(tipo);
+      limparCampos(tipo);
     }
 
-    dados.push(novo);
-    localStorage.setItem(tipo, JSON.stringify(dados));
-    carregarDados(tipo);
-    limparCampos(tipo);
-  }
+    // Carrega e mostra dados da seção no container
+    function carregarDados(tipo) {
+      const lista = document.getElementById(tipo + 'Lista');
+      lista.innerHTML = '';
+      const dados = JSON.parse(localStorage.getItem(tipo)) || [];
 
-  // Função para carregar dados e mostrar na lista
-  function carregarDados(tipo) {
-    const lista = document.getElementById(tipo + 'Lista');
-    lista.innerHTML = '';
-    const dados = JSON.parse(localStorage.getItem(tipo)) || [];
+      if (dados.length === 0) {
+        lista.innerHTML = '<p>Nenhum dado cadastrado.</p>';
+        return;
+      }
 
-    if (dados.length === 0) {
-      lista.innerHTML = '<p>Nenhum dado cadastrado.</p>';
-      return;
+      dados.forEach(item => {
+        let html = '<div class="entry">';
+        for (const key in item) {
+          html += `<p><strong>${key}:</strong> ${item[key]}</p>`;
+        }
+        html += '</div>';
+        lista.innerHTML += html;
+      });
     }
 
-    dados.forEach(item => {
-      let html = '<div class="entry">';
-      for (const key in item) {
-        html += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${item[key]}</p>`;
-      }
-      html += '</div>';
-      lista.innerHTML += html;
-    });
-  }
+    // Limpa os campos do formulário da seção ativa
+    function limparCampos(tipo) {
+      const inputs = document.querySelectorAll(`#${tipo} input`);
+      inputs.forEach(input => input.value = '');
+    }
 
-  // Limpar campos do formulário após salvar
-  function limparCampos(tipo) {
-    const inputs = document.querySelectorAll(`#${tipo} input`);
-    inputs.forEach(input => input.value = '');
-  }
-
-  // Carrega os dados da primeira aba na inicialização
-  carregarDados('cliente');
-</script>
-
+    // Carrega dados da primeira seção ao iniciar
+    carregarDados('cliente');
+  </script>
 </body>
 </html>
