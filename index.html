@@ -123,7 +123,6 @@
       width: 100%;
     }
 
-    /* Scrollbar estilizada */
     ul::-webkit-scrollbar {
       width: 8px;
     }
@@ -149,7 +148,6 @@
     <button onclick="mostrar('financeiro')">📊 Financeiro</button>
   </nav>
 
-  <!-- Clientes -->
   <section id="clientes" class="active">
     <h2>Cadastro de Cliente</h2>
     <input id="clienteNome" placeholder="Nome do cliente" />
@@ -159,7 +157,6 @@
     <ul id="listaClientes"></ul>
   </section>
 
-  <!-- Pedidos -->
   <section id="pedidos">
     <h2>Pedidos</h2>
     <input id="pedidoCliente" placeholder="Nome do cliente" />
@@ -177,7 +174,6 @@
     <ul id="listaPedidos"></ul>
   </section>
 
-  <!-- Despesas -->
   <section id="despesas">
     <h2>Despesas</h2>
     <select id="tipoDespesa">
@@ -190,7 +186,6 @@
     <ul id="listaDespesas"></ul>
   </section>
 
-  <!-- Estoque -->
   <section id="estoque">
     <h2>Estoque</h2>
     <input id="produtoNome" placeholder="Nome do Produto" />
@@ -203,7 +198,6 @@
     <ul id="listaEstoque"></ul>
   </section>
 
-  <!-- Financeiro -->
   <section id="financeiro" class="financeiro">
     <h2>Financeiro</h2>
     <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
@@ -269,7 +263,7 @@
   function entrar() {
     document.getElementById('splash').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    mostrar('clientes');
+    mostrar('clientes');  // Mostra clientes por padrão após entrar
   }
 
   // ---------- CLIENTES ----------
@@ -449,113 +443,4 @@
     listarEstoque();
   }
 
-  function listarEstoque(filtrar = '') {
-    const lista = document.getElementById('listaEstoque');
-    lista.innerHTML = '';
-    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-
-    estoque.forEach((p, i) => {
-      if(filtrar && !p.nome.toLowerCase().includes(filtrar.toLowerCase())) return;
-
-      const li = document.createElement('li');
-      li.innerHTML = `
-        ${p.nome} - ${p.qtd} unidade(s)
-        ${p.qtd === 0 ? '<span class="em-falta"> (Em falta)</span>' : ''}
-        <div class="acoes">
-          <button class="editar" onclick="editarProduto(${i})">Editar</button>
-          <button class="excluir" onclick="excluirProduto(${i})">Excluir</button>
-        </div>
-      `;
-
-      lista.appendChild(li);
-    });
-  }
-
-  function buscarEstoque() {
-    const termo = buscaEstoqueInput.value.trim();
-    listarEstoque(termo);
-  }
-
-  function editarProduto(index) {
-    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    const p = estoque[index];
-    produtoNome.value = p.nome;
-    produtoQtd.value = p.qtd;
-    produtoEditando = index;
-  }
-
-  function excluirProduto(index) {
-    if (!confirm('Deseja realmente excluir este produto?')) return;
-    let estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    estoque.splice(index, 1);
-    localStorage.setItem('estoque', JSON.stringify(estoque));
-    listarEstoque();
-  }
-
-  // ---------- FINANCEIRO ----------
-  function atualizarFinanceiro() {
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-
-    const ganhos = pedidos.reduce((sum, p) => sum + p.valor, 0);
-    const gastos = despesas.reduce((sum, d) => sum + d.valor, 0);
-    const lucros = ganhos - gastos;
-
-    ganhosSpan.textContent = ganhos.toFixed(2);
-    gastosSpan.textContent = gastos.toFixed(2);
-    lucrosSpan.textContent = lucros.toFixed(2);
-  }
-
-  // Relatórios simples por data (dia, mês, ano)
-  function gerarRelatorio() {
-    const dataEscolhida = relatorioDataInput.value;
-    if (!dataEscolhida) {
-      relatorioResultado.textContent = '';
-      return;
-    }
-
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-
-    // Formatar datas para comparar (YYYY-MM-DD)
-    const dataFiltro = new Date(dataEscolhida);
-    const ano = dataFiltro.getFullYear();
-    const mes = dataFiltro.getMonth();
-    const dia = dataFiltro.getDate();
-
-    // Função para extrair data do ISO
-    function extrairData(isoString) {
-      const d = new Date(isoString);
-      return { ano: d.getFullYear(), mes: d.getMonth(), dia: d.getDate() };
-    }
-
-    // Filtrar pedidos e despesas do dia selecionado
-    const pedidosFiltrados = pedidos.filter(p => {
-      const d = extrairData(p.data);
-      return d.ano === ano && d.mes === mes && d.dia === dia;
-    });
-    const despesasFiltradas = despesas.filter(d => {
-      const dt = extrairData(d.data);
-      return dt.ano === ano && dt.mes === mes && dt.dia === dia;
-    });
-
-    // Somar valores
-    const ganhos = pedidosFiltrados.reduce((s, p) => s + p.valor, 0);
-    const gastos = despesasFiltradas.reduce((s, d) => s + d.valor, 0);
-    const lucro = ganhos - gastos;
-
-    relatorioResultado.innerHTML = `
-      <p>Relatório para ${dataEscolhida}:</p>
-      <p>Ganhos: R$ ${ganhos.toFixed(2)}</p>
-      <p>Gastos: R$ ${gastos.toFixed(2)}</p>
-      <p>Lucros: R$ ${lucro.toFixed(2)}</p>
-    `;
-  }
-
-  // Inicialização - listar tudo ao entrar
-  entrar();
-
-</script>
-
-</body>
-</html>
+  function listarEstoque(fil
