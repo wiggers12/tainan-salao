@@ -9,17 +9,10 @@
     body { background: #fff0f5; color: #333; }
 
     .splash {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100vh; background: #f28ab2; color: white; text-align: center;
-    }
-    .splash h1 { font-size: 3rem; margin-bottom: 20px; }
-    .splash button {
-      background: white; color: #f28ab2; font-size: 1.2rem;
-      border: none; padding: 12px 24px; border-radius: 8px;
-      cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none; /* Oculta a splash screen */
     }
 
-    .container { display: none; padding: 20px; }
+    .container { display: block; padding: 20px; }
 
     nav {
       display: flex; justify-content: space-around; background: #f28ab2;
@@ -96,13 +89,12 @@
   </nav>
 
   <!-- CLIENTES -->
-  <section id="clientes">
+  <section id="clientes" class="active">
     <h2>Cadastro de Clientes</h2>
     <input id="clienteNome" placeholder="Nome do cliente">
     <input id="clienteTelefone" placeholder="Telefone">
     <input id="clienteEndereco" placeholder="Endereço">
     <button class="save" onclick="salvarCliente()">Salvar</button>
-
     <input id="buscaCliente" placeholder="Buscar cliente" oninput="buscarCliente()">
     <ul id="listaClientes"></ul>
   </section>
@@ -118,7 +110,6 @@
       <option>Retirar</option>
     </select>
     <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
-
     <input id="buscaPedido" placeholder="Buscar pedido" oninput="buscarPedido()">
     <ul id="listaPedidos"></ul>
   </section>
@@ -129,7 +120,6 @@
     <input id="produtoNome" placeholder="Nome do Produto">
     <input id="produtoQtd" type="number" placeholder="Quantidade">
     <button class="save" onclick="salvarProduto()">Salvar Produto</button>
-
     <input id="buscaProduto" placeholder="Buscar produto" oninput="buscarProduto()">
     <ul id="listaEstoque"></ul>
   </section>
@@ -144,22 +134,19 @@
 </div>
 
 <script>
-  // SPLASH
-  function entrar() {
-    splash.style.display = 'none';
-    app.style.display = 'block';
+  // FORÇA A EXIBIÇÃO DO APP DIRETO
+  window.onload = () => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
     atualizarTudo();
-  }
+  };
 
-  // NAVEGAÇÃO
   function mostrar(secao) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.getElementById(secao).classList.add('active');
   }
 
-  // CLIENTES
   let clienteEditando = null;
-
   function salvarCliente() {
     const nome = clienteNome.value.trim();
     const telefone = clienteTelefone.value.trim();
@@ -173,7 +160,6 @@
     } else {
       clientes.push({ nome, telefone, endereco });
     }
-
     localStorage.setItem('clientes', JSON.stringify(clientes));
     clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
     buscarCliente();
@@ -184,7 +170,6 @@
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
     const lista = listaClientes;
     lista.innerHTML = '';
-
     clientes.forEach((c, i) => {
       if (!c.nome.toLowerCase().includes(termo)) return;
       const li = document.createElement('li');
@@ -213,9 +198,7 @@
     buscarCliente();
   }
 
-  // PEDIDOS
   let pedidoEditando = null;
-
   function salvarPedido() {
     const nome = pedidoNome.value.trim();
     const produto = pedidoProduto.value.trim();
@@ -230,7 +213,6 @@
     } else {
       pedidos.push({ nome, produto, valor, entrega });
     }
-
     localStorage.setItem('pedidos', JSON.stringify(pedidos));
     pedidoNome.value = pedidoProduto.value = pedidoValor.value = '';
     buscarPedido(); atualizarFinanceiro();
@@ -241,7 +223,6 @@
     const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
     const lista = listaPedidos;
     lista.innerHTML = '';
-
     pedidos.forEach((p, i) => {
       if (!p.nome.toLowerCase().includes(termo)) return;
       const li = document.createElement('li');
@@ -271,9 +252,7 @@
     buscarPedido(); atualizarFinanceiro();
   }
 
-  // ESTOQUE
   let produtoEditando = null;
-
   function salvarProduto() {
     const nome = produtoNome.value.trim();
     const qtd = parseInt(produtoQtd.value);
@@ -286,7 +265,6 @@
     } else {
       estoque.push({ nome, qtd });
     }
-
     localStorage.setItem('estoque', JSON.stringify(estoque));
     produtoNome.value = produtoQtd.value = '';
     buscarProduto();
@@ -297,7 +275,6 @@
     const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
     const lista = listaEstoque;
     lista.innerHTML = '';
-
     estoque.forEach((p, i) => {
       if (!p.nome.toLowerCase().includes(termo)) return;
       const li = document.createElement('li');
@@ -326,7 +303,6 @@
     buscarProduto();
   }
 
-  // FINANCEIRO
   function atualizarFinanceiro() {
     const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
     const despesas = []; // futuras despesas
@@ -339,7 +315,6 @@
     lucrosSpan.textContent = lucros.toFixed(2);
   }
 
-  // ATUALIZAR TUDO
   function atualizarTudo() {
     buscarCliente();
     buscarPedido();
