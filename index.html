@@ -12,7 +12,7 @@
             margin: 0;
             font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
-            visibility: hidden;
+            visibility: hidden; /* Hidden until JS loads main content */
             background-color: #f8f8f8;
         }
 
@@ -78,26 +78,55 @@
             box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
         }
 
-        /* Conteúdo principal */
+        /* Main content */
         #main-content {
             padding: 20px;
             text-align: center;
             background-color: #f0f0f0;
             min-height: 100vh;
             box-sizing: border-box;
-            display: none;
+            display: none; /* Hidden until splash screen is gone */
             transition: all 0.5s ease-in-out;
         }
 
-        h1 {
-            color: #333;
+        #dashboard-notifications {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            color: #664d03;
+            text-align: left;
+            display: none; /* Hidden by default, shown by JS */
+        }
+        #dashboard-notifications ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #dashboard-notifications li {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+        }
+        #dashboard-notifications li .material-icons {
+            margin-right: 8px;
+            color: #DAA520;
+        }
+        #dashboard-notifications p {
+            margin-top: 0;
             margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .notification-item {
+            background-color: #e6ffe6;
+            border: 1px solid #c3e6cb;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
         }
 
-        p {
-            color: #555;
-            margin-bottom: 30px;
-        }
 
         #dashboard-icons {
             display: flex;
@@ -160,7 +189,7 @@
         }
 
         .open-btn.active {
-            background: linear-gradient(45deg, #0056b3, #007bff);
+            background: linear-gradient(45deg, #0056b3, #007bff); /* Distinct color for active button */
             box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
             transform: translateY(-2px);
             color: #fff;
@@ -182,34 +211,75 @@
             opacity: 0;
             overflow: hidden;
             transition: max-height 0.7s ease-out, opacity 0.7s ease-out, padding 0.7s ease-out;
+            position: relative; /* For close button positioning */
         }
 
         .icon-content.active {
             display: block;
-            max-height: 1000px;
+            max-height: 2000px; /* Adjust as needed for content */
             opacity: 1;
             padding: 20px;
         }
 
-        .icon-content h3 {
-            color: #444;
-            margin-top: 0;
-            margin-bottom: 15px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
 
-        .icon-content input,
-        .icon-content select,
-        .icon-content textarea {
-            width: calc(100% - 20px);
-            padding: 10px;
+        .section-header h3 {
+            color: #444;
+            margin: 0; /* Remove default h3 margins */
+        }
+
+        .close-section-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.8em; /* Size of the Material Icon */
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            padding: 5px; /* Make clickable area larger */
+        }
+
+        .close-section-btn:hover {
+            color: #DAA520;
+            transform: rotate(90deg);
+        }
+
+        /* Form Grouping and Labels */
+        .form-group {
             margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95em;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 10px;
             border-radius: 8px;
             border: 1px solid #ddd;
             font-size: 0.98em;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Include padding and border in width */
         }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #DAA520;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.2);
+        }
+
 
         .icon-content button {
             background: #000;
@@ -231,19 +301,23 @@
         .icon-content .btn-action {
             width: 100%;
             margin-top: 15px;
-            background: #DAA520;
+            background: linear-gradient(45deg, #DAA520, #B8860B);
             color: #fff;
             font-size: 1.1em;
             padding: 12px;
             transition: background 0.3s ease, transform 0.2s ease;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .icon-content .btn-action:hover {
-            background: #B8860B;
+            background: linear-gradient(45deg, #B8860B, #DAA520);
             transform: translateY(-1px);
         }
         .icon-content .btn-action:disabled {
             background: #ccc;
             cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
         .icon-content .btn-action.loading {
             background: #6c757d;
@@ -286,7 +360,7 @@
         .list-fake li {
             background-color: #f5f5f5;
             margin-bottom: 8px;
-            padding: 10px;
+            padding: 12px 15px; /* Increased padding */
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
@@ -297,18 +371,29 @@
         .list-fake li:hover {
             background-color: #ececec;
         }
+        .list-fake li:last-child {
+            margin-bottom: 0;
+        }
 
         .search-container {
             margin-bottom: 20px;
+            padding-top: 10px; /* Add some space above search */
+            border-top: 1px solid #eee; /* Visual separator */
             display: flex;
             gap: 10px;
-            align-items: center;
+            align-items: flex-end; /* Align inputs and button at the bottom */
             flex-wrap: wrap;
         }
-        .search-container input {
+        .search-container .form-group {
             flex-grow: 1;
-            margin-bottom: 0;
+            margin-bottom: 0; /* Remove default form-group margin */
             min-width: 150px;
+        }
+        .search-container .form-group label {
+            margin-bottom: 2px; /* Reduce label margin in search */
+        }
+        .search-container input {
+            margin-bottom: 0; /* Remove input default margin */
         }
         .search-container button {
             width: auto;
@@ -316,6 +401,7 @@
             color: white;
             padding: 10px 15px;
             border-radius: 8px;
+            height: 42px; /* Match input height for alignment */
         }
         .search-container button:hover {
             background: #45a049;
@@ -340,6 +426,9 @@
         }
         .finance-section-group strong {
             color: #DAA520;
+        }
+        .finance-section-group .form-group {
+            margin-bottom: 10px;
         }
         .finance-section-group input {
             margin-bottom: 5px;
@@ -380,43 +469,6 @@
         }
         .export-buttons button:hover {
             background: #5a6268;
-        }
-
-        #dashboard-notifications {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 30px;
-            color: #664d03;
-            text-align: left;
-        }
-        #dashboard-notifications ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        #dashboard-notifications li {
-            margin-bottom: 8px;
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-        }
-        #dashboard-notifications li .material-icons {
-            margin-right: 8px;
-            color: #DAA520;
-        }
-        #dashboard-notifications p {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        .notification-item {
-            background-color: #e6ffe6;
-            border: 1px solid #c3e6cb;
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 4px;
         }
 
         #sugestao-inteligente {
@@ -609,9 +661,9 @@
                 font-size: 48px;
             }
 
-            .icon-content input,
-            .icon-content select,
-            .icon-content textarea,
+            .form-group input,
+            .form-group select,
+            .form-group textarea,
             .icon-content button {
                 width: 100%;
                 margin-right: 0;
@@ -661,41 +713,57 @@
         </div>
     </div>
 
-
     <div id="main-content">
-        <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
-        <p>Explore as funcionalidades abaixo:</p>
-
-        <div id="dashboard-notifications" style="display: none;">
+        <section id="dashboard-notifications">
             <p>Avisos Importantes:</p>
-            <ul id="notifications-list">
-                </ul>
-        </div>
+            <ul id="notifications-list"></ul>
+        </section>
 
         <section id="dashboard-icons">
-
             <div class="icon-card">
                 <span class="material-icons">person</span>
                 <h2>Cliente</h2>
                 <button class="open-btn" data-section-id="cliente-section" data-first-field="cliente-nome">Abrir</button>
                 <div class="icon-content" id="cliente-section">
-                    <h3>Cadastrar/Atualizar Cliente</h3>
+                    <div class="section-header">
+                        <h3>Cadastrar/Atualizar Cliente</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Cliente" data-section-id="cliente-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="cliente-id-edit">
-                    <input type="text" id="cliente-nome" placeholder="Nome Completo" list="clientes-datalist">
-                    <datalist id="clientes-datalist"></datalist>
-                    <input type="text" id="cliente-telefone" placeholder="Telefone (Ex: (DD) XXXXX-XXXX)">
-                    <input type="email" id="cliente-email" placeholder="E-mail (Ex: email@example.com)">
-                    <textarea id="cliente-historico-servicos" placeholder="Histórico de Serviços Realizados"></textarea>
-                    <textarea id="cliente-observacoes" placeholder="Observações/Preferências do Cliente"></textarea>
+                    <div class="form-group">
+                        <label for="cliente-nome">Nome Completo</label>
+                        <input type="text" id="cliente-nome" placeholder="Nome Completo do Cliente" list="clientes-datalist">
+                        <datalist id="clientes-datalist"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="cliente-telefone">Telefone</label>
+                        <input type="text" id="cliente-telefone" placeholder="(DD) XXXXX-XXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="cliente-email">E-mail</label>
+                        <input type="email" id="cliente-email" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="cliente-historico-servicos">Histórico de Serviços Realizados</label>
+                        <textarea id="cliente-historico-servicos" placeholder="Serviços anteriores, datas, etc."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="cliente-observacoes">Observações/Preferências</label>
+                        <textarea id="cliente-observacoes" placeholder="Anotações sobre o cliente"></textarea>
+                    </div>
                     <button id="btn-salvar-cliente" class="btn-action">Salvar Cliente</button>
                     <hr />
-                    <h3>Lista de Clientes</h3>
+                    <div class="section-header">
+                        <h3>Lista de Clientes</h3>
+                    </div>
                     <div class="search-container">
-                        <input type="text" id="search-cliente" placeholder="Buscar cliente por nome/telefone...">
+                        <div class="form-group">
+                            <label for="search-cliente">Buscar por Nome/Telefone</label>
+                            <input type="text" id="search-cliente" placeholder="Buscar cliente...">
+                        </div>
                         <button id="btn-search-cliente">Buscar</button>
                     </div>
-                    <ul id="lista-clientes" class="list-fake">
-                        </ul>
+                    <ul id="lista-clientes" class="list-fake"></ul>
                     <div class="export-buttons">
                         <button onclick="exportarDados('clientes')">Exportar Clientes (CSV)</button>
                     </div>
@@ -707,43 +775,71 @@
                 <h2>Agenda</h2>
                 <button class="open-btn" data-section-id="agenda-section" data-first-field="agenda-cliente-nome">Abrir</button>
                 <div class="icon-content" id="agenda-section">
-                    <h3>Novo Agendamento</h3>
+                    <div class="section-header">
+                        <h3>Novo Agendamento</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Agenda" data-section-id="agenda-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="agenda-id-edit">
-                    <input type="text" id="agenda-cliente-nome" placeholder="Nome do Cliente" list="clientes-agendamento-datalist">
-                    <datalist id="clientes-agendamento-datalist"></datalist>
-                    <input type="datetime-local" id="agenda-data-hora">
-                    <select id="agenda-servico">
-                        <option value="">Selecione um Serviço</option>
+                    <div class="form-group">
+                        <label for="agenda-cliente-nome">Nome do Cliente</label>
+                        <input type="text" id="agenda-cliente-nome" placeholder="Nome do Cliente" list="clientes-agendamento-datalist">
+                        <datalist id="clientes-agendamento-datalist"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="agenda-data-hora">Data e Hora</label>
+                        <input type="datetime-local" id="agenda-data-hora">
+                    </div>
+                    <div class="form-group">
+                        <label for="agenda-servico">Serviço</label>
+                        <select id="agenda-servico">
+                            <option value="">Selecione um Serviço</option>
                         </select>
-                    <input type="number" id="agenda-valor-servico" placeholder="Valor do Serviço R$" min="0" step="0.01" readonly>
-                    <select id="agenda-profissional-responsavel">
-                        <option value="">Selecione o Profissional</option>
+                    </div>
+                    <div class="form-group">
+                        <label for="agenda-valor-servico">Valor do Serviço (R$)</label>
+                        <input type="number" id="agenda-valor-servico" placeholder="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="agenda-profissional-responsavel">Profissional Responsável</label>
+                        <select id="agenda-profissional-responsavel">
+                            <option value="">Selecione o Profissional</option>
                         </select>
+                    </div>
                     <div id="sugestao-inteligente" style="display:none;">
                         <p>Sugestão para este cliente: <span id="sugestao-texto"></span></p>
                     </div>
-                    <textarea id="agenda-observacoes" placeholder="Observações sobre o agendamento"></textarea>
+                    <div class="form-group">
+                        <label for="agenda-observacoes">Observações do Agendamento</label>
+                        <textarea id="agenda-observacoes" placeholder="Detalhes ou observações"></textarea>
+                    </div>
                     <button id="btn-salvar-agendamento" class="btn-action">Salvar Agendamento</button>
                     <hr />
-                    <h3>Notificação de Agendamento para o Cliente</h3>
                     <div class="finance-section-group">
-                        <h4>Gerar Mensagem para Envio Manual</h4>
+                        <h4>Gerar Mensagem para Cliente</h4>
                         <textarea id="agendamento-mensagem-pronta" rows="4" readonly style="width: 100%; resize: vertical;"></textarea>
                         <button onclick="copiarMensagemAgendamento()">Copiar Mensagem</button>
-                        <p style="font-size: 0.85em; color: #666; margin-top: 10px;">Copie a mensagem acima e cole no WhatsApp/SMS para o cliente.</p>
+                        <p style="font-size: 0.85em; color: #666; margin-top: 10px;">Copie a mensagem e cole no WhatsApp/SMS.</p>
                     </div>
                     <hr />
-                    <h3>Próximos Agendamentos</h3>
+                    <div class="section-header">
+                        <h3>Próximos Agendamentos</h3>
+                    </div>
                     <div class="search-container">
-                        <input type="text" id="search-agendamento" placeholder="Buscar agendamento por cliente/serviço...">
-                        <label for="filter-agendamento-start" style="margin-left: 10px;">De:</label>
-                        <input type="date" id="filter-agendamento-start">
-                        <label for="filter-agendamento-end">Até:</label>
-                        <input type="date" id="filter-agendamento-end">
+                        <div class="form-group">
+                            <label for="search-agendamento">Buscar por Cliente/Serviço</label>
+                            <input type="text" id="search-agendamento" placeholder="Buscar agendamento...">
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-agendamento-start">Data Início</label>
+                            <input type="date" id="filter-agendamento-start">
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-agendamento-end">Data Fim</label>
+                            <input type="date" id="filter-agendamento-end">
+                        </div>
                         <button id="btn-filter-agendamento">Filtrar</button>
                     </div>
-                    <ul id="lista-agendamentos" class="list-fake">
-                        </ul>
+                    <ul id="lista-agendamentos" class="list-fake"></ul>
                     <div class="export-buttons">
                         <button onclick="exportarDados('agendamentos')">Exportar Agendamentos (CSV)</button>
                     </div>
@@ -755,19 +851,32 @@
                 <h2>Serviços</h2>
                 <button class="open-btn" data-section-id="servicos-section" data-first-field="servico-nome">Abrir</button>
                 <div class="icon-content" id="servicos-section">
-                    <h3>Cadastrar/Atualizar Serviço</h3>
+                    <div class="section-header">
+                        <h3>Cadastrar/Atualizar Serviço</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Serviços" data-section-id="servicos-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="servico-id-edit">
-                    <input type="text" id="servico-nome" placeholder="Nome do Serviço (Ex: Corte Feminino)">
-                    <input type="number" id="servico-preco" placeholder="Preço R$" min="0" step="0.01">
+                    <div class="form-group">
+                        <label for="servico-nome">Nome do Serviço</label>
+                        <input type="text" id="servico-nome" placeholder="Ex: Corte Feminino">
+                    </div>
+                    <div class="form-group">
+                        <label for="servico-preco">Preço (R$)</label>
+                        <input type="number" id="servico-preco" placeholder="0.00" min="0" step="0.01">
+                    </div>
                     <button id="btn-salvar-servico" class="btn-action">Salvar Serviço</button>
                     <hr />
-                    <h3>Lista de Serviços</h3>
+                    <div class="section-header">
+                        <h3>Lista de Serviços</h3>
+                    </div>
                     <div class="search-container">
-                        <input type="text" id="search-servico" placeholder="Buscar serviço por nome...">
+                        <div class="form-group">
+                            <label for="search-servico">Buscar por Nome</label>
+                            <input type="text" id="search-servico" placeholder="Buscar serviço...">
+                        </div>
                         <button id="btn-search-servico">Buscar</button>
                     </div>
-                    <ul id="lista-servicos" class="list-fake">
-                        </ul>
+                    <ul id="lista-servicos" class="list-fake"></ul>
                     <div class="export-buttons">
                         <button onclick="exportarDados('servicos')">Exportar Serviços (CSV)</button>
                     </div>
@@ -779,15 +888,27 @@
                 <h2>Financeiro</h2>
                 <button class="open-btn" data-section-id="financeiro-section" data-first-field="financeiro-tipo">Abrir</button>
                 <div class="icon-content" id="financeiro-section">
-                    <h3>Registrar Transação</h3>
+                    <div class="section-header">
+                        <h3>Registrar Transação</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Financeiro" data-section-id="financeiro-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="financeiro-id-edit">
-                    <select id="financeiro-tipo">
-                        <option value="">Tipo de Transação</option>
-                        <option value="entrada">Entrada</option>
-                        <option value="saida">Saída</option>
-                    </select>
-                    <input type="text" id="financeiro-descricao" placeholder="Descrição">
-                    <input type="number" id="financeiro-valor" placeholder="Valor R$">
+                    <div class="form-group">
+                        <label for="financeiro-tipo">Tipo de Transação</label>
+                        <select id="financeiro-tipo">
+                            <option value="">Selecione o Tipo</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="saida">Saída</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="financeiro-descricao">Descrição</label>
+                        <input type="text" id="financeiro-descricao" placeholder="Ex: Pagamento Cliente X, Aluguel">
+                    </div>
+                    <div class="form-group">
+                        <label for="financeiro-valor">Valor (R$)</label>
+                        <input type="number" id="financeiro-valor" placeholder="0.00">
+                    </div>
                     <button id="btn-salvar-transacao" class="btn-action">Salvar Transação</button>
                     <hr />
                     <div class="finance-section-group">
@@ -799,10 +920,14 @@
                     <hr />
                     <div class="finance-section-group">
                         <h4>Metas Financeiras do Mês</h4>
-                        <label for="meta-entrada">Meta de Entrada (R$):</label>
-                        <input type="number" id="meta-entrada" placeholder="Ex: 5000">
-                        <label for="meta-saida">Meta de Saída (R$):</label>
-                        <input type="number" id="meta-saida" placeholder="Ex: 2000">
+                        <div class="form-group">
+                            <label for="meta-entrada">Meta de Entrada (R$):</label>
+                            <input type="number" id="meta-entrada" placeholder="Ex: 5000">
+                        </div>
+                        <div class="form-group">
+                            <label for="meta-saida">Meta de Saída (R$):</label>
+                            <input type="number" id="meta-saida" placeholder="Ex: 2000">
+                        </div>
                         <button id="btn-salvar-metas">Salvar Metas</button>
                         <p>Progresso Entrada: <span id="progresso-entrada-valor">R$ 0,00</span> de <span id="meta-entrada-valor">R$ 0,00</span></p>
                         <div class="progress-bar-container"><div id="progress-bar-entrada" class="progress-bar"></div></div>
@@ -812,15 +937,22 @@
                     <hr />
                     <div class="finance-section-group">
                         <h4>Relatórios por Período</h4>
-                        <label for="relatorio-data-inicio">Data Início:</label>
-                        <input type="date" id="relatorio-data-inicio">
-                        <label for="relatorio-data-fim">Data Fim:</label>
-                        <input type="date" id="relatorio-data-fim">
-                        <select id="financeiro-relatorio-tipo">
-                            <option value="todos">Todas as Transações</option>
-                            <option value="entradas">Apenas Entradas</option>
-                            <option value="saidas">Apenas Saídas</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="relatorio-data-inicio">Data Início:</label>
+                            <input type="date" id="relatorio-data-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="relatorio-data-fim">Data Fim:</label>
+                            <input type="date" id="relatorio-data-fim">
+                        </div>
+                        <div class="form-group">
+                            <label for="financeiro-relatorio-tipo">Tipo de Relatório:</label>
+                            <select id="financeiro-relatorio-tipo">
+                                <option value="todos">Todas as Transações</option>
+                                <option value="entradas">Apenas Entradas</option>
+                                <option value="saidas">Apenas Saídas</option>
+                            </select>
+                        </div>
                         <button id="btn-gerar-relatorio">Gerar Relatório</button>
                         <div id="financeiro-relatorio-output">
                             <p>Selecione um período e opção e clique em "Gerar Relatório".</p>
@@ -830,9 +962,10 @@
                         </div>
                     </div>
                     <hr />
-                    <h3>Histórico de Transações</h3>
-                    <ul id="lista-transacoes" class="list-fake">
-                        </ul>
+                    <div class="section-header">
+                        <h3>Histórico de Transações</h3>
+                    </div>
+                    <ul id="lista-transacoes" class="list-fake"></ul>
                 </div>
             </div>
 
@@ -841,23 +974,37 @@
                 <h2>Estoque</h2>
                 <button class="open-btn" data-section-id="estoque-section" data-first-field="estoque-nome-produto">Abrir</button>
                 <div class="icon-content" id="estoque-section">
-                    <h3>Cadastro/Atualizar Produto</h3>
+                    <div class="section-header">
+                        <h3>Cadastro/Atualizar Produto</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Estoque" data-section-id="estoque-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="estoque-id-edit">
-                    <input type="text" id="estoque-nome-produto" placeholder="Nome do Produto">
-                    <input type="number" id="estoque-quantidade" placeholder="Quantidade">
+                    <div class="form-group">
+                        <label for="estoque-nome-produto">Nome do Produto</label>
+                        <input type="text" id="estoque-nome-produto" placeholder="Ex: Shampoo, Condicionador">
+                    </div>
+                    <div class="form-group">
+                        <label for="estoque-quantidade">Quantidade</label>
+                        <input type="number" id="estoque-quantidade" placeholder="0" min="0">
+                    </div>
                     <button id="btn-salvar-produto" class="btn-action">Salvar Produto</button>
                     <hr />
-                    <h3>Produtos em Estoque</h3>
+                    <div class="section-header">
+                        <h3>Produtos em Estoque</h3>
+                    </div>
                     <div class="search-container">
-                        <input type="text" id="search-produto" placeholder="Buscar produto por nome...">
+                        <div class="form-group">
+                            <label for="search-produto">Buscar Produto</label>
+                            <input type="text" id="search-produto" placeholder="Buscar produto...">
+                        </div>
                         <button id="btn-search-produto">Buscar</button>
                     </div>
-                    <ul id="lista-produtos" class="list-fake">
-                        </ul>
+                    <ul id="lista-produtos" class="list-fake"></ul>
                     <hr />
-                    <h3>Alerta de Estoque Baixo (< 5 unidades)</h3>
-                    <ul id="lista-alerta-estoque" class="list-fake">
-                        </ul>
+                    <div class="section-header">
+                        <h3>Alerta de Estoque Baixo (< 5 unidades)</h3>
+                    </div>
+                    <ul id="lista-alerta-estoque" class="list-fake"></ul>
                 </div>
             </div>
 
@@ -866,38 +1013,56 @@
                 <h2>Profissional</h2>
                 <button class="open-btn" data-section-id="profissional-section" data-first-field="profissional-nome">Abrir</button>
                 <div class="icon-content" id="profissional-section">
-                    <h3>Cadastrar/Atualizar Profissional</h3>
+                    <div class="section-header">
+                        <h3>Cadastrar/Atualizar Profissional</h3>
+                        <button class="close-section-btn" aria-label="Fechar seção Profissional" data-section-id="profissional-section"><span class="material-icons">close</span></button>
+                    </div>
                     <input type="hidden" id="profissional-id-edit">
-                    <input type="text" id="profissional-nome" placeholder="Nome Completo">
-                    <input type="text" id="profissional-especialidade" placeholder="Especialidade">
-                    <textarea id="profissional-disponibilidade" placeholder="Disponibilidade (Ex: Seg-Sex 9h-18h, Sáb 9h-13h)"></textarea>
+                    <div class="form-group">
+                        <label for="profissional-nome">Nome Completo</label>
+                        <input type="text" id="profissional-nome" placeholder="Nome do Profissional">
+                    </div>
+                    <div class="form-group">
+                        <label for="profissional-especialidade">Especialidade</label>
+                        <input type="text" id="profissional-especialidade" placeholder="Ex: Cabeleireira, Manicure">
+                    </div>
+                    <div class="form-group">
+                        <label for="profissional-disponibilidade">Disponibilidade</label>
+                        <textarea id="profissional-disponibilidade" placeholder="Ex: Seg-Sex 9h-18h, Sáb 9h-13h"></textarea>
+                    </div>
                     <button id="btn-salvar-profissional" class="btn-action">Salvar Profissional</button>
                     <hr />
-                    <h3>Profissionais Cadastrados</h3>
-                    <ul id="lista-profissionais" class="list-fake">
-                        </ul>
+                    <div class="section-header">
+                        <h3>Profissionais Cadastrados</h3>
+                    </div>
+                    <ul id="lista-profissionais" class="list-fake"></ul>
                     <hr />
-                    <h3>Relatório de Desempenho e Comissões</h3>
+                    <div class="section-header">
+                        <h3>Relatório de Desempenho e Comissões</h3>
+                    </div>
                     <div class="finance-section-group">
                         <h4>Período do Relatório</h4>
-                        <label for="relatorio-prof-data-inicio">Data Início:</label>
-                        <input type="date" id="relatorio-prof-data-inicio">
-                        <label for="relatorio-prof-data-fim">Data Fim:</label>
-                        <input type="date" id="relatorio-prof-data-fim">
+                        <div class="form-group">
+                            <label for="relatorio-prof-data-inicio">Data Início:</label>
+                            <input type="date" id="relatorio-prof-data-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="relatorio-prof-data-fim">Data Fim:</label>
+                            <input type="date" id="relatorio-prof-data-fim">
+                        </div>
                         <button id="btn-gerar-relatorio-profissionais">Gerar Relatório</button>
                     </div>
                     <div id="relatorio-profissionais-output">
                         <p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>
-                        </div>
+                    </div>
                 </div>
             </div>
-
         </section>
     </div>
 
     <script>
         const LOCAL_STORAGE_PREFIX = 'espacoTaiBotelho_';
-        const TAXA_COMISSAO_PADRAO = 0.30;
+        const TAXA_COMISSAO_PADRAO = 0.30; // 30%
 
         let clientes = [];
         let agendamentos = [];
@@ -941,6 +1106,7 @@
             toast.innerHTML = `<span class="material-icons">${icon}</span> ${message}`;
             toastContainer.appendChild(toast);
 
+            // Trigger reflow to ensure transition plays
             void toast.offsetWidth;
 
             toast.classList.add('show');
@@ -960,7 +1126,7 @@
             });
             section.querySelectorAll('select').forEach(select => {
                 if (select.options.length > 0) {
-                    select.value = select.options[0].value;
+                    select.value = select.options[0].value; // Reset to first option
                 }
             });
             section.querySelectorAll('input[type="hidden"]').forEach(input => {
@@ -969,6 +1135,19 @@
 
             if (sectionId === 'agenda-section') {
                 document.getElementById('agenda-valor-servico').value = '';
+                document.getElementById('agendamento-mensagem-pronta').value = ''; // Clear message
+                document.getElementById('sugestao-inteligente').style.display = 'none'; // Hide suggestion
+            }
+            if (sectionId === 'financeiro-section') {
+                 document.getElementById('financeiro-relatorio-output').innerHTML = '<p>Selecione um período e opção e clique em "Gerar Relatório".</p>';
+                 document.getElementById('relatorio-data-inicio').value = '';
+                 document.getElementById('relatorio-data-fim').value = '';
+                 document.getElementById('financeiro-relatorio-tipo').value = 'todos';
+            }
+            if (sectionId === 'profissional-section') {
+                document.getElementById('relatorio-profissionais-output').innerHTML = '<p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>';
+                 document.getElementById('relatorio-prof-data-inicio').value = '';
+                 document.getElementById('relatorio-prof-data-fim').value = '';
             }
         };
 
@@ -1002,20 +1181,21 @@
         };
 
         const validarEmail = (email) => {
-            if (!email) return true;
+            if (!email) return true; // Email is optional
             const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());
         };
 
         const validarTelefone = (telefone) => {
-            if (!telefone) return true;
+            if (!telefone) return true; // Phone is optional in this version based on previous code.
+            // Simplified regex for (DD) XXXXX-XXXX or (DD) XXXX-XXXX with optional space
             const re = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
             return re.test(telefone);
         };
 
         const formatarTelefone = (telefone) => {
             if (!telefone) return '';
-            telefone = telefone.replace(/\D/g, '');
+            telefone = telefone.replace(/\D/g, ''); // Remove all non-digits
             if (telefone.length > 11) telefone = telefone.substring(0, 11);
             if (telefone.length === 11) {
                 return `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
@@ -1034,15 +1214,15 @@
                 const historicoServicos = document.getElementById('cliente-historico-servicos').value.trim();
                 const observacoes = document.getElementById('cliente-observacoes').value.trim();
 
-                if (!nome || !telefone) {
-                    showToast('Por favor, preencha o nome e o telefone do cliente.', 'error');
-                    throw new Error('Campos obrigatórios vazios.');
+                if (!nome) {
+                    showToast('Por favor, preencha o nome do cliente.', 'error');
+                    throw new Error('Nome do cliente é obrigatório.');
                 }
-                if (!validarTelefone(telefone)) {
+                if (telefone && !validarTelefone(telefone)) {
                     showToast('Formato de telefone inválido. Use (DD) XXXXX-XXXX ou (DD) XXXX-XXXX.', 'error');
                     throw new Error('Telefone inválido.');
                 }
-                if (!validarEmail(email)) {
+                if (email && !validarEmail(email)) {
                     showToast('Formato de e-mail inválido.', 'error');
                     throw new Error('Email inválido.');
                 }
@@ -1091,7 +1271,7 @@
             editar: (id) => {
                 const cliente = clientes.find(c => c.id === id);
                 if (cliente) {
-                    resetForm('cliente-section');
+                    resetForm('cliente-section'); // Ensures all fields are clear before loading
                     document.getElementById('cliente-id-edit').value = cliente.id;
                     document.getElementById('cliente-nome').value = cliente.nome;
                     document.getElementById('cliente-telefone').value = cliente.telefone;
@@ -1219,7 +1399,8 @@
                     showToast('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).', 'error');
                     throw new Error('Campos obrigatórios vazios.');
                 }
-                 if (!id && dataAgendamento < agora) {
+                // Only validate future date for NEW appointments
+                if (!id && dataAgendamento < agora) {
                     showToast('Não é possível agendar para uma data/hora no passado.', 'error');
                     throw new Error('Data/hora no passado.');
                 }
@@ -1243,9 +1424,9 @@
                 }
                 salvarDados('agendamentos', agendamentos);
                 AgendaManager.renderizar();
-                gerarMensagemAgendamento();
-                document.getElementById('sugestao-inteligente').style.display = 'none';
-                profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id));
+                gerarMensagemAgendamento(); // Update message on save
+                document.getElementById('sugestao-inteligente').style.display = 'none'; // Hide suggestion after saving
+                profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id)); // Recalculate prof details
             },
             renderizar: (filtro = '', dataInicioFiltro = null, dataFimFiltro = null) => {
                 const listaAgendamentosUl = document.getElementById('lista-agendamentos');
@@ -1256,8 +1437,13 @@
                 let agendamentosFiltrados = agendamentosOrdenados.filter(agendamento => {
                     const dataAgendamento = new Date(agendamento.dataHora);
                     const hoje = new Date();
+                    hoje.setHours(0,0,0,0); // For comparison without time
+
+                    // If no date filters are set, only show future appointments
                     if (!dataInicioFiltro && !dataFimFiltro) {
-                         return dataAgendamento >= hoje;
+                         const agendamentoDateOnly = new Date(agendamento.dataHora);
+                         agendamentoDateOnly.setHours(0,0,0,0);
+                         return agendamentoDateOnly >= hoje;
                     }
 
                     let passaNoFiltroData = true;
@@ -1306,6 +1492,7 @@
                     document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
                     showToast('Agendamento carregado para edição!', 'info');
                     document.getElementById('agenda-cliente-nome').focus();
+                    gerarMensagemAgendamento(); // Generate message for editing
                 }
             },
             excluir: async (id) => {
@@ -1314,7 +1501,7 @@
                     agendamentos = agendamentos.filter(a => a.id !== id);
                     salvarDados('agendamentos', agendamentos);
                     AgendaManager.renderizar();
-                    profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id));
+                    profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id)); // Recalculate prof details
                     atualizarNotificacoesDashboard();
                     showToast('Agendamento excluído com sucesso!', 'success');
                 }
@@ -1360,7 +1547,9 @@
                 if (transacoes.length === 0) {
                     listaTransacoesUl.innerHTML = '<li>Nenhuma transação registrada.</li>';
                 } else {
-                    transacoes.forEach(transacao => {
+                    // Sort by date in descending order (most recent first)
+                    const sortedTransactions = [...transacoes].sort((a, b) => new Date(b.dataCriacao) - new Date(a.dataCriacao));
+                    sortedTransactions.forEach(transacao => {
                         const li = document.createElement('li');
                         const valorFormatado = parseFloat(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         const dataTransacao = transacao.dataCriacao ? new Date(transacao.dataCriacao).toLocaleDateString('pt-BR') : 'N/A';
@@ -1432,7 +1621,7 @@
 
                 salvarDados('financeiroMetas', financeiroMetas);
                 showToast('Metas financeiras salvas com sucesso!', 'success');
-                FinanceiroManager.renderizar();
+                FinanceiroManager.renderizar(); // Re-render to update progress bars
             },
             atualizarMetasDisplay: (totalEntradas, totalSaidas) => {
                 document.getElementById('meta-entrada-valor').textContent = financeiroMetas.entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -1449,12 +1638,13 @@
                 let percentEntrada = (financeiroMetas.entrada > 0) ? (totalEntradas / financeiroMetas.entrada) * 100 : 0;
                 let percentSaida = (financeiroMetas.saida > 0) ? (totalSaidas / financeiroMetas.saida) * 100 : 0;
 
-                percentEntrada = Math.min(percentEntrada, 100);
-                progressBarEntrada.style.width = `${percentEntrada}%`;
-                progressBarEntrada.classList.toggle('red', percentEntrada < 100);
+                // Ensure percentage does not exceed 100% for display purposes, but track if over
+                progressBarEntrada.style.width = `${Math.min(percentEntrada, 100)}%`;
+                progressBarEntrada.classList.toggle('red', percentEntrada < 100); // Red if not met goal
 
-                progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545';
                 progressBarSaida.style.width = `${Math.min(percentSaida, 100)}%`;
+                // For expenses, red means we are over budget
+                progressBarSaida.classList.toggle('red', percentSaida > 100);
             },
             gerarRelatorio: () => {
                 const tipoRelatorio = document.getElementById('financeiro-relatorio-tipo').value;
@@ -1488,7 +1678,7 @@
                     transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'saida');
                     totalSaidasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
                     outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-                } else {
+                } else { // "todos"
                     transacoesParaRelatorio = transacoesFiltradasPorData;
                     totalEntradasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
                     totalSaidasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
@@ -1499,7 +1689,9 @@
 
                 if (transacoesParaRelatorio.length > 0) {
                     outputDiv.innerHTML += '<p><strong>Detalhes:</strong></p>';
-                    transacoesParaRelatorio.forEach(t => {
+                    // Sort transactions for report by date, ascending
+                    const sortedReportTransactions = [...transacoesParaRelatorio].sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao));
+                    sortedReportTransactions.forEach(t => {
                         const transacaoDate = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : 'Data Indisp.';
                         outputDiv.innerHTML += `<p>${transacaoDate} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
                     });
@@ -1529,7 +1721,7 @@
                 } else {
                     const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
                     if (produtoExistente) {
-                        produtoExistente.quantidade += quantidade;
+                        produtoExistente.quantidade += quantidade; // Add to existing quantity
                         showToast('Quantidade de produto existente atualizada!', 'success');
                     } else {
                         produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
@@ -1567,7 +1759,7 @@
                         if (produto.quantidade < 5) {
                             const alertaLi = document.createElement('li');
                             alertaLi.innerHTML = `<span class="material-icons" style="font-size: 1em; vertical-align: middle; margin-right: 5px; color: orange;">warning</span>${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
-                            alertaLi.style.color = 'orange';
+                            alertaLi.style.color = 'orange'; // Keep this for emphasis
                             listaAlertaEstoqueUl.appendChild(alertaLi);
                         }
                     });
@@ -1645,7 +1837,7 @@
                             <p><strong>Disponibilidade:</strong> ${profissional.disponibilidade || 'Não informada'}</p>
                             <p><strong>Agendamentos Realizados:</strong> <span id="prof-agendamentos-${profissional.id}">Calculando...</span></p>
                             <p><strong>Comissão Estimada:</strong> <span id="prof-comissao-${profissional.id}">Calculando...</span></p>
-                            <h5>Histórico de Serviços:</h5>
+                            <h6>Histórico de Serviços:</h6>
                             <ul id="prof-historico-${profissional.id}"><li>Carregando...</li></ul>
                         </div>
                     `;
@@ -1679,7 +1871,7 @@
                     salvarDados('profissionais', profissionais);
                     salvarDados('agendamentos', agendamentos);
                     ProfissionalManager.renderizar();
-                    AgendaManager.renderizar();
+                    AgendaManager.renderizar(); // Re-render agenda as well due to changes in prof
                     showToast('Profissional excluído com sucesso!', 'success');
                 }
             },
@@ -1745,6 +1937,7 @@
 
                 const relatorioPorProfissional = {};
 
+                // Initialize report for all professionals
                 profissionais.forEach(prof => {
                     relatorioPorProfissional[prof.id] = {
                         nome: prof.nome,
@@ -1879,7 +2072,7 @@
                 return;
             }
             textarea.select();
-            textarea.setSelectionRange(0, 99999);
+            textarea.setSelectionRange(0, 99999); // For mobile devices
             document.execCommand('copy');
             showToast('Mensagem copiada para a área de transferência!', 'success');
         };
@@ -1981,7 +2174,8 @@
             let csvContent = headers.join(';') + '\n';
             data.forEach(item => {
                 const row = headers.map(header => {
-                    const key = header.charAt(0).toLowerCase() + header.slice(1);
+                    // Convert header name to corresponding object key (camelCase)
+                    const key = header.charAt(0).toLowerCase() + header.slice(1); 
                     let value = item[key] !== undefined ? item[key] : '';
 
                     if (header === 'DataHora' && value) {
@@ -1989,8 +2183,9 @@
                     } else if (header === 'DataCriacao' && value) {
                         value = new Date(value).toLocaleString('pt-BR');
                     } else if (header === 'Preco' && typeof value === 'number') {
-                        value = value.toFixed(2).replace('.', ',');
+                        value = value.toFixed(2).replace('.', ','); // Format price for CSV
                     }
+                    // Escape double quotes and enclose in double quotes
                     return `"${String(value).replace(/"/g, '""')}"`;
                 }).join(';');
                 csvContent += row + '\n';
@@ -2008,13 +2203,14 @@
                 document.body.removeChild(link);
             } else {
                 showToast('Seu navegador não suporta download automático. Por favor, copie o conteúdo e salve como CSV.', 'info');
-                console.log(csvContent);
+                console.log(csvContent); // Fallback for older browsers
             }
             showToast(`Dados de ${tipo} exportados com sucesso para ${filename}!`, 'success');
         };
 
+        // Initialize App on DOMContentLoaded
         document.addEventListener("DOMContentLoaded", () => {
-            document.body.style.visibility = "visible";
+            document.body.style.visibility = "visible"; // Show body once DOM is ready
 
             const splash = document.getElementById("splash-screen");
             const button = document.getElementById("splash-enter-button");
@@ -2029,7 +2225,7 @@
                             splash.style.display = "none";
                             main.style.display = "block";
                             document.body.style.overflow = "auto";
-                            atualizarNotificacoesDashboard();
+                            atualizarNotificacoesDashboard(); // Load notifications after showing main content
                         },
                         { once: true }
                     );
@@ -2038,14 +2234,16 @@
 
             button.addEventListener("click", showMainContent);
 
+            // Load all data from localStorage
             clientes = carregarDados('clientes');
             agendamentos = carregarDados('agendamentos');
             transacoes = carregarDados('transacoes');
             produtos = carregarDados('produtos');
             profissionais = carregarDados('profissionais');
             servicos = carregarDados('servicos');
-            FinanceiroManager.carregarMetas();
+            FinanceiroManager.carregarMetas(); // Specific load for metas
 
+            // Centralized setup for save buttons
             const setupSaveButton = (buttonId, sectionId, saveFunction) => {
                 document.getElementById(buttonId).addEventListener('click', async () => {
                     const button = document.getElementById(buttonId);
@@ -2056,8 +2254,8 @@
 
                     try {
                         await saveFunction();
-                        resetForm(sectionId);
-                        focusFirstField(sectionId);
+                        resetForm(sectionId); // Reset form after successful save
+                        focusFirstField(sectionId); // Put focus back on first field
                     } catch (error) {
                         console.error('Erro ao salvar:', error.message);
                     } finally {
@@ -2075,33 +2273,29 @@
             setupSaveButton('btn-salvar-produto', 'estoque-section', EstoqueManager.salvar);
             setupSaveButton('btn-salvar-profissional', 'profissional-section', ProfissionalManager.salvar);
 
-            document.getElementById('btn-search-cliente').addEventListener('click', () => {
-                const termo = document.getElementById('search-cliente').value.trim();
-                ClienteManager.renderizar(termo);
-            });
-            document.getElementById('search-cliente').addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    document.getElementById('btn-search-cliente').click();
-                }
-            });
-            document.getElementById('search-cliente').addEventListener('input', () => {
-                if (document.getElementById('search-cliente').value.trim() === '') {
-                    ClienteManager.renderizar('');
-                }
-            });
+            // Search/Filter Event Listeners (with Enter key support)
+            const setupSearch = (searchId, buttonId, managerRenderFunction) => {
+                document.getElementById(buttonId).addEventListener('click', () => {
+                    const termo = document.getElementById(searchId).value.trim();
+                    managerRenderFunction(termo);
+                });
+                document.getElementById(searchId).addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        document.getElementById(buttonId).click();
+                    }
+                });
+                document.getElementById(searchId).addEventListener('input', () => {
+                    if (document.getElementById(searchId).value.trim() === '') {
+                        managerRenderFunction(''); // Clear filter when search box is empty
+                    }
+                });
+            };
 
-            document.getElementById('btn-search-agendamento').addEventListener('click', () => {
-                const termo = document.getElementById('search-agendamento').value.trim();
-                const dataInicio = document.getElementById('filter-agendamento-start').value;
-                const dataFim = document.getElementById('filter-agendamento-end').value;
+            setupSearch('search-cliente', 'btn-search-cliente', ClienteManager.renderizar);
+            setupSearch('search-servico', 'btn-search-servico', ServicoManager.renderizar);
+            setupSearch('search-produto', 'btn-search-produto', EstoqueManager.renderizar);
 
-                let startDate = null;
-                let endDate = null;
-                if (dataInicio) startDate = new Date(dataInicio + 'T00:00:00');
-                if (dataFim) endDate = new Date(dataFim + 'T23:59:59');
-
-                AgendaManager.renderizar(termo, startDate, endDate);
-            });
+            // Specific agenda filter setup due to date inputs
             document.getElementById('btn-filter-agendamento').addEventListener('click', () => {
                 const termo = document.getElementById('search-agendamento').value.trim();
                 const dataInicio = document.getElementById('filter-agendamento-start').value;
@@ -2116,46 +2310,15 @@
             });
             document.getElementById('search-agendamento').addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
-                    document.getElementById('btn-search-agendamento').click();
+                    document.getElementById('btn-filter-agendamento').click();
                 }
             });
             document.getElementById('search-agendamento').addEventListener('input', () => {
-                if (document.getElementById('search-agendamento').value.trim() === '') {
-                    if (!document.getElementById('filter-agendamento-start').value && !document.getElementById('filter-agendamento-end').value) {
-                         AgendaManager.renderizar('');
-                    }
+                 if (document.getElementById('search-agendamento').value.trim() === '' && !document.getElementById('filter-agendamento-start').value && !document.getElementById('filter-agendamento-end').value) {
+                    AgendaManager.renderizar(''); // Clear filter when search and dates are empty
                 }
             });
 
-            document.getElementById('btn-search-servico').addEventListener('click', () => {
-                const termo = document.getElementById('search-servico').value.trim();
-                ServicoManager.renderizar(termo);
-            });
-            document.getElementById('search-servico').addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    document.getElementById('btn-search-servico').click();
-                }
-            });
-            document.getElementById('search-servico').addEventListener('input', () => {
-                if (document.getElementById('search-servico').value.trim() === '') {
-                    ServicoManager.renderizar('');
-                }
-            });
-
-            document.getElementById('btn-search-produto').addEventListener('click', () => {
-                const termo = document.getElementById('search-produto').value.trim();
-                EstoqueManager.renderizar(termo);
-            });
-            document.getElementById('search-produto').addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    document.getElementById('btn-search-produto').click();
-                }
-            });
-            document.getElementById('search-produto').addEventListener('input', () => {
-                if (document.getElementById('search-produto').value.trim() === '') {
-                    EstoqueManager.renderizar('');
-                }
-            });
 
             document.getElementById('btn-gerar-relatorio').addEventListener('click', FinanceiroManager.gerarRelatorio);
             document.getElementById('btn-salvar-metas').addEventListener('click', FinanceiroManager.salvarMetas);
@@ -2171,9 +2334,12 @@
                 document.getElementById('agenda-valor-servico').value = preco || '';
             });
 
+            // Initial rendering of lists and datalists
             preencherDatalistClientes();
             preencherDatalistProfissionais();
             preencherSelectServicos();
+            // No need to render managers here, as they are rendered when their section is opened via toggleSection
+            // The dashboard notifications are already updated when main content is shown.
         });
 
         function toggleSection(button) {
@@ -2181,6 +2347,7 @@
             const el = document.getElementById(sectionId);
             const isCurrentlyActive = el.classList.contains('active');
 
+            // Hide all sections and deactivate all "open" buttons
             document.querySelectorAll('.icon-content').forEach(section => {
                 section.classList.remove('active');
             });
@@ -2189,24 +2356,24 @@
             });
 
             if (!isCurrentlyActive) {
+                // Activate the clicked section and its button
                 el.classList.add('active');
                 button.classList.add('active');
 
-                resetForm(sectionId);
-                focusFirstField(sectionId);
+                resetForm(sectionId); // Clear forms on section open
+                focusFirstField(sectionId); // Focus first input
 
+                // Render content specific to the section
                 switch (sectionId) {
                     case 'cliente-section':
                         ClienteManager.renderizar();
-                        document.getElementById('search-cliente').value = '';
+                        document.getElementById('search-cliente').value = ''; // Clear search on open
                         break;
                     case 'agenda-section':
                         AgendaManager.renderizar();
                         document.getElementById('search-agendamento').value = '';
                         document.getElementById('filter-agendamento-start').value = '';
                         document.getElementById('filter-agendamento-end').value = '';
-                        document.getElementById('agendamento-mensagem-pronta').value = '';
-                        document.getElementById('sugestao-inteligente').style.display = 'none';
                         preencherDatalistProfissionais();
                         preencherSelectServicos();
                         break;
@@ -2216,10 +2383,11 @@
                         break;
                     case 'financeiro-section':
                         FinanceiroManager.renderizar();
-                        document.getElementById('financeiro-relatorio-tipo').value = 'todos';
+                        // Reset finance reports on open
+                        document.getElementById('financeiro-relatorio-output').innerHTML = '<p>Selecione um período e opção e clique em "Gerar Relatório".</p>';
                         document.getElementById('relatorio-data-inicio').value = '';
                         document.getElementById('relatorio-data-fim').value = '';
-                        FinanceiroManager.gerarRelatorio();
+                        document.getElementById('financeiro-relatorio-tipo').value = 'todos';
                         break;
                     case 'estoque-section':
                         EstoqueManager.renderizar();
@@ -2227,17 +2395,39 @@
                         break;
                     case 'profissional-section':
                         ProfissionalManager.renderizar();
+                        // Reset professional reports on open
                         document.getElementById('relatorio-prof-data-inicio').value = '';
                         document.getElementById('relatorio-prof-data-fim').value = '';
                         document.getElementById('relatorio-profissionais-output').innerHTML = '<p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>';
                         break;
                 }
+            } else {
+                // If the section was already active and the same button was clicked, it means we are closing it.
+                // Or if a close button was clicked, it also closes the current active section.
+                // No need to explicitly remove 'active' here as it's done at the start of the function.
             }
             atualizarNotificacoesDashboard();
         }
 
+        // Event listeners for "Abrir" buttons
         document.querySelectorAll('.open-btn').forEach(button => {
             button.addEventListener('click', () => toggleSection(button));
+        });
+
+        // Event listeners for "Fechar" buttons
+        document.querySelectorAll('.close-section-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const sectionId = button.dataset.sectionId;
+                const el = document.getElementById(sectionId);
+                const openButton = document.querySelector(`.open-btn[data-section-id="${sectionId}"]`);
+                
+                el.classList.remove('active');
+                if (openButton) {
+                    openButton.classList.remove('active');
+                }
+                resetForm(sectionId); // Also reset form when closing manually
+                atualizarNotificacoesDashboard(); // Update notifications after closing
+            });
         });
     </script>
 </body>
