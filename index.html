@@ -308,10 +308,12 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
         }
         .search-container input {
             flex-grow: 1;
             margin-bottom: 0;
+            min-width: 150px; /* Garante que inputs de data não fiquem muito pequenos */
         }
         .search-container button {
             width: auto;
@@ -512,6 +514,86 @@
             margin-right: 10px;
         }
 
+        /* Modal de Confirmação */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .modal-content p {
+            margin: 20px 0;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .modal-buttons button.confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal-buttons button.confirm:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons button.cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+        .modal-buttons button.cancel:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
 
         @media (max-width: 768px) {
             .splash-initials {
@@ -560,6 +642,13 @@
             #toast-container {
                 width: 95%;
             }
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+            .modal-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -572,6 +661,18 @@
     </div>
 
     <div id="toast-container"></div>
+
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmação Necessária</h3>
+            <p id="modal-message">Você tem certeza que deseja realizar esta ação?</p>
+            <div class="modal-buttons">
+                <button class="confirm" id="modal-confirm-btn">Confirmar</button>
+                <button class="cancel" id="modal-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
 
     <div id="main-content">
         <h1>Bem-vindo ao Espaço Tai Botelho!</h1>
@@ -594,8 +695,8 @@
                     <input type="hidden" id="cliente-id-edit">
                     <input type="text" id="cliente-nome" placeholder="Nome Completo" list="clientes-datalist">
                     <datalist id="clientes-datalist"></datalist>
-                    <input type="text" id="cliente-telefone" placeholder="Telefone">
-                    <input type="email" id="cliente-email" placeholder="E-mail">
+                    <input type="text" id="cliente-telefone" placeholder="Telefone (Ex: (DD) XXXXX-XXXX)">
+                    <input type="email" id="cliente-email" placeholder="E-mail (Ex: email@example.com)">
                     <textarea id="cliente-historico-servicos" placeholder="Histórico de Serviços Realizados"></textarea>
                     <textarea id="cliente-observacoes" placeholder="Observações/Preferências do Cliente"></textarea>
                     <button id="btn-salvar-cliente" class="btn-action">Salvar Cliente</button>
@@ -625,16 +726,8 @@
                     <input type="datetime-local" id="agenda-data-hora">
                     <select id="agenda-servico">
                         <option value="">Selecione um Serviço</option>
-                        <option value="Escova">Escova</option>
-                        <option value="Coloracao">Coloração</option>
-                        <option value="Corte">Corte</option>
-                        <option value="Hidratacao">Hidratação</option>
-                        <option value="Manicure">Manicure</option>
-                        <option value="Pedicure">Pedicure</option>
-                        <option value="Sobrancelha">Sobrancelha</option>
-                        <option value="Outro">Outro (especifique nas observações)</option>
-                    </select>
-                    <input type="number" id="agenda-valor-servico" placeholder="Valor do Serviço R$" min="0" step="0.01">
+                        </select>
+                    <input type="number" id="agenda-valor-servico" placeholder="Valor do Serviço R$" min="0" step="0.01" readonly>
                     <select id="agenda-profissional-responsavel">
                         <option value="">Selecione o Profissional</option>
                         </select>
@@ -655,12 +748,40 @@
                     <h3>Próximos Agendamentos</h3>
                     <div class="search-container">
                         <input type="text" id="search-agendamento" placeholder="Buscar agendamento por cliente/serviço...">
-                        <button id="btn-search-agendamento">Buscar</button>
+                        <label for="filter-agendamento-start" style="margin-left: 10px;">De:</label>
+                        <input type="date" id="filter-agendamento-start">
+                        <label for="filter-agendamento-end">Até:</label>
+                        <input type="date" id="filter-agendamento-end">
+                        <button id="btn-filter-agendamento">Filtrar</button>
                     </div>
                     <ul id="lista-agendamentos" class="list-fake">
                         </ul>
                     <div class="export-buttons">
                         <button onclick="exportarDados('agendamentos')">Exportar Agendamentos (CSV)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="icon-card">
+                <span class="material-icons">work</span>
+                <h2>Serviços</h2>
+                <button class="open-btn" data-section-id="servicos-section" data-first-field="servico-nome">Abrir</button>
+                <div class="icon-content" id="servicos-section">
+                    <h3>Cadastrar/Atualizar Serviço</h3>
+                    <input type="hidden" id="servico-id-edit">
+                    <input type="text" id="servico-nome" placeholder="Nome do Serviço (Ex: Corte Feminino)">
+                    <input type="number" id="servico-preco" placeholder="Preço R$" min="0" step="0.01">
+                    <button id="btn-salvar-servico" class="btn-action">Salvar Serviço</button>
+                    <hr />
+                    <h3>Lista de Serviços</h3>
+                    <div class="search-container">
+                        <input type="text" id="search-servico" placeholder="Buscar serviço por nome...">
+                        <button id="btn-search-servico">Buscar</button>
+                    </div>
+                    <ul id="lista-servicos" class="list-fake">
+                        </ul>
+                    <div class="export-buttons">
+                        <button onclick="exportarDados('servicos')">Exportar Serviços (CSV)</button>
                     </div>
                 </div>
             </div>
@@ -787,25 +908,38 @@
     </div>
 
     <script>
+        // --- Constantes Globais ---
+        const LOCAL_STORAGE_PREFIX = 'espacoTaiBotelho_';
+        const TAXA_COMISSAO_PADRAO = 0.30; // 30% de comissão
+
         // --- Variáveis globais para armazenar os dados ---
         let clientes = [];
         let agendamentos = [];
         let transacoes = [];
         let produtos = [];
         let profissionais = [];
-        let financeiroMetas = { entrada: 0, saida: 0 }; // Nova variável para metas
-
-        // --- Constante para taxa de comissão (30%) ---
-        const TAXA_COMISSAO_PADRAO = 0.30;
+        let servicos = []; // Nova variável para armazenar serviços
+        let financeiroMetas = { entrada: 0, saida: 0 };
 
         // --- Funções Genéricas para LocalStorage ---
         const carregarDados = (chave) => {
-            const dadosSalvos = localStorage.getItem(chave);
-            return dadosSalvos ? JSON.parse(dadosSalvos) : [];
+            try {
+                const dadosSalvos = localStorage.getItem(LOCAL_STORAGE_PREFIX + chave);
+                return dadosSalvos ? JSON.parse(dadosSalvos) : [];
+            } catch (e) {
+                console.error(`Erro ao carregar dados da chave ${chave}:`, e);
+                showToast(`Erro ao carregar dados de ${chave}.`, 'error');
+                return [];
+            }
         };
 
         const salvarDados = (chave, dados) => {
-            localStorage.setItem(chave, JSON.stringify(dados));
+            try {
+                localStorage.setItem(LOCAL_STORAGE_PREFIX + chave, JSON.stringify(dados));
+            } catch (e) {
+                console.error(`Erro ao salvar dados da chave ${chave}:`, e);
+                showToast(`Erro ao salvar dados de ${chave}. Por favor, verifique o espaço de armazenamento do navegador.`, 'error');
+            }
         };
 
         const gerarIdUnico = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -825,8 +959,7 @@
             toast.innerHTML = `<span class="material-icons">${icon}</span> ${message}`;
             toastContainer.appendChild(toast);
 
-            // Força o reflow para a transição funcionar
-            void toast.offsetWidth;
+            void toast.offsetWidth; // Força o reflow para a transição funcionar
 
             toast.classList.add('show');
 
@@ -841,26 +974,26 @@
             const section = document.getElementById(sectionId);
             if (!section) return;
 
-            // Limpa inputs de texto, email, number, textarea
-            section.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea').forEach(input => {
+            section.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea, input[type="datetime-local"], input[type="date"]').forEach(input => {
                 input.value = '';
             });
-            // Reseta selects para a primeira opção ou vazia
             section.querySelectorAll('select').forEach(select => {
                 if (select.options.length > 0) {
                     select.value = select.options[0].value;
                 }
             });
-            // Limpa hidden inputs de edição
             section.querySelectorAll('input[type="hidden"]').forEach(input => {
                 input.value = '';
             });
+
+            // Reseta valor do serviço na agenda
+            if (sectionId === 'agenda-section') {
+                document.getElementById('agenda-valor-servico').value = '';
+            }
         };
 
         // Função para focar no primeiro campo de um formulário
         const focusFirstField = (sectionId) => {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
             const firstFieldId = document.querySelector(`.open-btn[data-section-id="${sectionId}"]`).dataset.firstField;
             if (firstFieldId) {
                 const firstField = document.getElementById(firstFieldId);
@@ -870,468 +1003,936 @@
             }
         };
 
-        // --- Funções de Renderização (Read) ---
+        // Modal de Confirmação (Substitui o alert/confirm nativo)
+        let resolveModalPromise;
+        const showConfirmationModal = (message) => {
+            const modal = document.getElementById('confirmation-modal');
+            document.getElementById('modal-message').textContent = message;
+            modal.style.display = 'flex'; // Torna flex para centralizar
 
-        const renderizarClientes = (filtro = '') => {
-            const listaClientesUl = document.getElementById('lista-clientes');
-            listaClientesUl.innerHTML = '';
-            const clientesFiltrados = clientes.filter(cliente =>
-                cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-                cliente.telefone.includes(filtro) ||
-                (cliente.email && cliente.email.toLowerCase().includes(filtro.toLowerCase()))
-            );
-
-            if (clientesFiltrados.length === 0) {
-                listaClientesUl.innerHTML = `<li>Nenhum cliente ${filtro ? 'encontrado com o filtro' : 'cadastrado ainda'}.</li>`;
-                return;
-            }
-            clientesFiltrados.forEach(cliente => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${cliente.nome} - ${cliente.telefone} (${cliente.email || 'Não informado'})</span>
-                    <div class="list-actions">
-                        <button class="edit-btn" onclick="editarCliente('${cliente.id}')">Editar</button>
-                        <button class="delete-btn" onclick="excluirCliente('${cliente.id}')">Excluir</button>
-                    </div>
-                `;
-                listaClientesUl.appendChild(li);
+            return new Promise((resolve) => {
+                resolveModalPromise = resolve; // Armazena a função resolve
+                document.getElementById('modal-confirm-btn').onclick = () => {
+                    modal.style.display = 'none';
+                    resolveModalPromise(true);
+                };
+                document.getElementById('modal-cancel-btn').onclick = () => {
+                    modal.style.display = 'none';
+                    resolveModalPromise(false);
+                };
             });
-            preencherDatalistClientes(); // Atualiza o datalist de clientes
         };
 
-        const renderizarAgendamentos = (filtro = '') => {
-            const listaAgendamentosUl = document.getElementById('lista-agendamentos');
-            listaAgendamentosUl.innerHTML = '';
-            // Ordenar agendamentos por data
-            const agendamentosOrdenados = [...agendamentos].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
-
-            const agendamentosFiltrados = agendamentosOrdenados.filter(agendamento =>
-                agendamento.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
-                agendamento.servico.toLowerCase().includes(filtro.toLowerCase()) ||
-                (agendamento.profissionalResponsavel && agendamento.profissionalResponsavel.toLowerCase().includes(filtro.toLowerCase())) || // Filtra por profissional
-                new Date(agendamento.dataHora).toLocaleDateString('pt-BR').includes(filtro)
-            );
-
-            if (agendamentosFiltrados.length === 0) {
-                listaAgendamentosUl.innerHTML = `<li>Nenhum agendamento ${filtro ? 'encontrado com o filtro' : 'futuro'}.</li>`;
-                return;
-            }
-            agendamentosFiltrados.forEach(agendamento => {
-                const dataFormatada = new Date(agendamento.dataHora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${dataFormatada} - ${agendamento.cliente} (${agendamento.servico}) - Prof.: ${agendamento.profissionalResponsavel || 'Não Atribuído'}</span>
-                    <div class="list-actions">
-                        <button class="edit-btn" onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-                        <button class="delete-btn" onclick="excluirAgendamento('${agendamento.id}')">Excluir</button>
-                    </div>
-                `;
-                listaAgendamentosUl.appendChild(li);
-            });
-            atualizarNotificacoesDashboard(); // Atualiza notificações ao renderizar agendamentos
+        // --- Funções de Validação ---
+        const validarEmail = (email) => {
+            if (!email) return true; // Campo opcional
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
         };
 
-        const renderizarTransacoes = () => {
-            const listaTransacoesUl = document.getElementById('lista-transacoes');
-            const totalEntradasSpan = document.getElementById('total-entradas');
-            const totalSaidasSpan = document.getElementById('total-saidas');
-            const saldoTotalSpan = document.getElementById('saldo-total');
+        const validarTelefone = (telefone) => {
+            if (!telefone) return true; // Campo opcional
+            // Regex para (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+            const re = /^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+            return re.test(telefone);
+        };
 
-            listaTransacoesUl.innerHTML = '';
-            let totalEntradas = 0;
-            let totalSaidas = 0;
+        const formatarTelefone = (telefone) => {
+            if (!telefone) return '';
+            telefone = telefone.replace(/\D/g, ''); // Remove tudo que não é dígito
+            if (telefone.length > 11) telefone = telefone.substring(0, 11); // Limita a 11 digitos
+            if (telefone.length === 11) {
+                return `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
+            } else if (telefone.length === 10) {
+                return `(${telefone.substring(0, 2)}) ${telefone.substring(2, 6)}-${telefone.substring(6, 10)}`;
+            }
+            return telefone;
+        };
 
-            if (transacoes.length === 0) {
-                listaTransacoesUl.innerHTML = '<li>Nenhuma transação registrada.</li>';
-            } else {
-                transacoes.forEach(transacao => {
-                    const li = document.createElement('li');
-                    const valorFormatado = parseFloat(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    li.innerHTML = `
-                        <span style="color: ${transacao.tipo === 'entrada' ? 'green' : 'red'};">${transacao.tipo === 'entrada' ? '+' : '-'} ${valorFormatado} - ${transacao.descricao}</span>
-                        <div class="list-actions">
-                            <button class="edit-btn" onclick="editarTransacao('${transacao.id}')">Editar</button>
-                            <button class="delete-btn" onclick="excluirTransacao('${transacao.id}')">Excluir</button>
-                        </div>
-                    `;
-                    listaTransacoesUl.appendChild(li);
+        // --- Gerenciador de Clientes ---
+        const ClienteManager = {
+            salvar: async () => {
+                const id = document.getElementById('cliente-id-edit').value;
+                const nome = document.getElementById('cliente-nome').value.trim();
+                let telefone = document.getElementById('cliente-telefone').value.trim();
+                const email = document.getElementById('cliente-email').value.trim();
+                const historicoServicos = document.getElementById('cliente-historico-servicos').value.trim();
+                const observacoes = document.getElementById('cliente-observacoes').value.trim();
 
-                    if (transacao.tipo === 'entrada') {
-                        totalEntradas += parseFloat(transacao.valor);
-                    } else {
-                        totalSaidas += parseFloat(transacao.valor);
+                if (!nome || !telefone) {
+                    showToast('Por favor, preencha o nome e o telefone do cliente.', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
+                }
+                if (!validarTelefone(telefone)) {
+                    showToast('Formato de telefone inválido. Use (DD) XXXXX-XXXX ou (DD) XXXX-XXXX.', 'error');
+                    throw new Error('Telefone inválido.');
+                }
+                if (!validarEmail(email)) {
+                    showToast('Formato de e-mail inválido.', 'error');
+                    throw new Error('Email inválido.');
+                }
+
+                telefone = formatarTelefone(telefone); // Formata o telefone antes de salvar
+
+                if (id) {
+                    const index = clientes.findIndex(c => c.id === id);
+                    if (index !== -1) {
+                        clientes[index] = { ...clientes[index], nome, telefone, email, historicoServicos, observacoes };
+                        showToast('Cliente atualizado com sucesso!', 'success');
                     }
-                });
-            }
+                } else {
+                    clientes.push({ id: gerarIdUnico(), nome, telefone, email, historicoServicos, observacoes });
+                    showToast('Cliente cadastrado com sucesso!', 'success');
+                }
+                salvarDados('clientes', clientes);
+                ClienteManager.renderizar();
+            },
+            renderizar: (filtro = '') => {
+                const listaClientesUl = document.getElementById('lista-clientes');
+                listaClientesUl.innerHTML = '';
+                const clientesFiltrados = clientes.filter(cliente =>
+                    cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+                    cliente.telefone.includes(filtro) ||
+                    (cliente.email && cliente.email.toLowerCase().includes(filtro.toLowerCase()))
+                );
 
-            const saldo = totalEntradas - totalSaidas;
-            totalEntradasSpan.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            totalSaidasSpan.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            saldoTotalSpan.textContent = saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            saldoTotalSpan.style.color = saldo >= 0 ? 'green' : 'red';
-
-            atualizarMetasFinanceirasDisplay(totalEntradas, totalSaidas);
-        };
-
-        const renderizarProdutos = (filtro = '') => {
-            const listaProdutosUl = document.getElementById('lista-produtos');
-            const listaAlertaEstoqueUl = document.getElementById('lista-alerta-estoque');
-            listaProdutosUl.innerHTML = '';
-            listaAlertaEstoqueUl.innerHTML = '';
-
-            const produtosFiltrados = produtos.filter(produto =>
-                produto.nome.toLowerCase().includes(filtro.toLowerCase())
-            );
-
-            if (produtosFiltrados.length === 0) {
-                listaProdutosUl.innerHTML = `<li>Nenhum produto ${filtro ? 'encontrado com o filtro' : 'em estoque'}.</li>`;
-            } else {
-                produtosFiltrados.forEach(produto => {
+                if (clientesFiltrados.length === 0) {
+                    listaClientesUl.innerHTML = `<li>Nenhum cliente ${filtro ? 'encontrado com o filtro' : 'cadastrado ainda'}.</li>`;
+                    return;
+                }
+                clientesFiltrados.forEach(cliente => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <span>${produto.nome} - ${produto.quantidade} unid.</span>
+                        <span>${cliente.nome} - ${cliente.telefone} (${cliente.email || 'Não informado'})</span>
                         <div class="list-actions">
-                            <button class="edit-btn" onclick="editarProduto('${produto.id}')">Editar</button>
-                            <button class="delete-btn" onclick="excluirProduto('${produto.id}')">Excluir</button>
+                            <button class="edit-btn" onclick="ClienteManager.editar('${cliente.id}')">Editar</button>
+                            <button class="delete-btn" onclick="ClienteManager.excluir('${cliente.id}')">Excluir</button>
                         </div>
                     `;
-                    listaProdutosUl.appendChild(li);
-
-                    if (produto.quantidade < 5) { // Alerta de estoque baixo
-                        const alertaLi = document.createElement('li');
-                        alertaLi.innerHTML = `<span class="material-icons" style="font-size: 1em; vertical-align: middle; margin-right: 5px; color: orange;">warning</span>${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
-                        alertaLi.style.color = 'orange'; // Alerta de cor para estoque
-                        listaAlertaEstoqueUl.appendChild(alertaLi);
-                    }
+                    listaClientesUl.appendChild(li);
                 });
-            }
-            if (listaAlertaEstoqueUl.innerHTML === '') {
-                listaAlertaEstoqueUl.innerHTML = '<li>Nenhum alerta de estoque.</li>';
-            }
-        };
-
-        const renderizarProfissionais = () => {
-            const listaProfissionaisUl = document.getElementById('lista-profissionais');
-            listaProfissionaisUl.innerHTML = '';
-            if (profissionais.length === 0) {
-                listaProfissionaisUl.innerHTML = '<li>Nenhum profissional cadastrado.</li>';
-                return;
-            }
-            profissionais.forEach(profissional => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${profissional.nome} - ${profissional.especialidade}</span>
-                    <div class="list-actions">
-                        <button class="edit-btn" onclick="editarProfissional('${profissional.id}')">Editar</button>
-                        <button class="delete-btn" onclick="excluirProfissional('${profissional.id}')">Excluir</button>
-                    </div>
-                    <div class="profissional-detail-box">
-                        <h5>Detalhes e Desempenho:</h5>
-                        <p><strong>Disponibilidade:</strong> ${profissional.disponibilidade || 'Não informada'}</p>
-                        <p><strong>Agendamentos Realizados:</strong> <span id="prof-agendamentos-${profissional.id}">Calculando...</span></p>
-                        <p><strong>Comissão Estimada:</strong> <span id="prof-comissao-${profissional.id}">Calculando...</span></p>
-                        <h5>Histórico de Serviços:</h5>
-                        <ul id="prof-historico-${profissional.id}"><li>Carregando...</li></ul>
-                    </div>
-                `;
-                listaProfissionaisUl.appendChild(li);
-                atualizarDetalhesProfissional(profissional.id); // Atualiza os detalhes de desempenho
-            });
-            preencherDatalistProfissionais(); // Atualiza o datalist de profissionais na Agenda
-        };
-
-        // --- Funções de Edição (Update - Preenche o formulário) ---
-
-        const editarCliente = (id) => {
-            const cliente = clientes.find(c => c.id === id);
-            if (cliente) {
-                resetForm('cliente-section'); // Limpa antes de preencher
-                document.getElementById('cliente-id-edit').value = cliente.id;
-                document.getElementById('cliente-nome').value = cliente.nome;
-                document.getElementById('cliente-telefone').value = cliente.telefone;
-                document.getElementById('cliente-email').value = cliente.email;
-                document.getElementById('cliente-historico-servicos').value = cliente.historicoServicos || '';
-                document.getElementById('cliente-observacoes').value = cliente.observacoes || '';
-                showToast('Cliente carregado para edição!', 'info');
-                document.getElementById('cliente-nome').focus();
+                preencherDatalistClientes();
+            },
+            editar: (id) => {
+                const cliente = clientes.find(c => c.id === id);
+                if (cliente) {
+                    resetForm('cliente-section');
+                    document.getElementById('cliente-id-edit').value = cliente.id;
+                    document.getElementById('cliente-nome').value = cliente.nome;
+                    document.getElementById('cliente-telefone').value = cliente.telefone;
+                    document.getElementById('cliente-email').value = cliente.email;
+                    document.getElementById('cliente-historico-servicos').value = cliente.historicoServicos || '';
+                    document.getElementById('cliente-observacoes').value = cliente.observacoes || '';
+                    showToast('Cliente carregado para edição!', 'info');
+                    document.getElementById('cliente-nome').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este cliente? Todos os agendamentos vinculados a ele PERDERÃO a referência do cliente.');
+                if (confirmou) {
+                    clientes = clientes.filter(c => c.id !== id);
+                    agendamentos = agendamentos.map(ag => {
+                        if (ag.clienteId === id) { // Se tivermos um clienteId no agendamento, desvinculamos
+                            return { ...ag, cliente: 'Cliente Excluído', clienteId: null };
+                        }
+                        const clienteExistente = clientes.find(cli => cli.nome === ag.cliente); // Fallback por nome
+                        if (!clienteExistente && ag.cliente === clientes.find(c => c.id === id)?.nome) {
+                             return { ...ag, cliente: 'Cliente Excluído', clienteId: null };
+                        }
+                        return ag;
+                    });
+                    salvarDados('clientes', clientes);
+                    salvarDados('agendamentos', agendamentos);
+                    ClienteManager.renderizar();
+                    AgendaManager.renderizar(); // Atualiza a agenda caso algum cliente tenha sido desvinculado
+                    showToast('Cliente excluído com sucesso!', 'success');
+                }
             }
         };
 
-        const editarAgendamento = (id) => {
-            const agendamento = agendamentos.find(a => a.id === id);
-            if (agendamento) {
-                resetForm('agenda-section'); // Limpa antes de preencher
-                document.getElementById('agenda-id-edit').value = agendamento.id;
-                document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
-                document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
-                document.getElementById('agenda-servico').value = agendamento.servico;
-                document.getElementById('agenda-valor-servico').value = agendamento.valorServico || ''; // Novo campo de valor
-                document.getElementById('agenda-profissional-responsavel').value = agendamento.profissionalResponsavel || ''; // Novo campo de profissional
-                document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
-                showToast('Agendamento carregado para edição!', 'info');
-                document.getElementById('agenda-cliente-nome').focus();
+        // --- Gerenciador de Serviços ---
+        const ServicoManager = {
+            salvar: async () => {
+                const id = document.getElementById('servico-id-edit').value;
+                const nome = document.getElementById('servico-nome').value.trim();
+                const preco = parseFloat(document.getElementById('servico-preco').value);
+
+                if (!nome || isNaN(preco) || preco < 0) {
+                    showToast('Por favor, preencha o nome do serviço e um preço válido (número positivo).', 'error');
+                    throw new Error('Campos obrigatórios inválidos.');
+                }
+
+                if (id) {
+                    const index = servicos.findIndex(s => s.id === id);
+                    if (index !== -1) {
+                        servicos[index] = { ...servicos[index], nome, preco };
+                        showToast('Serviço atualizado com sucesso!', 'success');
+                    }
+                } else {
+                    servicos.push({ id: gerarIdUnico(), nome, preco });
+                    showToast('Serviço cadastrado com sucesso!', 'success');
+                }
+                salvarDados('servicos', servicos);
+                ServicoManager.renderizar();
+                preencherSelectServicos(); // Atualiza o select de serviços na agenda
+            },
+            renderizar: (filtro = '') => {
+                const listaServicosUl = document.getElementById('lista-servicos');
+                listaServicosUl.innerHTML = '';
+                const servicosFiltrados = servicos.filter(servico =>
+                    servico.nome.toLowerCase().includes(filtro.toLowerCase())
+                );
+
+                if (servicosFiltrados.length === 0) {
+                    listaServicosUl.innerHTML = `<li>Nenhum serviço ${filtro ? 'encontrado com o filtro' : 'cadastrado ainda'}.</li>`;
+                    return;
+                }
+                servicosFiltrados.forEach(servico => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${servico.nome} - ${servico.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                        <div class="list-actions">
+                            <button class="edit-btn" onclick="ServicoManager.editar('${servico.id}')">Editar</button>
+                            <button class="delete-btn" onclick="ServicoManager.excluir('${servico.id}')">Excluir</button>
+                        </div>
+                    `;
+                    listaServicosUl.appendChild(li);
+                });
+            },
+            editar: (id) => {
+                const servico = servicos.find(s => s.id === id);
+                if (servico) {
+                    resetForm('servicos-section');
+                    document.getElementById('servico-id-edit').value = servico.id;
+                    document.getElementById('servico-nome').value = servico.nome;
+                    document.getElementById('servico-preco').value = servico.preco;
+                    showToast('Serviço carregado para edição!', 'info');
+                    document.getElementById('servico-nome').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este serviço? Agendamentos que usam este serviço manterão o nome, mas sem vínculo.');
+                if (confirmou) {
+                    servicos = servicos.filter(s => s.id !== id);
+                    salvarDados('servicos', servicos);
+                    ServicoManager.renderizar();
+                    preencherSelectServicos(); // Atualiza o select de serviços na agenda
+                    showToast('Serviço excluído com sucesso!', 'success');
+                }
             }
         };
 
-        const editarTransacao = (id) => {
-            const transacao = transacoes.find(t => t.id === id);
-            if (transacao) {
-                resetForm('financeiro-section'); // Limpa antes de preencher
-                document.getElementById('financeiro-id-edit').value = transacao.id;
-                document.getElementById('financeiro-tipo').value = transacao.tipo;
-                document.getElementById('financeiro-descricao').value = transacao.descricao;
-                document.getElementById('financeiro-valor').value = transacao.valor;
-                showToast('Transação carregada para edição!', 'info');
-                document.getElementById('financeiro-tipo').focus();
-            }
-        };
+        // --- Gerenciador de Agendamentos ---
+        const AgendaManager = {
+            salvar: async () => {
+                const id = document.getElementById('agenda-id-edit').value;
+                const clienteNome = document.getElementById('agenda-cliente-nome').value.trim();
+                const dataHoraInput = document.getElementById('agenda-data-hora').value;
+                const servicoNome = document.getElementById('agenda-servico').value;
+                let valorServico = parseFloat(document.getElementById('agenda-valor-servico').value) || 0;
+                const profissionalResponsavel = document.getElementById('agenda-profissional-responsavel').value.trim();
+                const observacoes = document.getElementById('agenda-observacoes').value.trim();
 
-        const editarProduto = (id) => {
-            const produto = produtos.find(p => p.id === id);
-            if (produto) {
-                resetForm('estoque-section'); // Limpa antes de preencher
-                document.getElementById('estoque-id-edit').value = produto.id;
-                document.getElementById('estoque-nome-produto').value = produto.nome;
-                document.getElementById('estoque-quantidade').value = produto.quantidade;
-                showToast('Produto carregado para edição!', 'info');
-                document.getElementById('estoque-nome-produto').focus();
-            }
-        };
+                const clienteObj = clientes.find(c => c.nome.toLowerCase() === clienteNome.toLowerCase());
+                const clienteId = clienteObj ? clienteObj.id : null;
 
-        const editarProfissional = (id) => {
-            const profissional = profissionais.find(p => p.id === id);
-            if (profissional) {
-                resetForm('profissional-section'); // Limpa antes de preencher
-                document.getElementById('profissional-id-edit').value = profissional.id;
-                document.getElementById('profissional-nome').value = profissional.nome;
-                document.getElementById('profissional-especialidade').value = profissional.especialidade;
-                document.getElementById('profissional-disponibilidade').value = profissional.disponibilidade || ''; // Campo de disponibilidade
-                showToast('Profissional carregado para edição!', 'info');
-                document.getElementById('profissional-nome').focus();
-            }
-        };
+                const profissionalObj = profissionais.find(p => p.nome.toLowerCase() === profissionalResponsavel.toLowerCase());
+                const profissionalId = profissionalObj ? profissionalObj.id : null;
 
-        // --- Funções de Exclusão (Delete) ---
+                const dataAgendamento = new Date(dataHoraInput);
+                const agora = new Date();
 
-        const excluirCliente = (id) => {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                clientes = clientes.filter(c => c.id !== id);
-                salvarDados('clientesEspacoTaiBotelho', clientes);
-                renderizarClientes();
-                showToast('Cliente excluído com sucesso!', 'success');
-            }
-        };
+                if (!clienteNome || !dataHoraInput || !servicoNome) {
+                    showToast('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
+                }
+                 if (!id && dataAgendamento < agora) { // Apenas para novos agendamentos
+                    showToast('Não é possível agendar para uma data/hora no passado.', 'error');
+                    throw new Error('Data/hora no passado.');
+                }
 
-        const excluirAgendamento = (id) => {
-            if (confirm('Tem certeza que deseja excluir este agendamento?')) {
-                agendamentos = agendamentos.filter(a => a.id !== id);
-                salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
-                renderizarAgendamentos();
-                // Também pode ser necessário atualizar os relatórios de profissional após exclusão
-                profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
+                // Se o valor do serviço não foi preenchido manualmente, tente pegar do serviço cadastrado
+                if (valorServico === 0 && servicoNome) {
+                    const servicoCadastrado = servicos.find(s => s.nome === servicoNome);
+                    if (servicoCadastrado) {
+                        valorServico = servicoCadastrado.preco;
+                    }
+                }
+
+                if (id) {
+                    const index = agendamentos.findIndex(a => a.id === id);
+                    if (index !== -1) {
+                        agendamentos[index] = { ...agendamentos[index], cliente: clienteNome, clienteId, dataHora: dataHoraInput, servico: servicoNome, valorServico, profissionalResponsavel, profissionalId, observacoes };
+                        showToast('Agendamento atualizado com sucesso!', 'success');
+                    }
+                } else {
+                    agendamentos.push({ id: gerarIdUnico(), cliente: clienteNome, clienteId, dataHora: dataHoraInput, servico: servicoNome, valorServico, profissionalResponsavel, profissionalId, observacoes });
+                    showToast('Agendamento salvo com sucesso!', 'success');
+                }
+                salvarDados('agendamentos', agendamentos);
+                AgendaManager.renderizar();
+                gerarMensagemAgendamento();
+                document.getElementById('sugestao-inteligente').style.display = 'none';
+                profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id));
+            },
+            renderizar: (filtro = '', dataInicioFiltro = null, dataFimFiltro = null) => {
+                const listaAgendamentosUl = document.getElementById('lista-agendamentos');
+                listaAgendamentosUl.innerHTML = '';
+
+                // Ordenar agendamentos por data futura primeiro
+                const agendamentosOrdenados = [...agendamentos].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+
+                let agendamentosFiltrados = agendamentosOrdenados.filter(agendamento => {
+                    const dataAgendamento = new Date(agendamento.dataHora);
+                    const hoje = new Date();
+                    // Garante que só mostramos agendamentos futuros ou de hoje por padrão
+                    // (a menos que haja filtro de data específico)
+                    if (!dataInicioFiltro && !dataFimFiltro) {
+                         return dataAgendamento >= hoje;
+                    }
+
+                    // Filtra por período se as datas de filtro forem fornecidas
+                    let passaNoFiltroData = true;
+                    if (dataInicioFiltro && dataAgendamento < dataInicioFiltro) {
+                        passaNoFiltroData = false;
+                    }
+                    if (dataFimFiltro && dataAgendamento > dataFimFiltro) {
+                        passaNoFiltroData = false;
+                    }
+
+                    // Filtra por texto
+                    const passaNoFiltroTexto = agendamento.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
+                                               agendamento.servico.toLowerCase().includes(filtro.toLowerCase()) ||
+                                               (agendamento.profissionalResponsavel && agendamento.profissionalResponsavel.toLowerCase().includes(filtro.toLowerCase()));
+
+                    return passaNoFiltroData && passaNoFiltroTexto;
+                });
+
+                if (agendamentosFiltrados.length === 0) {
+                    listaAgendamentosUl.innerHTML = `<li>Nenhum agendamento ${filtro || (dataInicioFiltro || dataFimFiltro) ? 'encontrado com o filtro' : 'futuro'}.</li>`;
+                    return;
+                }
+                agendamentosFiltrados.forEach(agendamento => {
+                    const dataFormatada = new Date(agendamento.dataHora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${dataFormatada} - ${agendamento.cliente} (${agendamento.servico}) - Prof.: ${agendamento.profissionalResponsavel || 'Não Atribuído'}</span>
+                        <div class="list-actions">
+                            <button class="edit-btn" onclick="AgendaManager.editar('${agendamento.id}')">Editar</button>
+                            <button class="delete-btn" onclick="AgendaManager.excluir('${agendamento.id}')">Excluir</button>
+                        </div>
+                    `;
+                    listaAgendamentosUl.appendChild(li);
+                });
                 atualizarNotificacoesDashboard();
-                showToast('Agendamento excluído com sucesso!', 'success');
+            },
+            editar: (id) => {
+                const agendamento = agendamentos.find(a => a.id === id);
+                if (agendamento) {
+                    resetForm('agenda-section');
+                    document.getElementById('agenda-id-edit').value = agendamento.id;
+                    document.getElementById('agenda-cliente-nome').value = agendamento.cliente;
+                    document.getElementById('agenda-data-hora').value = new Date(agendamento.dataHora).toISOString().slice(0, 16);
+                    document.getElementById('agenda-servico').value = agendamento.servico;
+                    document.getElementById('agenda-valor-servico').value = agendamento.valorServico || '';
+                    document.getElementById('agenda-profissional-responsavel').value = agendamento.profissionalResponsavel || '';
+                    document.getElementById('agenda-observacoes').value = agendamento.observacoes || '';
+                    showToast('Agendamento carregado para edição!', 'info');
+                    document.getElementById('agenda-cliente-nome').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este agendamento?');
+                if (confirmou) {
+                    agendamentos = agendamentos.filter(a => a.id !== id);
+                    salvarDados('agendamentos', agendamentos);
+                    AgendaManager.renderizar();
+                    profissionais.forEach(p => ProfissionalManager.atualizarDetalhes(p.id));
+                    atualizarNotificacoesDashboard();
+                    showToast('Agendamento excluído com sucesso!', 'success');
+                }
             }
         };
 
-        const excluirTransacao = (id) => {
-            if (confirm('Tem certeza que deseja excluir esta transação?')) {
-                transacoes = transacoes.filter(t => t.id !== id);
-                salvarDados('transacoesEspacoTaiBotelho', transacoes);
-                renderizarTransacoes();
-                showToast('Transação excluída com sucesso!', 'success');
-            }
-        };
+        // --- Gerenciador de Financeiro ---
+        const FinanceiroManager = {
+            salvar: async () => {
+                const id = document.getElementById('financeiro-id-edit').value;
+                const tipo = document.getElementById('financeiro-tipo').value;
+                const descricao = document.getElementById('financeiro-descricao').value.trim();
+                const valor = parseFloat(document.getElementById('financeiro-valor').value);
+                const dataCriacao = new Date().toISOString();
 
-        const excluirProduto = (id) => {
-            if (confirm('Tem certeza que deseja excluir este produto?')) {
-                produtos = produtos.filter(p => p.id !== id);
-                salvarDados('produtosEspacoTaiBotelho', produtos);
-                renderizarProdutos();
-                atualizarNotificacoesDashboard(); // Pode remover alerta de estoque baixo
-                showToast('Produto excluído com sucesso!', 'success');
-            }
-        };
+                if (!tipo || !descricao || isNaN(valor) || valor <= 0) {
+                    showToast('Por favor, selecione o tipo, preencha a descrição e um valor numérico positivo.', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
+                }
 
-        const excluirProfissional = (id) => {
-            if (confirm('Tem certeza que deseja excluir este profissional? Todos os agendamentos vinculados a ele PERDERÃO a referência do profissional.')) {
-                profissionais = profissionais.filter(p => p.id !== id);
-                // Remover referência do profissional em agendamentos
-                agendamentos = agendamentos.map(a => {
-                    if (a.profissionalId === id) {
-                        return { ...a, profissionalId: null, profissionalResponsavel: 'Não Atribuído' };
+                if (id) {
+                    const index = transacoes.findIndex(t => t.id === id);
+                    if (index !== -1) {
+                        transacoes[index] = { ...transacoes[index], tipo, descricao, valor };
+                        showToast('Transação atualizada com sucesso!', 'success');
                     }
-                    return a;
-                });
-                salvarDados('profissionaisEspacoTaiBotelho', profissionais);
-                salvarDados('agendamentosEspacoTaiBotelho', agendamentos); // Salva agendamentos alterados
-                renderizarProfissionais();
-                renderizarAgendamentos(); // Atualiza agendamentos na tela
-                showToast('Profissional excluído com sucesso!', 'success');
-            }
-        };
+                } else {
+                    transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor, dataCriacao });
+                    showToast('Transação registrada com sucesso!', 'success');
+                }
+                salvarDados('transacoes', transacoes);
+                FinanceiroManager.renderizar();
+            },
+            renderizar: () => {
+                const listaTransacoesUl = document.getElementById('lista-transacoes');
+                const totalEntradasSpan = document.getElementById('total-entradas');
+                const totalSaidasSpan = document.getElementById('total-saidas');
+                const saldoTotalSpan = document.getElementById('saldo-total');
 
-        // --- Funções de Relatórios e Exportação ---
+                listaTransacoesUl.innerHTML = '';
+                let totalEntradas = 0;
+                let totalSaidas = 0;
 
-        const gerarRelatorioFinanceiro = () => {
-            const tipoRelatorio = document.getElementById('financeiro-relatorio-tipo').value;
-            const dataInicioStr = document.getElementById('relatorio-data-inicio').value;
-            const dataFimStr = document.getElementById('relatorio-data-fim').value;
-            const outputDiv = document.getElementById('financeiro-relatorio-output');
-            outputDiv.innerHTML = '';
+                if (transacoes.length === 0) {
+                    listaTransacoesUl.innerHTML = '<li>Nenhuma transação registrada.</li>';
+                } else {
+                    transacoes.forEach(transacao => {
+                        const li = document.createElement('li');
+                        const valorFormatado = parseFloat(transacao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        const dataTransacao = transacao.dataCriacao ? new Date(transacao.dataCriacao).toLocaleDateString('pt-BR') : 'N/A';
+                        li.innerHTML = `
+                            <span style="color: ${transacao.tipo === 'entrada' ? 'green' : 'red'};">${transacao.tipo === 'entrada' ? '+' : '-'} ${valorFormatado} - ${transacao.descricao} (${dataTransacao})</span>
+                            <div class="list-actions">
+                                <button class="edit-btn" onclick="FinanceiroManager.editar('${transacao.id}')">Editar</button>
+                                <button class="delete-btn" onclick="FinanceiroManager.excluir('${transacao.id}')">Excluir</button>
+                            </div>
+                        `;
+                        listaTransacoesUl.appendChild(li);
 
-            let transacoesFiltradasPorData = transacoes;
-            if (dataInicioStr && dataFimStr) {
-                const dataInicio = new Date(dataInicioStr + 'T00:00:00');
-                const dataFim = new Date(dataFimStr + 'T23:59:59'); // Inclui o dia inteiro
-                transacoesFiltradasPorData = transacoes.filter(t => {
-                    const transacaoDate = new Date(t.dataCriacao); // Assume que dataCriacao existe
-                    return transacaoDate >= dataInicio && transacaoDate <= dataFim;
-                });
-            } else if (dataInicioStr || dataFimStr) {
-                 showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar por período.', 'error');
-                 return;
-            }
+                        if (transacao.tipo === 'entrada') {
+                            totalEntradas += parseFloat(transacao.valor);
+                        } else {
+                            totalSaidas += parseFloat(transacao.valor);
+                        }
+                    });
+                }
 
+                const saldo = totalEntradas - totalSaidas;
+                totalEntradasSpan.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                totalSaidasSpan.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                saldoTotalSpan.textContent = saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                saldoTotalSpan.style.color = saldo >= 0 ? 'green' : 'red';
 
-            let transacoesParaRelatorio = [];
-            let totalEntradasRelatorio = 0;
-            let totalSaidasRelatorio = 0;
-
-            if (tipoRelatorio === 'entradas') {
-                transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'entrada');
-                totalEntradasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
-                outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-            } else if (tipoRelatorio === 'saidas') {
-                transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'saida');
-                totalSaidasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
-                outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-            } else { // todos
-                transacoesParaRelatorio = transacoesFiltradasPorData;
-                totalEntradasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
-                totalSaidasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
-                outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-                outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-                outputDiv.innerHTML += `<p><strong>Saldo Geral:</strong> ${(totalEntradasRelatorio - totalSaidasRelatorio).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-            }
-
-            if (transacoesParaRelatorio.length > 0) {
-                outputDiv.innerHTML += '<p><strong>Detalhes:</strong></p>';
-                transacoesParaRelatorio.forEach(t => {
-                    const transacaoDate = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : 'Data Indisp.';
-                    outputDiv.innerHTML += `<p>${transacaoDate} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
-                });
-            } else {
-                outputDiv.innerHTML += '<p>Nenhuma transação encontrada para este tipo ou período de relatório.</p>';
-            }
-        };
-
-        const exportarDados = (tipo) => {
-            let data = [];
-            let headers = [];
-            let filename = '';
-
-            if (tipo === 'clientes') {
-                data = clientes;
-                headers = ['ID', 'Nome', 'Telefone', 'Email', 'HistoricoServicos', 'Observacoes'];
-                filename = 'clientes_espaco_tai_botelho.csv';
-            } else if (tipo === 'agendamentos') {
-                data = agendamentos;
-                // Adiciona o valor do serviço e o profissional ao cabeçalho de exportação
-                headers = ['ID', 'Cliente', 'DataHora', 'Servico', 'ValorServico', 'ProfissionalResponsavel', 'Observacoes'];
-                filename = 'agendamentos_espaco_tai_botelho.csv';
-            } else if (tipo === 'transacoes') {
-                data = transacoes;
-                headers = ['ID', 'Tipo', 'Descricao', 'Valor', 'DataCriacao'];
-                filename = 'transacoes_espaco_tai_botelho.csv';
-            } else {
-                showToast('Tipo de exportação não suportado.', 'error');
-                return;
-            }
-
-            if (data.length === 0) {
-                showToast(`Não há ${tipo} para exportar.`, 'info');
-                return;
-            }
-
-            let csvContent = headers.join(';') + '\n';
-            data.forEach(item => {
-                const row = headers.map(header => {
-                    // Mapeia o nome do cabeçalho para a chave real no objeto (ex: HistoricoServicos -> historicoServicos)
-                    const key = header.charAt(0).toLowerCase() + header.slice(1);
-                    let value = item[key] || '';
-                    if (header === 'DataHora' && value) {
-                        value = new Date(value).toLocaleString('pt-BR');
-                    } else if (header === 'DataCriacao' && value) {
-                         value = new Date(value).toLocaleString('pt-BR');
+                FinanceiroManager.atualizarMetasDisplay(totalEntradas, totalSaidas);
+            },
+            editar: (id) => {
+                const transacao = transacoes.find(t => t.id === id);
+                if (transacao) {
+                    resetForm('financeiro-section');
+                    document.getElementById('financeiro-id-edit').value = transacao.id;
+                    document.getElementById('financeiro-tipo').value = transacao.tipo;
+                    document.getElementById('financeiro-descricao').value = transacao.descricao;
+                    document.getElementById('financeiro-valor').value = transacao.valor;
+                    showToast('Transação carregada para edição!', 'info');
+                    document.getElementById('financeiro-tipo').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir esta transação?');
+                if (confirmou) {
+                    transacoes = transacoes.filter(t => t.id !== id);
+                    salvarDados('transacoes', transacoes);
+                    FinanceiroManager.renderizar();
+                    showToast('Transação excluída com sucesso!', 'success');
+                }
+            },
+            carregarMetas: () => {
+                try {
+                    const metasSalvas = localStorage.getItem(LOCAL_STORAGE_PREFIX + 'financeiroMetas');
+                    if (metasSalvas) {
+                        financeiroMetas = JSON.parse(metasSalvas);
                     }
-                    return `"${String(value).replace(/"/g, '""')}"`; // Escapa aspas duplas no CSV
-                }).join(';');
-                csvContent += row + '\n';
-            });
+                    document.getElementById('meta-entrada').value = financeiroMetas.entrada || '';
+                    document.getElementById('meta-saida').value = financeiroMetas.saida || '';
+                } catch (e) {
+                     console.error("Erro ao carregar metas financeiras:", e);
+                     showToast('Erro ao carregar metas financeiras.', 'error');
+                }
+            },
+            salvarMetas: () => {
+                const metaEntrada = parseFloat(document.getElementById('meta-entrada').value);
+                const metaSaida = parseFloat(document.getElementById('meta-saida').value);
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', filename);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                showToast('Seu navegador não suporta download automático. Por favor, copie o conteúdo e salve como CSV.', 'info');
-                console.log(csvContent); // Mostra no console para copiar
+                financeiroMetas.entrada = isNaN(metaEntrada) ? 0 : metaEntrada;
+                financeiroMetas.saida = isNaN(metaSaida) ? 0 : metaSaida;
+
+                salvarDados('financeiroMetas', financeiroMetas);
+                showToast('Metas financeiras salvas com sucesso!', 'success');
+                FinanceiroManager.renderizar();
+            },
+            atualizarMetasDisplay: (totalEntradas, totalSaidas) => {
+                document.getElementById('meta-entrada-valor').textContent = financeiroMetas.entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('meta-saida-valor').textContent = financeiroMetas.saida.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                const progressBarEntrada = document.getElementById('progress-bar-entrada');
+                const progressBarSaida = document.getElementById('progress-bar-saida');
+                const progressoEntradaValor = document.getElementById('progresso-entrada-valor');
+                const progressoSaidaValor = document.getElementById('progresso-saida-valor');
+
+                progressoEntradaValor.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                progressoSaidaValor.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                let percentEntrada = (financeiroMetas.entrada > 0) ? (totalEntradas / financeiroMetas.entrada) * 100 : 0;
+                let percentSaida = (financeiroMetas.saida > 0) ? (totalSaidas / financeiroMetas.saida) * 100 : 0;
+
+                percentEntrada = Math.min(percentEntrada, 100);
+                progressBarEntrada.style.width = `${percentEntrada}%`;
+                progressBarEntrada.classList.toggle('red', percentEntrada < 100);
+
+                progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545';
+                progressBarSaida.style.width = `${Math.min(percentSaida, 100)}%`;
+            },
+            gerarRelatorio: () => {
+                const tipoRelatorio = document.getElementById('financeiro-relatorio-tipo').value;
+                const dataInicioStr = document.getElementById('relatorio-data-inicio').value;
+                const dataFimStr = document.getElementById('relatorio-data-fim').value;
+                const outputDiv = document.getElementById('financeiro-relatorio-output');
+                outputDiv.innerHTML = '';
+
+                let transacoesFiltradasPorData = transacoes;
+                if (dataInicioStr && dataFimStr) {
+                    const dataInicio = new Date(dataInicioStr + 'T00:00:00');
+                    const dataFim = new Date(dataFimStr + 'T23:59:59');
+                    transacoesFiltradasPorData = transacoes.filter(t => {
+                        const transacaoDate = new Date(t.dataCriacao);
+                        return transacaoDate >= dataInicio && transacaoDate <= dataFim;
+                    });
+                } else if (dataInicioStr || dataFimStr) {
+                     showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar por período.', 'error');
+                     return;
+                }
+
+                let transacoesParaRelatorio = [];
+                let totalEntradasRelatorio = 0;
+                let totalSaidasRelatorio = 0;
+
+                if (tipoRelatorio === 'entradas') {
+                    transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'entrada');
+                    totalEntradasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                    outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                } else if (tipoRelatorio === 'saidas') {
+                    transacoesParaRelatorio = transacoesFiltradasPorData.filter(t => t.tipo === 'saida');
+                    totalSaidasRelatorio = transacoesParaRelatorio.reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                    outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                } else { // todos
+                    transacoesParaRelatorio = transacoesFiltradasPorData;
+                    totalEntradasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'entrada').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                    totalSaidasRelatorio = transacoesParaRelatorio.filter(t => t.tipo === 'saida').reduce((sum, t) => sum + parseFloat(t.valor), 0);
+                    outputDiv.innerHTML += `<p><strong>Total de Entradas:</strong> ${totalEntradasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                    outputDiv.innerHTML += `<p><strong>Total de Saídas:</strong> ${totalSaidasRelatorio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                    outputDiv.innerHTML += `<p><strong>Saldo Geral:</strong> ${(totalEntradasRelatorio - totalSaidasRelatorio).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                }
+
+                if (transacoesParaRelatorio.length > 0) {
+                    outputDiv.innerHTML += '<p><strong>Detalhes:</strong></p>';
+                    transacoesParaRelatorio.forEach(t => {
+                        const transacaoDate = t.dataCriacao ? new Date(t.dataCriacao).toLocaleDateString('pt-BR') : 'Data Indisp.';
+                        outputDiv.innerHTML += `<p>${transacaoDate} - ${t.tipo === 'entrada' ? 'Entrada' : 'Saída'}: ${t.descricao} - ${parseFloat(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>`;
+                    });
+                } else {
+                    outputDiv.innerHTML += '<p>Nenhuma transação encontrada para este tipo ou período de relatório.</p>';
+                }
             }
-            showToast(`Dados de ${tipo} exportados com sucesso para ${filename}!`, 'success');
         };
 
-        // --- Funções de Metas Financeiras ---
-        const carregarMetasFinanceiras = () => {
-            const metasSalvas = localStorage.getItem('financeiroMetasEspacoTaiBotelho');
-            if (metasSalvas) {
-                financeiroMetas = JSON.parse(metasSalvas);
+        // --- Gerenciador de Estoque ---
+        const EstoqueManager = {
+            salvar: async () => {
+                const id = document.getElementById('estoque-id-edit').value;
+                const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
+                const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
+
+                if (!nomeProduto || isNaN(quantidade) || quantidade < 0) {
+                    showToast('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).', 'error');
+                    throw new Error('Campos obrigatórios inválidos.');
+                }
+
+                if (id) {
+                    const index = produtos.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
+                        showToast('Produto atualizado no estoque!', 'success');
+                    }
+                } else {
+                    const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
+                    if (produtoExistente) {
+                        produtoExistente.quantidade += quantidade;
+                        showToast('Quantidade de produto existente atualizada!', 'success');
+                    } else {
+                        produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
+                        showToast('Produto cadastrado no estoque!', 'success');
+                    }
+                }
+                salvarDados('produtos', produtos);
+                EstoqueManager.renderizar();
+                atualizarNotificacoesDashboard();
+            },
+            renderizar: (filtro = '') => {
+                const listaProdutosUl = document.getElementById('lista-produtos');
+                const listaAlertaEstoqueUl = document.getElementById('lista-alerta-estoque');
+                listaProdutosUl.innerHTML = '';
+                listaAlertaEstoqueUl.innerHTML = '';
+
+                const produtosFiltrados = produtos.filter(produto =>
+                    produto.nome.toLowerCase().includes(filtro.toLowerCase())
+                );
+
+                if (produtosFiltrados.length === 0) {
+                    listaProdutosUl.innerHTML = `<li>Nenhum produto ${filtro ? 'encontrado com o filtro' : 'em estoque'}.</li>`;
+                } else {
+                    produtosFiltrados.forEach(produto => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span>${produto.nome} - ${produto.quantidade} unid.</span>
+                            <div class="list-actions">
+                                <button class="edit-btn" onclick="EstoqueManager.editar('${produto.id}')">Editar</button>
+                                <button class="delete-btn" onclick="EstoqueManager.excluir('${produto.id}')">Excluir</button>
+                            </div>
+                        `;
+                        listaProdutosUl.appendChild(li);
+
+                        if (produto.quantidade < 5) {
+                            const alertaLi = document.createElement('li');
+                            alertaLi.innerHTML = `<span class="material-icons" style="font-size: 1em; vertical-align: middle; margin-right: 5px; color: orange;">warning</span>${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
+                            alertaLi.style.color = 'orange';
+                            listaAlertaEstoqueUl.appendChild(alertaLi);
+                        }
+                    });
+                }
+                if (listaAlertaEstoqueUl.innerHTML === '') {
+                    listaAlertaEstoqueUl.innerHTML = '<li>Nenhum alerta de estoque.</li>';
+                }
+            },
+            editar: (id) => {
+                const produto = produtos.find(p => p.id === id);
+                if (produto) {
+                    resetForm('estoque-section');
+                    document.getElementById('estoque-id-edit').value = produto.id;
+                    document.getElementById('estoque-nome-produto').value = produto.nome;
+                    document.getElementById('estoque-quantidade').value = produto.quantidade;
+                    showToast('Produto carregado para edição!', 'info');
+                    document.getElementById('estoque-nome-produto').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este produto do estoque?');
+                if (confirmou) {
+                    produtos = produtos.filter(p => p.id !== id);
+                    salvarDados('produtos', produtos);
+                    EstoqueManager.renderizar();
+                    atualizarNotificacoesDashboard();
+                    showToast('Produto excluído com sucesso!', 'success');
+                }
             }
-            document.getElementById('meta-entrada').value = financeiroMetas.entrada || '';
-            document.getElementById('meta-saida').value = financeiroMetas.saida || '';
         };
 
-        const salvarMetasFinanceiras = () => {
-            const metaEntrada = parseFloat(document.getElementById('meta-entrada').value);
-            const metaSaida = parseFloat(document.getElementById('meta-saida').value);
+        // --- Gerenciador de Profissionais ---
+        const ProfissionalManager = {
+            salvar: async () => {
+                const id = document.getElementById('profissional-id-edit').value;
+                const nome = document.getElementById('profissional-nome').value.trim();
+                const especialidade = document.getElementById('profissional-especialidade').value.trim();
+                const disponibilidade = document.getElementById('profissional-disponibilidade').value.trim();
 
-            financeiroMetas.entrada = isNaN(metaEntrada) ? 0 : metaEntrada;
-            financeiroMetas.saida = isNaN(metaSaida) ? 0 : metaSaida;
+                if (!nome || !especialidade) {
+                    showToast('Por favor, preencha o nome e a especialidade do profissional.', 'error');
+                    throw new Error('Campos obrigatórios vazios.');
+                }
 
-            salvarDados('financeiroMetasEspacoTaiBotelho', financeiroMetas);
-            showToast('Metas financeiras salvas com sucesso!', 'success');
-            renderizarTransacoes(); // Re-renderiza para atualizar o progresso
+                if (id) {
+                    const index = profissionais.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        profissionais[index] = { ...profissionais[index], nome, especialidade, disponibilidade };
+                        showToast('Profissional atualizado com sucesso!', 'success');
+                    }
+                } else {
+                    profissionais.push({ id: gerarIdUnico(), nome, especialidade, disponibilidade });
+                    showToast('Profissional cadastrado com sucesso!', 'success');
+                }
+                salvarDados('profissionais', profissionais);
+                ProfissionalManager.renderizar();
+                preencherDatalistProfissionais();
+            },
+            renderizar: () => {
+                const listaProfissionaisUl = document.getElementById('lista-profissionais');
+                listaProfissionaisUl.innerHTML = '';
+                if (profissionais.length === 0) {
+                    listaProfissionaisUl.innerHTML = '<li>Nenhum profissional cadastrado.</li>';
+                    return;
+                }
+                profissionais.forEach(profissional => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${profissional.nome} - ${profissional.especialidade}</span>
+                        <div class="list-actions">
+                            <button class="edit-btn" onclick="ProfissionalManager.editar('${profissional.id}')">Editar</button>
+                            <button class="delete-btn" onclick="ProfissionalManager.excluir('${profissional.id}')">Excluir</button>
+                        </div>
+                        <div class="profissional-detail-box">
+                            <h5>Detalhes e Desempenho:</h5>
+                            <p><strong>Disponibilidade:</strong> ${profissional.disponibilidade || 'Não informada'}</p>
+                            <p><strong>Agendamentos Realizados:</strong> <span id="prof-agendamentos-${profissional.id}">Calculando...</span></p>
+                            <p><strong>Comissão Estimada:</strong> <span id="prof-comissao-${profissional.id}">Calculando...</span></p>
+                            <h5>Histórico de Serviços:</h5>
+                            <ul id="prof-historico-${profissional.id}"><li>Carregando...</li></ul>
+                        </div>
+                    `;
+                    listaProfissionaisUl.appendChild(li);
+                    ProfissionalManager.atualizarDetalhes(profissional.id);
+                });
+                preencherDatalistProfissionais();
+            },
+            editar: (id) => {
+                const profissional = profissionais.find(p => p.id === id);
+                if (profissional) {
+                    resetForm('profissional-section');
+                    document.getElementById('profissional-id-edit').value = profissional.id;
+                    document.getElementById('profissional-nome').value = profissional.nome;
+                    document.getElementById('profissional-especialidade').value = profissional.especialidade;
+                    document.getElementById('profissional-disponibilidade').value = profissional.disponibilidade || '';
+                    showToast('Profissional carregado para edição!', 'info');
+                    document.getElementById('profissional-nome').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este profissional? Todos os agendamentos vinculados a ele PERDERÃO a referência do profissional.');
+                if (confirmou) {
+                    profissionais = profissionais.filter(p => p.id !== id);
+                    agendamentos = agendamentos.map(a => {
+                        if (a.profissionalId === id) {
+                            return { ...a, profissionalId: null, profissionalResponsavel: 'Não Atribuído' };
+                        }
+                        return a;
+                    });
+                    salvarDados('profissionais', profissionais);
+                    salvarDados('agendamentos', agendamentos);
+                    ProfissionalManager.renderizar();
+                    AgendaManager.renderizar();
+                    showToast('Profissional excluído com sucesso!', 'success');
+                }
+            },
+            atualizarDetalhes: (profissionalId) => {
+                const agendamentosDoProfissional = agendamentos.filter(ag => ag.profissionalId === profissionalId);
+                const profAgendamentosSpan = document.getElementById(`prof-agendamentos-${profissionalId}`);
+                const profComissaoSpan = document.getElementById(`prof-comissao-${profissionalId}`);
+                const profHistoricoUl = document.getElementById(`prof-historico-${profissionalId}`);
+
+                let totalComissao = 0;
+                if (profHistoricoUl) profHistoricoUl.innerHTML = '';
+
+                if (agendamentosDoProfissional.length === 0) {
+                    if (profAgendamentosSpan) profAgendamentosSpan.textContent = 'Nenhum.';
+                    if (profComissaoSpan) profComissaoSpan.textContent = 'R$ 0,00';
+                    if (profHistoricoUl) profHistoricoUl.innerHTML = '<li>Nenhum serviço registrado.</li>';
+                    return;
+                }
+
+                agendamentosDoProfissional.forEach(ag => {
+                    const valorServico = parseFloat(ag.valorServico || 0);
+                    totalComissao += valorServico * TAXA_COMISSAO_PADRAO;
+
+                    const li = document.createElement('li');
+                    const dataFormatada = new Date(ag.dataHora).toLocaleDateString('pt-BR');
+                    const valorFormatado = valorServico.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    li.textContent = `${dataFormatada} - ${ag.servico} (Cliente: ${ag.cliente}) - ${valorFormatado}`;
+                    if (profHistoricoUl) profHistoricoUl.appendChild(li);
+                });
+
+                if (profAgendamentosSpan) profAgendamentosSpan.textContent = `${agendamentosDoProfissional.length} agendamento(s).`;
+                if (profComissaoSpan) profComissaoSpan.textContent = totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            },
+            gerarRelatorio: () => {
+                const dataInicioStr = document.getElementById('relatorio-prof-data-inicio').value;
+                const dataFimStr = document.getElementById('relatorio-prof-data-fim').value;
+                const outputDiv = document.getElementById('relatorio-profissionais-output');
+                outputDiv.innerHTML = '';
+
+                let agendamentosFiltrados = agendamentos;
+
+                if (dataInicioStr && dataFimStr) {
+                    const dataInicio = new Date(dataInicioStr + 'T00:00:00');
+                    const dataFim = new Date(dataFimStr + 'T23:59:59');
+                    agendamentosFiltrados = agendamentos.filter(ag => {
+                        const agendamentoDate = new Date(ag.dataHora);
+                        return agendamentoDate >= dataInicio && agendamentoDate <= dataFim;
+                    });
+                } else if (dataInicioStr || dataFimStr) {
+                     showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar o relatório de profissionais.', 'error');
+                     return;
+                }
+
+                if (profissionais.length === 0) {
+                    outputDiv.innerHTML = '<p>Nenhum profissional cadastrado.</p>';
+                    return;
+                }
+
+                if (agendamentosFiltrados.length === 0) {
+                     outputDiv.innerHTML = '<p>Nenhum agendamento encontrado no período selecionado.</p>';
+                     return;
+                }
+
+                const relatorioPorProfissional = {};
+
+                profissionais.forEach(prof => {
+                    relatorioPorProfissional[prof.id] = {
+                        nome: prof.nome,
+                        especialidade: prof.especialidade, // Inclui a especialidade
+                        totalAgendamentos: 0,
+                        totalServicosValor: 0,
+                        comissaoTotal: 0,
+                        servicos: []
+                    };
+                });
+
+                agendamentosFiltrados.forEach(ag => {
+                    if (ag.profissionalId && relatorioPorProfissional[ag.profissionalId]) {
+                        const valorServico = parseFloat(ag.valorServico || 0);
+                        relatorioPorProfissional[ag.profissionalId].totalAgendamentos++;
+                        relatorioPorProfissional[ag.profissionalId].totalServicosValor += valorServico;
+                        relatorioPorProfissional[ag.profissionalId].comissaoTotal += valorServico * TAXA_COMISSAO_PADRAO;
+                        relatorioPorProfissional[ag.profissionalId].servicos.push({
+                            cliente: ag.cliente,
+                            servico: ag.servico,
+                            dataHora: new Date(ag.dataHora).toLocaleString('pt-BR'),
+                            valor: valorServico
+                        });
+                    }
+                });
+
+                let htmlOutput = '<h4>Relatório Detalhado por Profissional</h4>';
+                // Ordena os profissionais por nome para o relatório
+                const profissionaisOrdenados = [...profissionais].sort((a, b) => a.nome.localeCompare(b.nome));
+
+                profissionaisOrdenados.forEach(prof => {
+                    const dados = relatorioPorProfissional[prof.id];
+                    if (dados) {
+                        htmlOutput += `
+                            <div class="profissional-detail-box">
+                                <h5>${dados.nome} (${dados.especialidade})</h5>
+                                <p><strong>Total de Agendamentos:</strong> ${dados.totalAgendamentos}</p>
+                                <p><strong>Valor Total dos Serviços:</strong> ${dados.totalServicosValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                                <p><strong>Comissão Estimada (${(TAXA_COMISSAO_PADRAO * 100).toFixed(0)}%):</strong> ${dados.comissaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                                <h6>Serviços Realizados no Período:</h6>
+                                <ul>
+                        `;
+                        if (dados.servicos.length > 0) {
+                            // Ordena serviços por data para melhor visualização
+                            const servicosOrdenados = [...dados.servicos].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+                            servicosOrdenados.forEach(serv => {
+                                htmlOutput += `<li>${serv.dataHora} - ${serv.servico} (Cliente: ${serv.cliente}) - ${serv.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</li>`;
+                            });
+                        } else {
+                            htmlOutput += `<li>Nenhum serviço realizado por ${dados.nome} no período.</li>`;
+                        }
+                        htmlOutput += `
+                                </ul>
+                            </div>
+                        `;
+                    }
+                });
+                outputDiv.innerHTML = htmlOutput;
+            }
         };
 
-        const atualizarMetasFinanceirasDisplay = (totalEntradas, totalSaidas) => {
-            document.getElementById('meta-entrada-valor').textContent = financeiroMetas.entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('meta-saida-valor').textContent = financeiroMetas.saida.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        // --- Gerenciador de Estoque ---
+        const Estoque = {
+            salvar: async () => {
+                const id = document.getElementById('estoque-id-edit').value;
+                const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
+                const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
 
-            const progressBarEntrada = document.getElementById('progress-bar-entrada');
-            const progressBarSaida = document.getElementById('progress-bar-saida');
-            const progressoEntradaValor = document.getElementById('progresso-entrada-valor');
-            const progressoSaidaValor = document.getElementById('progresso-saida-valor');
+                if (!nomeProduto || isNaN(quantidade) || quantidade < 0) {
+                    showToast('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).', 'error');
+                    throw new Error('Campos obrigatórios inválidos.');
+                }
 
-            progressoEntradaValor.textContent = totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            progressoSaidaValor.textContent = totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                if (id) {
+                    const index = produtos.findIndex(p => p.id === id);
+                    if (index !== -1) {
+                        produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
+                        showToast('Produto atualizado no estoque!', 'success');
+                    }
+                } else {
+                    const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
+                    if (produtoExistente) {
+                        produtoExistente.quantidade += quantidade;
+                        showToast('Quantidade de produto existente atualizada!', 'success');
+                    } else {
+                        produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
+                        showToast('Produto cadastrado no estoque!', 'success');
+                    }
+                }
+                salvarDados('produtos', produtos);
+                EstoqueManager.renderizar();
+                atualizarNotificacoesDashboard();
+            },
+            renderizar: (filtro = '') => {
+                const listaProdutosUl = document.getElementById('lista-produtos');
+                const listaAlertaEstoqueUl = document.getElementById('lista-alerta-estoque');
+                listaProdutosUl.innerHTML = '';
+                listaAlertaEstoqueUl.innerHTML = '';
 
-            let percentEntrada = (financeiroMetas.entrada > 0) ? (totalEntradas / financeiroMetas.entrada) * 100 : 0;
-            let percentSaida = (financeiroMetas.saida > 0) ? (totalSaidas / financeiroMetas.saida) * 100 : 0;
+                const produtosFiltrados = produtos.filter(produto =>
+                    produto.nome.toLowerCase().includes(filtro.toLowerCase())
+                );
 
-            percentEntrada = Math.min(percentEntrada, 100); // Não passa de 100% na barra
-            progressBarEntrada.style.width = `${percentEntrada}%`;
-            progressBarEntrada.classList.toggle('red', percentEntrada < 100); // Se não atingiu a meta, pode mostrar vermelho (opcional)
+                if (produtosFiltrados.length === 0) {
+                    listaProdutosUl.innerHTML = `<li>Nenhum produto ${filtro ? 'encontrado com o filtro' : 'em estoque'}.</li>`;
+                } else {
+                    produtosFiltrados.forEach(produto => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span>${produto.nome} - ${produto.quantidade} unid.</span>
+                            <div class="list-actions">
+                                <button class="edit-btn" onclick="EstoqueManager.editar('${produto.id}')">Editar</button>
+                                <button class="delete-btn" onclick="EstoqueManager.excluir('${produto.id}')">Excluir</button>
+                            </div>
+                        `;
+                        listaProdutosUl.appendChild(li);
 
-            // Inverte a lógica de cor para a barra de saída para ser mais intuitiva: Verde se dentro da meta, vermelho se acima
-            progressBarSaida.style.backgroundColor = percentSaida <= 100 ? '#4CAF50' : '#dc3545';
-            progressBarSaida.style.width = `${Math.min(percentSaida, 100)}%`; // Saída: quanto menor melhor, então percent é o que já gastou
+                        if (produto.quantidade < 5) {
+                            const alertaLi = document.createElement('li');
+                            alertaLi.innerHTML = `<span class="material-icons" style="font-size: 1em; vertical-align: middle; margin-right: 5px; color: orange;">warning</span>${produto.nome} - ${produto.quantidade} unid. (Estoque Baixo!)`;
+                            alertaLi.style.color = 'orange';
+                            listaAlertaEstoqueUl.appendChild(alertaLi);
+                        }
+                    });
+                }
+                if (listaAlertaEstoqueUl.innerHTML === '') {
+                    listaAlertaEstoqueUl.innerHTML = '<li>Nenhum alerta de estoque.</li>';
+                }
+            },
+            editar: (id) => {
+                const produto = produtos.find(p => p.id === id);
+                if (produto) {
+                    resetForm('estoque-section');
+                    document.getElementById('estoque-id-edit').value = produto.id;
+                    document.getElementById('estoque-nome-produto').value = produto.nome;
+                    document.getElementById('estoque-quantidade').value = produto.quantidade;
+                    showToast('Produto carregado para edição!', 'info');
+                    document.getElementById('estoque-nome-produto').focus();
+                }
+            },
+            excluir: async (id) => {
+                const confirmou = await showConfirmationModal('Tem certeza que deseja excluir este produto do estoque?');
+                if (confirmou) {
+                    produtos = produtos.filter(p => p.id !== id);
+                    salvarDados('produtos', produtos);
+                    EstoqueManager.renderizar();
+                    atualizarNotificacoesDashboard();
+                    showToast('Produto excluído com sucesso!', 'success');
+                }
+            }
         };
+
 
         // --- Funções de Notificação e Sugestões ---
         const atualizarNotificacoesDashboard = () => {
@@ -1341,7 +1942,7 @@
             let hasNotifications = false;
 
             const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0); // Para comparar apenas a data
+            hoje.setHours(0, 0, 0, 0);
 
             const agendamentosHoje = agendamentos.filter(agendamento => {
                 const dataAgendamento = new Date(agendamento.dataHora);
@@ -1384,7 +1985,6 @@
 
             if (!clienteNome || !dataHora || !servico) {
                 document.getElementById('agendamento-mensagem-pronta').value = 'Preencha o nome do cliente, data/hora e serviço para gerar a mensagem.';
-                showToast('Preencha os campos obrigatórios para gerar a mensagem.', 'error');
                 return;
             }
 
@@ -1405,8 +2005,12 @@
 
         const copiarMensagemAgendamento = () => {
             const textarea = document.getElementById('agendamento-mensagem-pronta');
+            if (textarea.value.trim() === '' || textarea.value.includes('Preencha o nome do cliente')) {
+                showToast('Não há mensagem para copiar. Gere uma mensagem primeiro.', 'info');
+                return;
+            }
             textarea.select();
-            textarea.setSelectionRange(0, 99999); // Para mobile
+            textarea.setSelectionRange(0, 99999);
             document.execCommand('copy');
             showToast('Mensagem copiada para a área de transferência!', 'success');
         };
@@ -1432,10 +2036,23 @@
             selectProfissional.innerHTML = '<option value="">Selecione o Profissional</option>';
             profissionais.forEach(profissional => {
                 const option = document.createElement('option');
-                option.value = profissional.nome; // Usamos o nome como valor
+                option.value = profissional.nome;
                 option.textContent = profissional.nome;
-                option.dataset.profId = profissional.id; // Guardamos o ID no dataset para referência
+                option.dataset.profId = profissional.id;
                 selectProfissional.appendChild(option);
+            });
+        };
+
+        // Nova função para preencher o select de serviços na agenda
+        const preencherSelectServicos = () => {
+            const selectServico = document.getElementById('agenda-servico');
+            selectServico.innerHTML = '<option value="">Selecione um Serviço</option>';
+            servicos.forEach(servico => {
+                const option = document.createElement('option');
+                option.value = servico.nome;
+                option.textContent = `${servico.nome} (R$ ${servico.preco.toFixed(2).replace('.', ',')})`;
+                option.dataset.preco = servico.preco; // Armazena o preço no dataset
+                selectServico.appendChild(option);
             });
         };
 
@@ -1447,10 +2064,10 @@
             const clienteEncontrado = clientes.find(c => c.nome.toLowerCase() === nomeClienteInput.toLowerCase());
 
             if (clienteEncontrado) {
-                if (clienteEncontrado.historicoServicos && clienteEncontrado.historicoServicos.includes('Coloracao')) {
+                if (clienteEncontrado.historicoServicos && clienteEncontrado.historicoServicos.toLowerCase().includes('colora')) {
                      sugestaoTexto.textContent = 'Este cliente fez Coloração recentemente. Que tal oferecer um tratamento capilar ou um retoque de raiz?';
                      sugestaoDiv.style.display = 'block';
-                } else if (clienteEncontrado.observacoes && clienteEncontrado.observacoes.includes('Unhas')) {
+                } else if (clienteEncontrado.observacoes && clienteEncontrado.observacoes.toLowerCase().includes('unhas')) {
                     sugestaoTexto.textContent = 'O cliente mencionou algo sobre unhas. Lembrar de Manicure/Pedicure?';
                     sugestaoDiv.style.display = 'block';
                 } else {
@@ -1462,126 +2079,74 @@
             }
         };
 
-        // --- Funções da Área Profissional ---
-        const atualizarDetalhesProfissional = (profissionalId) => {
-            const agendamentosDoProfissional = agendamentos.filter(ag => ag.profissionalId === profissionalId);
-            const profAgendamentosSpan = document.getElementById(`prof-agendamentos-${profissionalId}`);
-            const profComissaoSpan = document.getElementById(`prof-comissao-${profissionalId}`);
-            const profHistoricoUl = document.getElementById(`prof-historico-${profissionalId}`);
+        // --- Funções de Exportação ---
+        const exportarDados = (tipo) => {
+            let data = [];
+            let headers = [];
+            let filename = '';
 
-            let totalComissao = 0;
-            if (profHistoricoUl) profHistoricoUl.innerHTML = ''; // Limpa o histórico anterior
-
-            if (agendamentosDoProfissional.length === 0) {
-                if (profAgendamentosSpan) profAgendamentosSpan.textContent = 'Nenhum.';
-                if (profComissaoSpan) profComissaoSpan.textContent = 'R$ 0,00';
-                if (profHistoricoUl) profHistoricoUl.innerHTML = '<li>Nenhum serviço registrado.</li>';
+            if (tipo === 'clientes') {
+                data = clientes;
+                headers = ['ID', 'Nome', 'Telefone', 'Email', 'HistoricoServicos', 'Observacoes'];
+                filename = 'clientes_espaco_tai_botelho.csv';
+            } else if (tipo === 'agendamentos') {
+                data = agendamentos;
+                headers = ['ID', 'Cliente', 'DataHora', 'Servico', 'ValorServico', 'ProfissionalResponsavel', 'ProfissionalId', 'Observacoes'];
+                filename = 'agendamentos_espaco_tai_botelho.csv';
+            } else if (tipo === 'servicos') { // Novo tipo de exportação
+                data = servicos;
+                headers = ['ID', 'Nome', 'Preco'];
+                filename = 'servicos_espaco_tai_botelho.csv';
+            } else if (tipo === 'transacoes') {
+                data = transacoes;
+                headers = ['ID', 'Tipo', 'Descricao', 'Valor', 'DataCriacao'];
+                filename = 'transacoes_espaco_tai_botelho.csv';
+            } else {
+                showToast('Tipo de exportação não suportado.', 'error');
                 return;
             }
 
-            agendamentosDoProfissional.forEach(ag => {
-                const valorServico = parseFloat(ag.valorServico || 0);
-                totalComissao += valorServico * TAXA_COMISSAO_PADRAO;
-
-                const li = document.createElement('li');
-                const dataFormatada = new Date(ag.dataHora).toLocaleDateString('pt-BR');
-                const valorFormatado = valorServico.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                li.textContent = `${dataFormatada} - ${ag.servico} (Cliente: ${ag.cliente}) - ${valorFormatado}`;
-                if (profHistoricoUl) profHistoricoUl.appendChild(li);
-            });
-
-            if (profAgendamentosSpan) profAgendamentosSpan.textContent = `${agendamentosDoProfissional.length} agendamento(s).`;
-            if (profComissaoSpan) profComissaoSpan.textContent = totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        };
-
-        const gerarRelatorioProfissionais = () => {
-            const dataInicioStr = document.getElementById('relatorio-prof-data-inicio').value;
-            const dataFimStr = document.getElementById('relatorio-prof-data-fim').value;
-            const outputDiv = document.getElementById('relatorio-profissionais-output');
-            outputDiv.innerHTML = '';
-
-            let agendamentosFiltrados = agendamentos;
-
-            if (dataInicioStr && dataFimStr) {
-                const dataInicio = new Date(dataInicioStr + 'T00:00:00');
-                const dataFim = new Date(dataFimStr + 'T23:59:59');
-                agendamentosFiltrados = agendamentos.filter(ag => {
-                    const agendamentoDate = new Date(ag.dataHora);
-                    return agendamentoDate >= dataInicio && agendamentoDate <= dataFim;
-                });
-            } else if (dataInicioStr || dataFimStr) {
-                 showToast('Por favor, preencha AMBAS as datas de início e fim para filtrar o relatório de profissionais.', 'error');
-                 return;
-            }
-
-            if (profissionais.length === 0) {
-                outputDiv.innerHTML = '<p>Nenhum profissional cadastrado.</p>';
+            if (data.length === 0) {
+                showToast(`Não há ${tipo} para exportar.`, 'info');
                 return;
             }
 
-            if (agendamentosFiltrados.length === 0) {
-                 outputDiv.innerHTML = '<p>Nenhum agendamento encontrado no período selecionado.</p>';
-                 return;
-            }
+            let csvContent = headers.join(';') + '\n';
+            data.forEach(item => {
+                const row = headers.map(header => {
+                    const key = header.charAt(0).toLowerCase() + header.slice(1);
+                    let value = item[key] !== undefined ? item[key] : '';
 
-            const relatorioPorProfissional = {};
-
-            profissionais.forEach(prof => {
-                relatorioPorProfissional[prof.id] = {
-                    nome: prof.nome,
-                    totalAgendamentos: 0,
-                    totalServicosValor: 0,
-                    comissaoTotal: 0,
-                    servicos: []
-                };
-            });
-
-            agendamentosFiltrados.forEach(ag => {
-                if (ag.profissionalId && relatorioPorProfissional[ag.profissionalId]) {
-                    const valorServico = parseFloat(ag.valorServico || 0);
-                    relatorioPorProfissional[ag.profissionalId].totalAgendamentos++;
-                    relatorioPorProfissional[ag.profissionalId].totalServicosValor += valorServico;
-                    relatorioPorProfissional[ag.profissionalId].comissaoTotal += valorServico * TAXA_COMISSAO_PADRAO;
-                    relatorioPorProfissional[ag.profissionalId].servicos.push({
-                        cliente: ag.cliente,
-                        servico: ag.servico,
-                        dataHora: new Date(ag.dataHora).toLocaleString('pt-BR'),
-                        valor: valorServico
-                    });
-                }
-            });
-
-            let htmlOutput = '<h4>Relatório Detalhado por Profissional</h4>';
-            profissionais.forEach(prof => {
-                const dados = relatorioPorProfissional[prof.id];
-                if (dados) {
-                    htmlOutput += `
-                        <div class="profissional-detail-box">
-                            <h5>${dados.nome} (${prof.especialidade})</h5>
-                            <p><strong>Total de Agendamentos:</strong> ${dados.totalAgendamentos}</p>
-                            <p><strong>Valor Total dos Serviços:</strong> ${dados.totalServicosValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                            <p><strong>Comissão Estimada (${(TAXA_COMISSAO_PADRAO * 100).toFixed(0)}%):</strong> ${dados.comissaoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                            <h6>Serviços Realizados no Período:</h6>
-                            <ul>
-                    `;
-                    if (dados.servicos.length > 0) {
-                        dados.servicos.forEach(serv => {
-                            htmlOutput += `<li>${serv.dataHora} - ${serv.servico} (Cliente: ${serv.cliente}) - ${serv.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</li>`;
-                        });
-                    } else {
-                        htmlOutput += `<li>Nenhum serviço realizado por ${dados.nome} no período.</li>`;
+                    if (header === 'DataHora' && value) {
+                        value = new Date(value).toLocaleString('pt-BR');
+                    } else if (header === 'DataCriacao' && value) {
+                        value = new Date(value).toLocaleString('pt-BR');
+                    } else if (header === 'Preco' && typeof value === 'number') { // Formata o preço para CSV
+                        value = value.toFixed(2).replace('.', ',');
                     }
-                    htmlOutput += `
-                            </ul>
-                        </div>
-                    `;
-                }
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                }).join(';');
+                csvContent += row + '\n';
             });
-            outputDiv.innerHTML = htmlOutput;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                showToast('Seu navegador não suporta download automático. Por favor, copie o conteúdo e salve como CSV.', 'info');
+                console.log(csvContent);
+            }
+            showToast(`Dados de ${tipo} exportados com sucesso para ${filename}!`, 'success');
         };
 
-
-        // --- Funções de Inicialização e Event Listeners ---
+        // --- Inicialização e Event Listeners ---
         document.addEventListener("DOMContentLoaded", () => {
             document.body.style.visibility = "visible";
 
@@ -1595,10 +2160,9 @@
                     splash.addEventListener(
                         "transitionend",
                         () => {
-                            splash.style.display = "none"; /* Esconde completamente após transição */
+                            splash.style.display = "none";
                             main.style.display = "block";
                             document.body.style.overflow = "auto";
-                            // Forçar uma atualização das notificações ao carregar
                             atualizarNotificacoesDashboard();
                         },
                         { once: true }
@@ -1609,14 +2173,15 @@
             button.addEventListener("click", showMainContent);
 
             // Carregar todos os dados do localStorage ao iniciar
-            clientes = carregarDados('clientesEspacoTaiBotelho');
-            agendamentos = carregarDados('agendamentosEspacoTaiBotelho');
-            transacoes = carregarDados('transacoesEspacoTaiBotelho');
-            produtos = carregarDados('produtosEspacoTaiBotelho');
-            profissionais = carregarDados('profissionaisEspacoTaiBotelho');
-            carregarMetasFinanceiras(); // Carrega metas financeiras
+            clientes = carregarDados('clientes');
+            agendamentos = carregarDados('agendamentos');
+            transacoes = carregarDados('transacoes');
+            produtos = carregarDados('produtos');
+            profissionais = carregarDados('profissionais');
+            servicos = carregarDados('servicos'); // Carrega os serviços
+            FinanceiroManager.carregarMetas();
 
-            // --- Event Listeners para botões de SALVAR (Criar/Atualizar) ---
+            // --- Gerenciamento de Eventos para os botões de SALVAR ---
             const setupSaveButton = (buttonId, sectionId, saveFunction) => {
                 document.getElementById(buttonId).addEventListener('click', async () => {
                     const button = document.getElementById(buttonId);
@@ -1626,9 +2191,12 @@
                     button.textContent = 'Salvando...';
 
                     try {
-                        await saveFunction(); // A função de salvar deve retornar uma Promise (ou ser async)
-                        resetForm(sectionId); // Limpa o formulário após salvar com sucesso
-                        focusFirstField(sectionId); // Foca no primeiro campo da seção novamente
+                        await saveFunction();
+                        resetForm(sectionId);
+                        focusFirstField(sectionId);
+                    } catch (error) {
+                        // Erros de validação já são mostrados com toast dentro da função de salvar
+                        console.error('Erro ao salvar:', error.message);
                     } finally {
                         button.textContent = originalText;
                         button.disabled = false;
@@ -1637,155 +2205,17 @@
                 });
             };
 
-            setupSaveButton('btn-salvar-cliente', 'cliente-section', async () => {
-                const id = document.getElementById('cliente-id-edit').value;
-                const nome = document.getElementById('cliente-nome').value.trim();
-                const telefone = document.getElementById('cliente-telefone').value.trim();
-                const email = document.getElementById('cliente-email').value.trim();
-                const historicoServicos = document.getElementById('cliente-historico-servicos').value.trim();
-                const observacoes = document.getElementById('cliente-observacoes').value.trim();
+            setupSaveButton('btn-salvar-cliente', 'cliente-section', ClienteManager.salvar);
+            setupSaveButton('btn-salvar-agendamento', 'agenda-section', AgendaManager.salvar);
+            setupSaveButton('btn-salvar-servico', 'servicos-section', ServicoManager.salvar); // Novo botão de serviço
+            setupSaveButton('btn-salvar-transacao', 'financeiro-section', FinanceiroManager.salvar);
+            setupSaveButton('btn-salvar-produto', 'estoque-section', EstoqueManager.salvar);
+            setupSaveButton('btn-salvar-profissional', 'profissional-section', ProfissionalManager.salvar);
 
-                if (nome && telefone) {
-                    if (id) {
-                        const index = clientes.findIndex(c => c.id === id);
-                        if (index !== -1) {
-                            clientes[index] = { ...clientes[index], nome, telefone, email, historicoServicos, observacoes };
-                            showToast('Cliente atualizado com sucesso!', 'success');
-                        }
-                    } else {
-                        clientes.push({ id: gerarIdUnico(), nome, telefone, email, historicoServicos, observacoes });
-                        showToast('Cliente cadastrado com sucesso!', 'success');
-                    }
-                    salvarDados('clientesEspacoTaiBotelho', clientes);
-                    renderizarClientes();
-                } else {
-                    showToast('Por favor, preencha o nome e o telefone do cliente.', 'error');
-                    throw new Error('Campos obrigatórios vazios.'); // Lança erro para o finally
-                }
-            });
-
-            setupSaveButton('btn-salvar-agendamento', 'agenda-section', async () => {
-                const id = document.getElementById('agenda-id-edit').value;
-                const cliente = document.getElementById('agenda-cliente-nome').value.trim();
-                const dataHora = document.getElementById('agenda-data-hora').value;
-                const servico = document.getElementById('agenda-servico').value;
-                const valorServico = parseFloat(document.getElementById('agenda-valor-servico').value) || 0;
-                const profissionalResponsavel = document.getElementById('agenda-profissional-responsavel').value.trim();
-                const observacoes = document.getElementById('agenda-observacoes').value.trim();
-
-                const profissionalObj = profissionais.find(p => p.nome === profissionalResponsavel);
-                const profissionalId = profissionalObj ? profissionalObj.id : null;
-
-                if (cliente && dataHora && servico) {
-                    if (id) {
-                        const index = agendamentos.findIndex(a => a.id === id);
-                        if (index !== -1) {
-                            agendamentos[index] = { ...agendamentos[index], cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes };
-                            showToast('Agendamento atualizado com sucesso!', 'success');
-                        }
-                    } else {
-                        agendamentos.push({ id: gerarIdUnico(), cliente, dataHora, servico, valorServico, profissionalResponsavel, profissionalId, observacoes });
-                        showToast('Agendamento salvo com sucesso!', 'success');
-                    }
-                    salvarDados('agendamentosEspacoTaiBotelho', agendamentos);
-                    renderizarAgendamentos();
-                    gerarMensagemAgendamento(); // Gera mensagem após salvar
-                    document.getElementById('sugestao-inteligente').style.display = 'none';
-                    profissionais.forEach(p => atualizarDetalhesProfissional(p.id));
-                } else {
-                    showToast('Por favor, preencha todos os campos obrigatórios do agendamento (Cliente, Data/Hora, Serviço).', 'error');
-                    throw new Error('Campos obrigatórios vazios.');
-                }
-            });
-
-            setupSaveButton('btn-salvar-transacao', 'financeiro-section', async () => {
-                const id = document.getElementById('financeiro-id-edit').value;
-                const tipo = document.getElementById('financeiro-tipo').value;
-                const descricao = document.getElementById('financeiro-descricao').value.trim();
-                const valor = parseFloat(document.getElementById('financeiro-valor').value);
-                const dataCriacao = new Date().toISOString();
-
-                if (tipo && descricao && !isNaN(valor) && valor > 0) {
-                    if (id) {
-                        const index = transacoes.findIndex(t => t.id === id);
-                        if (index !== -1) {
-                            transacoes[index] = { ...transacoes[index], tipo, descricao, valor };
-                            showToast('Transação atualizada com sucesso!', 'success');
-                        }
-                    } else {
-                        transacoes.push({ id: gerarIdUnico(), tipo, descricao, valor, dataCriacao });
-                        showToast('Transação registrada com sucesso!', 'success');
-                    }
-                    salvarDados('transacoesEspacoTaiBotelho', transacoes);
-                    renderizarTransacoes();
-                } else {
-                    showToast('Por favor, selecione o tipo, preencha a descrição e um valor numérico positivo.', 'error');
-                    throw new Error('Campos obrigatórios vazios.');
-                }
-            });
-
-            setupSaveButton('btn-salvar-produto', 'estoque-section', async () => {
-                const id = document.getElementById('estoque-id-edit').value;
-                const nomeProduto = document.getElementById('estoque-nome-produto').value.trim();
-                const quantidade = parseInt(document.getElementById('estoque-quantidade').value);
-
-                if (nomeProduto && !isNaN(quantidade) && quantidade >= 0) {
-                    if (id) {
-                        const index = produtos.findIndex(p => p.id === id);
-                        if (index !== -1) {
-                            produtos[index] = { ...produtos[index], nome: nomeProduto, quantidade };
-                            showToast('Produto atualizado no estoque!', 'success');
-                        }
-                    } else {
-                        const produtoExistente = produtos.find(p => p.nome.toLowerCase() === nomeProduto.toLowerCase());
-                        if (produtoExistente) {
-                            produtoExistente.quantidade += quantidade;
-                            showToast('Quantidade de produto existente atualizada!', 'success');
-                        } else {
-                            produtos.push({ id: gerarIdUnico(), nome: nomeProduto, quantidade });
-                            showToast('Produto cadastrado no estoque!', 'success');
-                        }
-                    }
-                    salvarDados('produtosEspacoTaiBotelho', produtos);
-                    renderizarProdutos();
-                    atualizarNotificacoesDashboard();
-                } else {
-                    showToast('Por favor, preencha o nome do produto e uma quantidade numérica válida (maior ou igual a zero).', 'error');
-                    throw new Error('Campos obrigatórios vazios.');
-                }
-            });
-
-            setupSaveButton('btn-salvar-profissional', 'profissional-section', async () => {
-                const id = document.getElementById('profissional-id-edit').value;
-                const nome = document.getElementById('profissional-nome').value.trim();
-                const especialidade = document.getElementById('profissional-especialidade').value.trim();
-                const disponibilidade = document.getElementById('profissional-disponibilidade').value.trim();
-
-                if (nome && especialidade) {
-                    if (id) {
-                        const index = profissionais.findIndex(p => p.id === id);
-                        if (index !== -1) {
-                            profissionais[index] = { ...profissionais[index], nome, especialidade, disponibilidade };
-                            showToast('Profissional atualizado com sucesso!', 'success');
-                        }
-                    } else {
-                        profissionais.push({ id: gerarIdUnico(), nome, especialidade, disponibilidade });
-                        showToast('Profissional cadastrado com sucesso!', 'success');
-                    }
-                    salvarDados('profissionaisEspacoTaiBotelho', profissionais);
-                    renderizarProfissionais();
-                    preencherDatalistProfissionais();
-                } else {
-                    showToast('Por favor, preencha o nome e a especialidade do profissional.', 'error');
-                    throw new Error('Campos obrigatórios vazios.');
-                }
-            });
-
-
-            // --- Event Listeners para Busca ---
+            // --- Event Listeners para Busca e Filtros ---
             document.getElementById('btn-search-cliente').addEventListener('click', () => {
                 const termo = document.getElementById('search-cliente').value.trim();
-                renderizarClientes(termo);
+                ClienteManager.renderizar(termo);
             });
             document.getElementById('search-cliente').addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
@@ -1794,28 +2224,67 @@
             });
             document.getElementById('search-cliente').addEventListener('input', () => {
                 if (document.getElementById('search-cliente').value.trim() === '') {
-                    renderizarClientes('');
+                    ClienteManager.renderizar('');
                 }
             });
 
             document.getElementById('btn-search-agendamento').addEventListener('click', () => {
                 const termo = document.getElementById('search-agendamento').value.trim();
-                renderizarAgendamentos(termo);
+                const dataInicio = document.getElementById('filter-agendamento-start').value;
+                const dataFim = document.getElementById('filter-agendamento-end').value;
+
+                let startDate = null;
+                let endDate = null;
+                if (dataInicio) startDate = new Date(dataInicio + 'T00:00:00');
+                if (dataFim) endDate = new Date(dataFim + 'T23:59:59');
+
+                AgendaManager.renderizar(termo, startDate, endDate);
+            });
+            document.getElementById('btn-filter-agendamento').addEventListener('click', () => {
+                const termo = document.getElementById('search-agendamento').value.trim();
+                const dataInicio = document.getElementById('filter-agendamento-start').value;
+                const dataFim = document.getElementById('filter-agendamento-end').value;
+
+                let startDate = null;
+                let endDate = null;
+                if (dataInicio) startDate = new Date(dataInicio + 'T00:00:00');
+                if (dataFim) endDate = new Date(dataFim + 'T23:59:59');
+
+                AgendaManager.renderizar(termo, startDate, endDate);
             });
             document.getElementById('search-agendamento').addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
                     document.getElementById('btn-search-agendamento').click();
                 }
             });
-             document.getElementById('search-agendamento').addEventListener('input', () => {
+            document.getElementById('search-agendamento').addEventListener('input', () => {
                 if (document.getElementById('search-agendamento').value.trim() === '') {
-                    renderizarAgendamentos('');
+                    // Limpa filtro de data também se o texto for limpo
+                    if (!document.getElementById('filter-agendamento-start').value && !document.getElementById('filter-agendamento-end').value) {
+                         AgendaManager.renderizar('');
+                    }
+                }
+            });
+
+            // Event listeners para a nova seção de serviços
+            document.getElementById('btn-search-servico').addEventListener('click', () => {
+                const termo = document.getElementById('search-servico').value.trim();
+                ServicoManager.renderizar(termo);
+            });
+            document.getElementById('search-servico').addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    document.getElementById('btn-search-servico').click();
+                }
+            });
+            document.getElementById('search-servico').addEventListener('input', () => {
+                if (document.getElementById('search-servico').value.trim() === '') {
+                    ServicoManager.renderizar('');
                 }
             });
 
             document.getElementById('btn-search-produto').addEventListener('click', () => {
                 const termo = document.getElementById('search-produto').value.trim();
-                renderizarProdutos(termo);
+                EstoqueManager.renderizar(termo);
             });
             document.getElementById('search-produto').addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
@@ -1824,25 +2293,33 @@
             });
             document.getElementById('search-produto').addEventListener('input', () => {
                 if (document.getElementById('search-produto').value.trim() === '') {
-                    renderizarProdutos('');
+                    EstoqueManager.renderizar('');
                 }
             });
 
             // --- Event Listener para Relatório Financeiro e Metas ---
-            document.getElementById('btn-gerar-relatorio').addEventListener('click', gerarRelatorioFinanceiro);
-            document.getElementById('btn-salvar-metas').addEventListener('click', salvarMetasFinanceiras);
+            document.getElementById('btn-gerar-relatorio').addEventListener('click', FinanceiroManager.gerarRelatorio);
+            document.getElementById('btn-salvar-metas').addEventListener('click', FinanceiroManager.salvarMetas);
 
             // --- Event Listener para sugestão inteligente e mensagem de agendamento ---
             document.getElementById('agenda-cliente-nome').addEventListener('input', mostrarSugestaoInteligente);
-            // Removido o event listener do btn-salvar-agendamento para gerar mensagem, agora é chamado dentro do setupSaveButton
-            document.getElementById('agendamento-mensagem-pronta').addEventListener('click', copiarMensagemAgendamento); // Clicar no textarea copia a mensagem
+            document.getElementById('agendamento-mensagem-pronta').addEventListener('click', copiarMensagemAgendamento);
 
             // --- Event Listener para Relatório de Profissionais ---
-            document.getElementById('btn-gerar-relatorio-profissionais').addEventListener('click', gerarRelatorioProfissionais);
+            document.getElementById('btn-gerar-relatorio-profissionais').addEventListener('click', ProfissionalManager.gerarRelatorio);
+
+            // --- Event Listener para preencher valor do serviço na Agenda ---
+            document.getElementById('agenda-servico').addEventListener('change', (event) => {
+                const selectedOption = event.target.options[event.target.selectedIndex];
+                const preco = selectedOption.dataset.preco;
+                document.getElementById('agenda-valor-servico').value = preco || '';
+            });
+
 
             // Inicializa datalists e selects ao carregar a página
             preencherDatalistClientes();
             preencherDatalistProfissionais();
+            preencherSelectServicos(); // Preenche os serviços ao carregar
         }); // Fim do DOMContentLoaded
 
 
@@ -1863,48 +2340,52 @@
             if (!isCurrentlyActive) {
                 // Ativa a seção clicada
                 el.classList.add('active');
-                button.classList.add('active'); // Destaca o botão
+                button.classList.add('active');
 
-                // Limpa e foca o formulário
                 resetForm(sectionId);
                 focusFirstField(sectionId);
 
-                // Renderiza o conteúdo específico da seção quando ela é aberta
                 switch (sectionId) {
                     case 'cliente-section':
-                        renderizarClientes();
+                        ClienteManager.renderizar();
                         document.getElementById('search-cliente').value = '';
                         break;
                     case 'agenda-section':
-                        renderizarAgendamentos();
+                        AgendaManager.renderizar();
                         document.getElementById('search-agendamento').value = '';
-                        document.getElementById('agendamento-mensagem-pronta').value = ''; // Limpa mensagem ao abrir
-                        document.getElementById('sugestao-inteligente').style.display = 'none'; // Esconde sugestão
-                        preencherDatalistProfissionais(); // Garante que a lista de profissionais esteja atualizada
+                        document.getElementById('filter-agendamento-start').value = '';
+                        document.getElementById('filter-agendamento-end').value = '';
+                        document.getElementById('agendamento-mensagem-pronta').value = '';
+                        document.getElementById('sugestao-inteligente').style.display = 'none';
+                        preencherDatalistProfissionais();
+                        preencherSelectServicos(); // Garante que a lista de serviços esteja atualizada
+                        break;
+                    case 'servicos-section': // Nova seção de serviços
+                        ServicoManager.renderizar();
+                        document.getElementById('search-servico').value = '';
                         break;
                     case 'financeiro-section':
-                        renderizarTransacoes();
+                        FinanceiroManager.renderizar();
                         document.getElementById('financeiro-relatorio-tipo').value = 'todos';
                         document.getElementById('relatorio-data-inicio').value = '';
                         document.getElementById('relatorio-data-fim').value = '';
-                        gerarRelatorioFinanceiro(); // Gera um relatório inicial "todos" ao abrir o financeiro
+                        FinanceiroManager.gerarRelatorio();
                         break;
                     case 'estoque-section':
-                        renderizarProdutos();
+                        EstoqueManager.renderizar();
                         document.getElementById('search-produto').value = '';
                         break;
                     case 'profissional-section':
-                        renderizarProfissionais();
+                        ProfissionalManager.renderizar();
                         document.getElementById('relatorio-prof-data-inicio').value = '';
                         document.getElementById('relatorio-prof-data-fim').value = '';
                         document.getElementById('relatorio-profissionais-output').innerHTML = '<p>Selecione um período e clique em "Gerar Relatório" para ver o desempenho dos profissionais.</p>';
                         break;
                 }
             }
-            atualizarNotificacoesDashboard(); // Garante que as notificações estejam sempre atualizadas
+            atualizarNotificacoesDashboard();
         }
 
-        // Adiciona o event listener para todos os botões .open-btn
         document.querySelectorAll('.open-btn').forEach(button => {
             button.addEventListener('click', () => toggleSection(button));
         });
