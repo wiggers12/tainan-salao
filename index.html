@@ -205,7 +205,9 @@
         <input type="text" id="ingrediente-nome" required />
         <label>Quantidade:</label>
         <input type="number" id="ingrediente-quantidade" required />
-        <button type="submit" class="primary">Adicionar Ingrediente</button>
+        <div id="estoque-form-actions">
+            <button type="submit" class="primary" id="btn-submit-estoque">Adicionar Ingrediente</button>
+        </div>
       </form>
       <div class="table-wrapper">
         <table id="tabela-estoque"><thead>
@@ -325,10 +327,14 @@
       agenda.push(a);
       localStorage.setItem("agenda", JSON.stringify(agenda));
       formAgenda.reset(); carregarAgenda();
+      atualizarFinanceiro(); // Atualiza financeiro ao adicionar pedido
     }
 
     const formEstoque = document.getElementById("form-estoque");
     const tabelaEstoque = document.querySelector("#tabela-estoque tbody");
+    const btnSubmitEstoque = document.getElementById("btn-submit-estoque");
+    const estoqueFormActions = document.getElementById("estoque-form-actions");
+    let editingEstoqueIndex = -1; // Variável para controlar qual item do estoque está sendo editado
 
     function carregarEstoque() {
       const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
@@ -338,19 +344,69 @@
           <tr>
             <td>${e.nome}</td>
             <td>${e.quantidade}</td>
-            <td><div class="action-buttons"><button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button></div></td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editarEstoque(${i})">Editar</button>
+                    <button onclick="excluirItem('estoque', ${i}, carregarEstoque)">Excluir</button>
+                </div>
+            </td>
           </tr>`;
       });
+      resetEstoqueForm(); // Garante que o formulário esteja no modo de adição ao carregar
+    }
+
+    function editarEstoque(index) {
+      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
+      const ingrediente = estoque[index];
+      
+      document.getElementById("ingrediente-nome").value = ingrediente.nome;
+      document.getElementById("ingrediente-quantidade").value = ingrediente.quantidade;
+      
+      btnSubmitEstoque.textContent = "Atualizar Ingrediente";
+      btnSubmitEstoque.classList.add("edit-mode"); 
+      
+      if (!document.getElementById("btn-cancel-estoque")) {
+          const cancelButton = document.createElement("button");
+          cancelButton.textContent = "Cancelar";
+          cancelButton.type = "button";
+          cancelButton.id = "btn-cancel-estoque";
+          cancelButton.classList.add("primary"); 
+          cancelButton.style.backgroundColor = "#ccc"; 
+          cancelButton.style.marginLeft = "10px";
+          cancelButton.onclick = resetEstoqueForm;
+          estoqueFormActions.appendChild(cancelButton);
+      }
+
+      editingEstoqueIndex = index; 
+    }
+
+    function resetEstoqueForm() {
+        formEstoque.reset();
+        btnSubmitEstoque.textContent = "Adicionar Ingrediente";
+        btnSubmitEstoque.classList.remove("edit-mode");
+        const cancelButton = document.getElementById("btn-cancel-estoque");
+        if (cancelButton) {
+            cancelButton.remove();
+        }
+        editingEstoqueIndex = -1; 
     }
 
     formEstoque.onsubmit = e => {
       e.preventDefault();
       const nome = document.getElementById("ingrediente-nome").value;
       const quantidade = document.getElementById("ingrediente-quantidade").value;
-      const estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
-      estoque.push({ nome, quantidade });
+      let estoque = JSON.parse(localStorage.getItem("estoque") || "[]");
+
+      if (editingEstoqueIndex !== -1) {
+        // Modo de edição
+        estoque[editingEstoqueIndex] = { nome, quantidade };
+      } else {
+        // Modo de adição
+        estoque.push({ nome, quantidade });
+      }
+      
       localStorage.setItem("estoque", JSON.stringify(estoque));
-      formEstoque.reset(); carregarEstoque();
+      carregarEstoque(); 
     }
 
     const formGastos = document.getElementById("form-gastos");
@@ -388,22 +444,21 @@
       document.getElementById("gasto-valor").value = gasto.valor;
       
       btnSubmitGasto.textContent = "Atualizar Gasto";
-      btnSubmitGasto.classList.add("edit-mode"); // Adiciona uma classe para estilização se necessário
+      btnSubmitGasto.classList.add("edit-mode"); 
       
-      // Adiciona o botão de cancelar se não existir
       if (!document.getElementById("btn-cancel-gasto")) {
           const cancelButton = document.createElement("button");
           cancelButton.textContent = "Cancelar";
           cancelButton.type = "button";
           cancelButton.id = "btn-cancel-gasto";
-          cancelButton.classList.add("primary"); // Pode adicionar uma classe diferente para estilo
-          cancelButton.style.backgroundColor = "#ccc"; // Cor cinza para cancelar
+          cancelButton.classList.add("primary"); 
+          cancelButton.style.backgroundColor = "#ccc"; 
           cancelButton.style.marginLeft = "10px";
           cancelButton.onclick = resetGastoForm;
           gastoFormActions.appendChild(cancelButton);
       }
 
-      editingGastoIndex = index; // Salva o índice do item que está sendo editado
+      editingGastoIndex = index; 
     }
 
     function resetGastoForm() {
@@ -414,7 +469,7 @@
         if (cancelButton) {
             cancelButton.remove();
         }
-        editingGastoIndex = -1; // Reseta o índice de edição
+        editingGastoIndex = -1; 
     }
 
     formGastos.onsubmit = e => {
@@ -433,8 +488,8 @@
       }
       
       localStorage.setItem("gastos", JSON.stringify(gastos));
-      carregarGastos(); // Recarrega a tabela e reseta o formulário
-      atualizarFinanceiro();
+      carregarGastos(); 
+      atualizarFinanceiro(); // Atualiza financeiro ao adicionar/editar gasto
     }
 
     function atualizarFinanceiro() {
@@ -464,8 +519,8 @@
 
     carregarClientes();
     carregarAgenda();
-    carregarEstoque();
-    carregarGastos(); // Chamada para carregar os gastos e inicializar o formulário
+    carregarEstoque(); 
+    carregarGastos(); 
     atualizarFinanceiro();
   </script>
 </body>
