@@ -30,7 +30,7 @@
     section {
       display: none; background: white; padding: 20px;
       margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      max-width: 600px;
+      max-width: 600px; margin-left: auto; margin-right: auto; /* Centraliza as seções */
     }
     section.active { display: block; }
     h2 {
@@ -68,10 +68,8 @@
       <button onclick="mostrar('pedidos')">🧁 Pedidos</button>
       <button onclick="mostrar('despesas')">💸 Despesas</button>
       <button onclick="mostrar('estoque')">📦 Estoque</button>
-      <button onclick="mostrar('financeiro')">📊 Financeiro</button>
-    </nav>
+      <button onclick="mostrar('financeiro')">💲 Financeiro</button> </nav>
 
-    <!-- Clientes -->
     <section id="clientes" class="active">
       <h2>Cadastro de Clientes</h2>
       <input id="clienteNome" placeholder="Nome do cliente" />
@@ -82,7 +80,6 @@
       <ul id="listaClientes"></ul>
     </section>
 
-    <!-- Pedidos -->
     <section id="pedidos">
       <h2>Pedidos</h2>
       <input id="pedidoCliente" placeholder="Nome do cliente" />
@@ -97,7 +94,6 @@
       <ul id="listaPedidos"></ul>
     </section>
 
-    <!-- Despesas -->
     <section id="despesas">
       <h2>Despesas</h2>
 
@@ -168,7 +164,6 @@
       ></ul>
     </section>
 
-    <!-- Estoque -->
     <section id="estoque">
       <h2>Controle de Estoque</h2>
       <input id="produtoNome" placeholder="Nome do Produto" />
@@ -193,7 +188,6 @@
       <ul id="listaHistorico" class="historico"></ul>
     </section>
 
-    <!-- Financeiro -->
     <section id="financeiro">
       <h2>Financeiro</h2>
       <p>
@@ -289,12 +283,16 @@
       despesas.push({ categoria, descricao, data, valor });
       localStorage.setItem('despesas', JSON.stringify(despesas));
 
-      // Limpa campos após salvar
       document.getElementById('descricaoDespesa').value = '';
       document.getElementById('dataDespesa').value = '';
       document.getElementById('valorDespesa').value = '';
 
-      alert('Despesa salva com sucesso! Para ver a lista, clique em "Ver despesas".');
+      atualizarFinanceiro();
+      listaDespesasVisivel = true;
+      document.getElementById('listaDespesas').style.display = 'block';
+      document.getElementById('btnVerDespesas').textContent = 'Ocultar despesas';
+      filtrarDespesas();
+      alert('Despesa salva com sucesso!');
     }
 
     function filtrarDespesas() {
@@ -326,7 +324,11 @@
       const lista = document.getElementById('listaDespesas');
       lista.style.display = listaDespesasVisivel ? 'block' : 'none';
 
-      if (listaDespesasVisivel) filtrarDespesas();
+      if (listaDespesasVisivel) {
+        filtrarDespesas();
+      } else {
+        lista.innerHTML = '';
+      }
 
       const btn = document.getElementById('btnVerDespesas');
       btn.textContent = listaDespesasVisivel ? 'Ocultar despesas' : 'Ver despesas';
@@ -407,32 +409,11 @@
     function atualizarTudo() {
       listarClientes();
       listarPedidos();
-      listarDespesas();
       atualizarFinanceiro();
       listarProdutos();
       listarHistorico();
-    }
-
-    // AQUI listarDespesas mostra todas (sem filtro)
-    function listarDespesas() {
-      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      const lista = document.getElementById('listaDespesas');
-      lista.innerHTML = '';
-
-      if (despesas.length === 0) {
-        lista.innerHTML = '<li style="color:#999; font-style:italic;">Nenhuma despesa cadastrada.</li>';
-        return;
-      }
-
-      despesas.forEach((d) => {
-        const li = document.createElement('li');
-        li.style.background = '#ffe6ec';
-        li.style.marginBottom = '8px';
-        li.style.padding = '10px';
-        li.style.borderRadius = '6px';
-        li.textContent = `${d.data} | ${d.categoria} | ${d.descricao} - R$ ${d.valor.toFixed(2)}`;
-        lista.appendChild(li);
-      });
+      // Não chame listarDespesas aqui, pois filtrarDespesas já faz o trabalho quando a seção é ativada ou a visibilidade é alternada.
+      // A visibilidade inicial da lista de despesas é 'none' por CSS.
     }
   </script>
 </body>
