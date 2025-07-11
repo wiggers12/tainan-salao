@@ -432,10 +432,10 @@
 
   <div class="splash" id="splash">
     <h1>Doce Sabor Caseiro</h1>
-    <button onclick="entrar()">Entrar</button>
+    <button onclick="App.entrar()">Entrar</button>
   </div>
 
-  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="App.toggleSidebar()">
     <i class="fas fa-bars"></i>
   </button>
 
@@ -443,11 +443,11 @@
     <aside class="sidebar" id="sidebar">
       <h2>Menu</h2>
       <nav>
-        <button id="navClientes" onclick="mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
-        <button id="navPedidos" onclick="mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
-        <button id="navDespesas" onclick="mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
-        <button id="navEstoque" onclick="mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
-        <button id="navFinanceiro" onclick="mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
+        <button id="navClientes" onclick="App.mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
+        <button id="navPedidos" onclick="App.mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
+        <button id="navDespesas" onclick="App.mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
+        <button id="navEstoque" onclick="App.mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
+        <button id="navFinanceiro" onclick="App.mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
       </nav>
     </aside>
 
@@ -457,10 +457,10 @@
           <input id="clienteNome" placeholder="Nome Completo" type="text" />
           <input id="clienteTelefone" placeholder="Telefone (ex: 51999998888)" type="tel" pattern="[0-9]{11}" title="Telefone com 11 dígitos (DDD + número)" />
           <input id="clienteEndereco" placeholder="Endereço Completo" type="text" />
-          <button class="save" onclick="salvarCliente()">Salvar Cliente</button>
+          <button class="save" onclick="Clientes.salvarCliente()">Salvar Cliente</button>
 
           <h3>Clientes Cadastrados</h3>
-          <input id="buscaCliente" placeholder="Buscar cliente por nome, telefone ou endereço..." oninput="listarClientes()" />
+          <input id="buscaCliente" placeholder="Buscar cliente por nome, telefone ou endereço..." oninput="Clientes.listarClientes()" />
           <ul id="listaClientes"></ul>
         </section>
 
@@ -475,7 +475,7 @@
             <option value="Entregar">Entrega (Delivery)</option>
             <option value="Retirar">Retirada no Local</option>
           </select>
-          <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
+          <button class="save" onclick="Pedidos.salvarPedido()">Salvar Pedido</button>
 
           <h3>Pedidos Salvos</h3>
           <ul id="listaPedidos"></ul>
@@ -505,7 +505,7 @@
             <label for="valorDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Valor (R$):</label>
             <input type="number" step="0.01" min="0" id="valorDespesa" placeholder="0.00" />
 
-            <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
+            <button class="save" onclick="Despesas.salvarDespesa()">Salvar Despesa</button>
           </div>
 
           <h3>Despesas Registradas</h3>
@@ -517,10 +517,10 @@
                 id="buscaDescricaoDespesa"
                 placeholder="Buscar por descrição..."
                 style="flex:1;"
-                onkeydown="if(event.key==='Enter'){filtrarDespesas()}"
+                onkeydown="if(event.key==='Enter'){Despesas.filtrarDespesas()}"
               />
               <button
-                onclick="filtrarDespesas()"
+                onclick="Despesas.filtrarDespesas()"
                 style="background:#f08080; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold; transition:all 0.3s ease;"
               >
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -543,11 +543,11 @@
           <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
           <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
           <input id="produtoValidade" type="date" />
-          <button class="save" onclick="adicionarProduto()">Adicionar/Atualizar Produto</button>
+          <button class="save" onclick="Estoque.adicionarProduto()">Adicionar/Atualizar Produto</button>
 
           <h3>Itens em Estoque</h3>
-          <input id="buscaProduto" placeholder="Buscar produto por nome..." oninput="listarProdutos()" style="margin-top:20px;" />
-          <select id="filtroTipoEstoque" onchange="listarProdutos()" style="margin-bottom:20px;">
+          <input id="buscaProduto" placeholder="Buscar produto por nome..." oninput="Estoque.listarProdutos()" style="margin-top:20px;" />
+          <select id="filtroTipoEstoque" onchange="Estoque.listarProdutos()" style="margin-bottom:20px;">
             <option value="">Filtrar por Tipo (Todos)</option>
             <option value="Ingrediente">Ingrediente</option>
             <option value="Embalagem">Embalagem</option>
@@ -562,7 +562,7 @@
         <section id="financeiro">
           <h2>Visão Financeira</h2>
           <div class="financeiro-filters">
-            <select id="filtroMesFinanceiro" onchange="atualizarFinanceiro()">
+            <select id="filtroMesFinanceiro" onchange="Financeiro.atualizarFinanceiro()">
               <option value="">Todos os Meses</option>
               <option value="01">Janeiro</option><option value="02">Fevereiro</option>
               <option value="03">Março</option><option value="04">Abril</option>
@@ -571,7 +571,7 @@
               <option value="09">Setembro</option><option value="10">Outubro</option>
               <option value="11">Novembro</option><option value="12">Dezembro</option>
             </select>
-            <select id="filtroAnoFinanceiro" onchange="atualizarFinanceiro()">
+            <select id="filtroAnoFinanceiro" onchange="Financeiro.atualizarFinanceiro()">
               <option value="">Todos os Anos</option>
               </select>
           </div>
@@ -588,7 +588,7 @@
             </p>
           </div>
 
-          <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('ganhos')">
+          <button class="financeiro-detail-toggle" onclick="Financeiro.toggleDetalhesFinanceiros('ganhos')">
             <i class="fa-solid fa-circle-plus"></i> Detalhes dos Ganhos
           </button>
           <div id="detalhesGanhos" class="financeiro-list-container">
@@ -596,7 +596,7 @@
             <ul id="listaGanhosDetalhes"></ul>
           </div>
 
-          <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('gastos')">
+          <button class="financeiro-detail-toggle" onclick="Financeiro.toggleDetalhesFinanceiros('gastos')">
             <i class="fa-solid fa-circle-minus"></i> Detalhes dos Gastos
           </button>
           <div id="detalhesGastos" class="financeiro-list-container">
@@ -608,658 +608,656 @@
   </div>
 
   <script>
-    // --- Funções de Inicialização e Navegação ---
+    // --- UTILS: Funções genéricas para LocalStorage, validação, etc. ---
+    const Utils = {
+        // Obtém dados do localStorage
+        getStorage: (key) => {
+            try {
+                return JSON.parse(localStorage.getItem(key) || '[]');
+            } catch (e) {
+                console.error(`Erro ao parsear dados do LocalStorage para a chave '${key}':`, e);
+                return [];
+            }
+        },
 
-    function entrar() {
-      const splash = document.getElementById('splash');
-      const app = document.getElementById('app');
-      splash.classList.add('fade-out'); // Adiciona classe para iniciar a transição
-      setTimeout(() => {
-        splash.style.display = 'none';
-        app.style.display = 'flex'; // Muda para flex para o layout com sidebar
-        preencherFiltrosAnoFinanceiro();
-        atualizarTudo(); // Carrega todos os dados iniciais
-      }, 900); // Tempo para a transição (um pouco menos que o tempo total da transição CSS)
-    }
+        // Salva dados no localStorage
+        setStorage: (key, data) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.error(`Erro ao salvar dados no LocalStorage para a chave '${key}':`, e);
+            }
+        },
 
-    // Botão de toggle da sidebar para mobile
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('active');
-    }
-
-    function mostrar(secaoId) {
-      // Fecha a sidebar em mobile ao clicar no item do menu
-      if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('active');
-      }
-
-      // Remove 'active' de todas as seções e botões de navegação da sidebar
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
-
-      // Adiciona 'active' à seção e botão clicado
-      document.getElementById(secaoId).classList.add('active');
-      document.getElementById(`nav${secaoId.charAt(0).toUpperCase() + secaoId.slice(1)}`).classList.add('active'); // Ex: navClientes
-
-      // Chama a função de listagem para a seção ativa para garantir atualização
-      switch (secaoId) {
-        case 'clientes':
-          listarClientes();
-          break;
-        case 'pedidos':
-          listarPedidos();
-          break;
-        case 'despesas':
-          filtrarDespesas(); // Lista as despesas imediatamente
-          break;
-        case 'estoque':
-          listarProdutos();
-          listarHistorico();
-          break;
-        case 'financeiro':
-          atualizarFinanceiro();
-          // Garante que os detalhes estejam fechados ao entrar na seção
-          document.getElementById('detalhesGanhos').classList.remove('active');
-          document.getElementById('detalhesGastos').classList.remove('active');
-          break;
-      }
-    }
-
-    // --- Funções Genéricas de Edição e Exclusão ---
-
-    /**
-     * Função genérica para editar um item. Preenche o formulário com os dados do item
-     * e informa o usuário que ele deve salvar novamente.
-     * @param {string} key - A chave do localStorage (ex: 'clientes', 'pedidos').
-     * @param {number} id - O índice do item na lista do localStorage.
-     * @param {Array<Object>} formFields - Um array de objetos descrevendo os campos do formulário.
-     * Ex: [{id: 'inputId', name: 'propertyName', type: 'text'|'number'|'date'|'select'}]
-     * @param {Function} listFunction - A função de listar/atualizar a UI para essa seção.
-     * @param {Function} itemToDisplay - Uma função que recebe o item e retorna uma string para exibir no prompt de confirmação.
-     */
-    function editarItem(key, id, formFields, listFunction, itemToDisplay) {
-        let items = JSON.parse(localStorage.getItem(key) || '[]');
-        const item = items[id];
-
-        if (!item) {
-            console.error('Item não encontrado para edição:', key, id);
-            alert('Erro: Item não encontrado para edição.');
-            return;
-        }
-
-        // Preenche os campos do formulário com os dados do item selecionado
-        for (const field of formFields) {
-            const inputElement = document.getElementById(field.id);
-            if (inputElement) {
-                if (field.type === 'date') {
-                    // Para datas, garante que o formato seja 'YYYY-MM-DD'
-                    inputElement.value = item[field.name] ? item[field.name].split('T')[0] : '';
-                } else if (field.type === 'number') {
-                    inputElement.value = item[field.name] !== undefined ? parseFloat(item[field.name]) : '';
-                } else {
-                    inputElement.value = item[field.name] || '';
+        // Limpa campos de formulário
+        clearForm: (...inputIds) => {
+            inputIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.tagName === 'SELECT') {
+                        element.value = ''; // Reseta selects
+                    } else if (element.type === 'number' || element.type === 'text' || element.type === 'tel' || element.type === 'date') {
+                        element.value = ''; // Limpa inputs
+                    }
                 }
+            });
+        },
+
+        // Valida um input de telefone (11 dígitos numéricos)
+        validatePhone: (phone) => {
+            return /^\d{11}$/.test(phone);
+        },
+
+        // Formata data para exibição (DD/MM/YYYY)
+        formatDate: (dateString) => {
+            if (!dateString) return 'Data Indefinida';
+            try {
+                // Adiciona 'T00:00:00' para garantir que a data seja interpretada como local e evitar problemas de fuso horário
+                return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR');
+            } catch (e) {
+                console.error('Erro ao formatar data:', dateString, e);
+                return 'Data Inválida';
+            }
+        },
+
+        // Cria elemento <li> para listas genéricas
+        createListItem: (itemDetailsHtml, actionsHtml) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="item-details">${itemDetailsHtml}</span>
+                <div class="item-actions">${actionsHtml}</div>
+            `;
+            return li;
+        },
+
+        // Função genérica para editar um item.
+        editItem: (key, id, formFields, listFunction, itemToDisplay) => {
+            let items = Utils.getStorage(key);
+            const item = items[id];
+
+            if (!item) {
+                console.error('Item não encontrado para edição:', key, id);
+                alert('Erro: Item não encontrado para edição.');
+                return;
+            }
+
+            // Preenche os campos do formulário com os dados do item selecionado
+            formFields.forEach(field => {
+                const inputElement = document.getElementById(field.id);
+                if (inputElement) {
+                    if (field.type === 'date') {
+                        inputElement.value = item[field.name] ? item[field.name].split('T')[0] : '';
+                    } else if (field.type === 'number') {
+                        inputElement.value = item[field.name] !== undefined ? parseFloat(item[field.name]) : '';
+                    } else {
+                        inputElement.value = item[field.name] || '';
+                    }
+                }
+            });
+
+            if (confirm(`Você está prestes a editar este item:\n\n${itemToDisplay(item)}\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Por favor, faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O item original será removido ao confirmar.`)) {
+                // Remove o item original da lista, ele será recadastrado com as alterações
+                items.splice(id, 1);
+                Utils.setStorage(key, items);
+                listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
+                alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
+            } else {
+                alert('Edição cancelada. O item original não foi alterado.');
+            }
+        },
+
+        // Função genérica para excluir um item.
+        deleteItem: (key, id, listFunction, itemToDisplay, onCompleteCallback = null) => {
+            let items = Utils.getStorage(key);
+            const item = items[id];
+
+            if (!item) {
+                console.error('Item não encontrado para exclusão:', key, id);
+                alert('Erro: Item não encontrado para exclusão.');
+                return;
+            }
+
+            if (confirm(`Tem certeza que deseja excluir o seguinte item?\n\n${itemToDisplay(item)}`)) {
+                items.splice(id, 1);
+                Utils.setStorage(key, items);
+                listFunction(); // Atualiza a UI
+                if (onCompleteCallback && typeof onCompleteCallback === 'function') {
+                    onCompleteCallback(); // Executa callback após exclusão (ex: atualizar financeiro)
+                }
+                alert('Item excluído com sucesso!');
             }
         }
+    };
 
-        if (confirm(`Você está prestes a editar este item:\n\n${itemToDisplay(item)}\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Por favor, faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O item original será removido ao confirmar.`)) {
-            // Remove o item original da lista, ele será recadastrado com as alterações
-            items.splice(id, 1);
-            localStorage.setItem(key, JSON.stringify(items));
-            listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
-            alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
-        } else {
-            // Se o usuário cancelar a edição, os campos podem ficar preenchidos, mas o item não é removido.
-            alert('Edição cancelada. O item original não foi alterado.');
-        }
-    }
+    // --- APP: Gerencia a interface principal (splash, navegação) ---
+    const App = {
+        entrar: () => {
+            const splash = document.getElementById('splash');
+            const app = document.getElementById('app');
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+                app.style.display = 'flex';
+                Financeiro.preencherFiltrosAno(); // Preenche filtros de ano ao carregar
+                App.atualizarTudo();
+            }, 900);
+        },
 
-    /**
-     * Função genérica para excluir um item.
-     * @param {string} key - A chave do localStorage.
-     * @param {number} id - O índice do item na lista.
-     * @param {Function} listFunction - A função de listar/atualizar a UI para essa seção.
-     * @param {Function} itemToDisplay - Uma função que recebe o item e retorna uma string para exibir no prompt de confirmação.
-     */
-    function excluirItem(key, id, listFunction, itemToDisplay) {
-        let items = JSON.parse(localStorage.getItem(key) || '[]');
-        const item = items[id];
+        toggleSidebar: () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        },
 
-        if (!item) {
-            console.error('Item não encontrado para exclusão:', key, id);
-            alert('Erro: Item não encontrado para exclusão.');
-            return;
-        }
-
-        if (confirm(`Tem certeza que deseja excluir o seguinte item?\n\n${itemToDisplay(item)}`)) {
-            items.splice(id, 1);
-            localStorage.setItem(key, JSON.stringify(items));
-            listFunction(); // Atualiza a UI
-
-            // Se for pedido ou despesa, atualiza o financeiro
-            if (key === 'pedidos' || key === 'despesas') {
-                atualizarFinanceiro();
+        mostrar: (secaoId) => {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
             }
-            alert('Item excluído com sucesso!');
+
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(secaoId).classList.add('active');
+            document.getElementById(`nav${secaoId.charAt(0).toUpperCase() + secaoId.slice(1)}`).classList.add('active');
+
+            // Chama o método de listagem/inicialização do módulo correspondente
+            switch (secaoId) {
+                case 'clientes':
+                    Clientes.listarClientes();
+                    break;
+                case 'pedidos':
+                    Pedidos.listarPedidos();
+                    break;
+                case 'despesas':
+                    Despesas.filtrarDespesas();
+                    break;
+                case 'estoque':
+                    Estoque.listarProdutos();
+                    Estoque.listarHistorico();
+                    break;
+                case 'financeiro':
+                    Financeiro.atualizarFinanceiro();
+                    document.getElementById('detalhesGanhos').classList.remove('active');
+                    document.getElementById('detalhesGastos').classList.remove('active');
+                    break;
+            }
+        },
+
+        atualizarTudo: () => {
+            // Define a seção inicial ao carregar o app
+            App.mostrar('clientes');
         }
-    }
+    };
 
     // --- MÓDULO CLIENTES ---
+    const Clientes = {
+        formFields: [
+            {id:'clienteNome', name:'nome', type:'text'},
+            {id:'clienteTelefone', name:'telefone', type:'tel'},
+            {id:'clienteEndereco', name:'endereco', type:'text'}
+        ],
+        listElement: document.getElementById('listaClientes'),
+        buscaInput: document.getElementById('buscaCliente'),
+        nomeInput: document.getElementById('clienteNome'),
+        telefoneInput: document.getElementById('clienteTelefone'),
+        enderecoInput: document.getElementById('clienteEndereco'),
 
-    function salvarCliente() {
-      const nomeInput = document.getElementById('clienteNome');
-      const telefoneInput = document.getElementById('clienteTelefone');
-      const enderecoInput = document.getElementById('clienteEndereco');
+        salvarCliente: () => {
+            const nome = Clientes.nomeInput.value.trim();
+            const telefone = Clientes.telefoneInput.value.trim();
+            const endereco = Clientes.enderecoInput.value.trim();
 
-      const nome = nomeInput.value.trim();
-      const telefone = telefoneInput.value.trim();
-      const endereco = enderecoInput.value.trim();
+            if (!nome || !telefone || !endereco) {
+                return alert('Por favor, preencha todos os campos do cliente (Nome, Telefone, Endereço).');
+            }
+            if (!Utils.validatePhone(telefone)) {
+                return alert('Telefone inválido! Digite 11 dígitos, incluindo o DDD (ex: 51999998888).');
+            }
 
-      if (!nome || !telefone || !endereco) {
-        return alert('Por favor, preencha todos os campos do cliente (Nome, Telefone, Endereço).');
-      }
+            const clientes = Utils.getStorage('clientes');
+            clientes.push({ nome, telefone, endereco });
+            Utils.setStorage('clientes', clientes);
 
-      // Validação de telefone simples (11 dígitos, apenas números)
-      if (!/^\d{11}$/.test(telefone)) {
-        return alert('Telefone inválido! Digite 11 dígitos, incluindo o DDD (ex: 51999998888).');
-      }
+            Utils.clearForm('clienteNome', 'clienteTelefone', 'clienteEndereco');
+            Clientes.listarClientes();
+            alert('Cliente salvo com sucesso!');
+        },
 
-      const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+        listarClientes: () => {
+            const termoBusca = Clientes.buscaInput.value.toLowerCase();
+            Clientes.listElement.innerHTML = '';
+            const clientes = Utils.getStorage('clientes');
 
-      clientes.push({ nome, telefone, endereco });
-      localStorage.setItem('clientes', JSON.stringify(clientes));
+            if (clientes.length === 0) {
+                Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+                return;
+            }
 
-      nomeInput.value = '';
-      telefoneInput.value = '';
-      enderecoInput.value = '';
+            const clientesFiltrados = clientes.filter(c =>
+                c.nome.toLowerCase().includes(termoBusca) ||
+                c.telefone.toLowerCase().includes(termoBusca) ||
+                c.endereco.toLowerCase().includes(termoBusca)
+            );
 
-      listarClientes(); // Garante que a lista seja atualizada após salvar
-      alert('Cliente salvo com sucesso!');
-    }
+            if (clientesFiltrados.length === 0) {
+                Clientes.listElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
+                return;
+            }
 
-    function listarClientes() {
-      const termoBusca = document.getElementById('buscaCliente').value.toLowerCase();
-      const listaClientesUl = document.getElementById('listaClientes');
-      listaClientesUl.innerHTML = ''; // Limpa a lista antes de preencher
-
-      const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-
-      // Se não houver clientes no total, exibe a mensagem de lista vazia
-      if (clientes.length === 0) {
-        listaClientesUl.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
-        return; // Sai da função
-      }
-
-      // Filtra os clientes se houver um termo de busca
-      const clientesFiltrados = clientes.filter(c =>
-          c.nome.toLowerCase().includes(termoBusca) ||
-          c.telefone.toLowerCase().includes(termoBusca) ||
-          c.endereco.toLowerCase().includes(termoBusca)
-      );
-
-      // Se houver clientes, mas nenhum corresponder ao filtro
-      if (clientesFiltrados.length === 0) {
-        listaClientesUl.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
-        return; // Sai da função
-      }
-
-      // Se houver clientes (e/ou filtro aplicado) e clientes encontrados, exibe a lista
-      clientesFiltrados.forEach((cliente, index) => {
-        const li = document.createElement('li');
-        const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
-        li.innerHTML = `
-            <span class="item-details">${itemText}</span>
-            <div class="item-actions">
-                <button class="edit" onclick="editarItem('clientes', ${index}, [
-                    {id:'clienteNome', name:'nome', type:'text'},
-                    {id:'clienteTelefone', name:'telefone', type:'tel'},
-                    {id:'clienteEndereco', name:'endereco', type:'text'}
-                ], listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
-                    <i class="fa-solid fa-pen"></i> Editar
-                </button>
-                <button class="delete" onclick="excluirItem('clientes', ${index}, listarClientes, (item) => \`Nome: ${item.nome}\`)">
-                    <i class="fa-solid fa-trash"></i> Excluir
-                </button>
-            </div>
-        `;
-        listaClientesUl.appendChild(li);
-      });
-    }
+            clientesFiltrados.forEach((cliente, index) => {
+                const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
+                const actionsHtml = `
+                    <button class="edit" onclick="Utils.editItem('clientes', ${index}, Clientes.formFields, Clientes.listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="delete" onclick="Utils.deleteItem('clientes', ${index}, Clientes.listarClientes, (item) => \`Nome: ${item.nome}\`)">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                `;
+                Clientes.listElement.appendChild(Utils.createListItem(itemText, actionsHtml));
+            });
+        }
+    };
 
     // --- MÓDULO PEDIDOS ---
+    const Pedidos = {
+        formFields: [
+            {id:'pedidoCliente', name:'nome', type:'text'},
+            {id:'tipoProduto', name:'produto', type:'text'},
+            {id:'valorPedido', name:'valor', type:'number'},
+            {id:'dataEntrega', name:'data', type:'date'},
+            {id:'formaEntrega', name:'entrega', type:'select'}
+        ],
+        listElement: document.getElementById('listaPedidos'),
+        clienteInput: document.getElementById('pedidoCliente'),
+        produtoInput: document.getElementById('tipoProduto'),
+        valorInput: document.getElementById('valorPedido'),
+        dataInput: document.getElementById('dataEntrega'),
+        formaEntregaSelect: document.getElementById('formaEntrega'),
 
-    function salvarPedido() {
-      const clienteInput = document.getElementById('pedidoCliente');
-      const produtoInput = document.getElementById('tipoProduto');
-      const valorInput = document.getElementById('valorPedido');
-      const dataInput = document.getElementById('dataEntrega');
-      const formaEntregaSelect = document.getElementById('formaEntrega');
+        salvarPedido: () => {
+            const nomeCliente = Pedidos.clienteInput.value.trim();
+            const tipoProduto = Pedidos.produtoInput.value.trim();
+            const valor = parseFloat(Pedidos.valorInput.value);
+            const data = Pedidos.dataInput.value;
+            const formaEntrega = Pedidos.formaEntregaSelect.value;
 
-      const nomeCliente = clienteInput.value.trim();
-      const tipoProduto = produtoInput.value.trim();
-      const valor = parseFloat(valorInput.value);
-      const data = dataInput.value; // Formato YYYY-MM-DD
-      const formaEntrega = formaEntregaSelect.value;
+            if (!nomeCliente || !tipoProduto || isNaN(valor) || valor <= 0 || !data || !formaEntrega) {
+                return alert('Por favor, preencha todos os campos do pedido corretamente (Valor deve ser positivo).');
+            }
 
-      if (!nomeCliente || !tipoProduto || isNaN(valor) || valor <= 0 || !data || !formaEntrega) {
-        return alert('Por favor, preencha todos os campos do pedido corretamente (Valor deve ser positivo).');
-      }
+            const pedidos = Utils.getStorage('pedidos');
+            pedidos.push({ nome: nomeCliente, produto: tipoProduto, valor, data, entrega: formaEntrega });
+            Utils.setStorage('pedidos', pedidos);
 
-      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-      pedidos.push({ nome: nomeCliente, produto: tipoProduto, valor, data, entrega: formaEntrega });
-      localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            Utils.clearForm('pedidoCliente', 'tipoProduto', 'valorPedido', 'dataEntrega', 'formaEntrega');
+            Pedidos.listarPedidos();
+            Financeiro.atualizarFinanceiro();
+            alert('Pedido salvo com sucesso!');
+        },
 
-      clienteInput.value = '';
-      produtoInput.value = '';
-      valorInput.value = '';
-      dataInput.value = '';
-      formaEntregaSelect.value = ''; // Limpa seleção
+        listarPedidos: () => {
+            Pedidos.listElement.innerHTML = '';
+            const pedidos = Utils.getStorage('pedidos');
 
-      listarPedidos();
-      atualizarFinanceiro();
-      alert('Pedido salvo com sucesso!');
-    }
+            if (pedidos.length === 0) {
+                Pedidos.listElement.innerHTML = '<li class="empty-list-message">Nenhum pedido cadastrado ainda.</li>';
+                return;
+            }
 
-    function listarPedidos() {
-      const listaPedidosUl = document.getElementById('listaPedidos');
-      listaPedidosUl.innerHTML = '';
-      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+            pedidos.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-      if (pedidos.length === 0) {
-        listaPedidosUl.innerHTML = '<li class="empty-list-message">Nenhum pedido cadastrado ainda.</li>';
-        return;
-      }
-
-      // Ordena os pedidos pela data (mais recente primeiro)
-      pedidos.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
-
-      pedidos.forEach((p, index) => {
-        const li = document.createElement('li');
-        // Formata a data para exibir como DD/MM/YYYY
-        const dataFormatada = p.data ? new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data Indefinida';
-        const itemText = `<strong>${p.nome}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
-        li.innerHTML = `
-            <span class="item-details">${itemText}</span>
-            <div class="item-actions">
-                <button class="edit" onclick="editarItem('pedidos', ${index}, [
-                    {id:'pedidoCliente', name:'nome', type:'text'},
-                    {id:'tipoProduto', name:'produto', type:'text'},
-                    {id:'valorPedido', name:'valor', type:'number'},
-                    {id:'dataEntrega', name:'data', type:'date'},
-                    {id:'formaEntrega', name:'entrega', type:'select'}
-                ], listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`)">
-                    <i class="fa-solid fa-pen"></i> Editar
-                </button>
-                <button class="delete" onclick="excluirItem('pedidos', ${index}, listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}\`)">
-                    <i class="fa-solid fa-trash"></i> Excluir
-                </button>
-            </div>
-        `;
-        listaPedidosUl.appendChild(li);
-      });
-    }
+            pedidos.forEach((p, index) => {
+                const dataFormatada = Utils.formatDate(p.data);
+                const itemText = `<strong>${p.nome}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
+                const actionsHtml = `
+                    <button class="edit" onclick="Utils.editItem('pedidos', ${index}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`)">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="delete" onclick="Utils.deleteItem('pedidos', ${index}, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}\`, Financeiro.atualizarFinanceiro)">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                `;
+                Pedidos.listElement.appendChild(Utils.createListItem(itemText, actionsHtml));
+            });
+        }
+    };
 
     // --- MÓDULO DESPESAS ---
+    const Despesas = {
+        formFields: [
+            {id:'categoriaDespesa', name:'categoria', type:'select'},
+            {id:'descricaoDespesa', name:'descricao', type:'text'},
+            {id:'dataDespesa', name:'data', type:'date'},
+            {id:'valorDespesa', name:'valor', type:'number'}
+        ],
+        listElement: document.getElementById('listaDespesas'),
+        categoriaSelect: document.getElementById('categoriaDespesa'),
+        descricaoInput: document.getElementById('descricaoDespesa'),
+        dataInput: document.getElementById('dataDespesa'),
+        valorInput: document.getElementById('valorDespesa'),
+        buscaInput: document.getElementById('buscaDescricaoDespesa'),
 
-    function salvarDespesa() {
-      const categoriaSelect = document.getElementById('categoriaDespesa');
-      const descricaoInput = document.getElementById('descricaoDespesa');
-      const dataInput = document.getElementById('dataDespesa');
-      const valorInput = document.getElementById('valorDespesa');
+        salvarDespesa: () => {
+            const categoria = Despesas.categoriaSelect.value;
+            const descricao = Despesas.descricaoInput.value.trim();
+            const data = Despesas.dataInput.value;
+            const valor = parseFloat(Despesas.valorInput.value);
 
-      const categoria = categoriaSelect.value;
-      const descricao = descricaoInput.value.trim();
-      const data = dataInput.value;
-      const valor = parseFloat(valorInput.value);
+            if (!categoria || !descricao || !data || isNaN(valor) || valor <= 0) {
+                alert('Por favor, selecione uma categoria e preencha todos os campos da despesa corretamente (Descrição, Data, Valor positivo).');
+                return;
+            }
 
-      if (!categoria || !descricao || !data || isNaN(valor) || valor <= 0) {
-        alert('Por favor, selecione uma categoria e preencha todos os campos da despesa corretamente (Descrição, Data, Valor positivo).');
-        return;
-      }
+            const despesas = Utils.getStorage('despesas');
+            despesas.push({ categoria, descricao, data, valor });
+            Utils.setStorage('despesas', despesas);
 
-      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      despesas.push({ categoria, descricao, data, valor });
-      localStorage.setItem('despesas', JSON.stringify(despesas));
+            Utils.clearForm('categoriaDespesa', 'descricaoDespesa', 'dataDespesa', 'valorDespesa');
+            Financeiro.atualizarFinanceiro();
+            Despesas.filtrarDespesas();
+            alert('Despesa salva com sucesso!');
+        },
 
-      categoriaSelect.value = ''; // Limpa seleção
-      descricaoInput.value = '';
-      dataInput.value = '';
-      valorInput.value = '';
+        filtrarDespesas: () => {
+            const despesas = Utils.getStorage('despesas');
+            const termoBusca = Despesas.buscaInput.value.toLowerCase();
+            Despesas.listElement.innerHTML = '';
 
-      atualizarFinanceiro();
-      // Apenas filtra as despesas, sem controle de visibilidade via botão
-      filtrarDespesas();
-      alert('Despesa salva com sucesso!');
-    }
+            const despesasFiltradas = despesas.filter((d) =>
+                d.descricao.toLowerCase().includes(termoBusca) ||
+                d.categoria.toLowerCase().includes(termoBusca)
+            );
 
-    function filtrarDespesas() {
-      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      const termoBusca = document.getElementById('buscaDescricaoDespesa').value.toLowerCase();
-      const listaDespesasUl = document.getElementById('listaDespesas');
-      listaDespesasUl.innerHTML = '';
+            if (despesas.length === 0) {
+                Despesas.listElement.innerHTML = '<li class="empty-list-message">Nenhuma despesa cadastrada ainda.</li>';
+                return;
+            }
 
-      const despesasFiltradas = despesas.filter((d) =>
-          d.descricao.toLowerCase().includes(termoBusca) ||
-          d.categoria.toLowerCase().includes(termoBusca)
-      );
+            if (despesasFiltradas.length === 0 && termoBusca !== '') {
+                Despesas.listElement.innerHTML = `<li class="empty-list-message">Nenhuma despesa encontrada com "${termoBusca}".</li>`;
+                return;
+            }
 
-      if (despesas.length === 0) {
-          listaDespesasUl.innerHTML = '<li class="empty-list-message">Nenhuma despesa cadastrada ainda.</li>';
-          return;
-      }
+            despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-      if (despesasFiltradas.length === 0 && termoBusca !== '') {
-        listaDespesasUl.innerHTML = `<li class="empty-list-message">Nenhuma despesa encontrada com "${termoBusca}".</li>`;
-        return;
-      }
-
-      // Ordena as despesas pela data (mais recente primeiro)
-      despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
-
-
-      despesasFiltradas.forEach((d, index) => {
-        const li = document.createElement('li');
-        const dataFormatada = d.data ? new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data Indefinida';
-        const itemText = `<strong>${dataFormatada}</strong> | ${d.categoria} | ${d.descricao}<br>Valor: R$ ${d.valor.toFixed(2)}`;
-        li.innerHTML = `
-            <span class="item-details">${itemText}</span>
-            <div class="item-actions">
-                <button class="edit" onclick="editarItem('despesas', ${index}, [
-                    {id:'categoriaDespesa', name:'categoria', type:'select'},
-                    {id:'descricaoDespesa', name:'descricao', type:'text'},
-                    {id:'dataDespesa', name:'data', type:'date'},
-                    {id:'valorDespesa', name:'valor', type:'number'}
-                ], filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
-                    <i class="fa-solid fa-pen"></i> Editar
-                </button>
-                <button class="delete" onclick="excluirItem('despesas', ${index}, filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`)">
-                    <i class="fa-solid fa-trash"></i> Excluir
-                </button>
-            </div>
-        `;
-        listaDespesasUl.appendChild(li);
-      });
-    }
+            despesasFiltradas.forEach((d, index) => {
+                const dataFormatada = Utils.formatDate(d.data);
+                const itemText = `<strong>${dataFormatada}</strong> | ${d.categoria} | ${d.descricao}<br>Valor: R$ ${d.valor.toFixed(2)}`;
+                const actionsHtml = `
+                    <button class="edit" onclick="Utils.editItem('despesas', ${index}, Despesas.formFields, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="delete" onclick="Utils.deleteItem('despesas', ${index}, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`, Financeiro.atualizarFinanceiro)">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                `;
+                Despesas.listElement.appendChild(Utils.createListItem(itemText, actionsHtml));
+            });
+        }
+    };
 
     // --- MÓDULO ESTOQUE ---
+    const Estoque = {
+        formFields: [
+            {id:'produtoNome', name:'nome', type:'text'},
+            {id:'produtoTipo', name:'tipo', type:'select'},
+            {id:'produtoQtd', name:'qtd', type:'number'},
+            {id:'produtoMin', name:'min', type:'number'},
+            {id:'produtoValidade', name:'validade', type:'date'}
+        ],
+        listElement: document.getElementById('listaEstoque'),
+        historicoListElement: document.getElementById('listaHistorico'),
+        nomeInput: document.getElementById('produtoNome'),
+        tipoSelect: document.getElementById('produtoTipo'),
+        qtdInput: document.getElementById('produtoQtd'),
+        minInput: document.getElementById('produtoMin'),
+        validadeInput: document.getElementById('produtoValidade'),
+        buscaInput: document.getElementById('buscaProduto'),
+        filtroTipoSelect: document.getElementById('filtroTipoEstoque'),
 
-    function adicionarProduto() {
-      const nomeInput = document.getElementById('produtoNome');
-      const tipoSelect = document.getElementById('produtoTipo');
-      const qtdInput = document.getElementById('produtoQtd');
-      const minInput = document.getElementById('produtoMin');
-      const validadeInput = document.getElementById('produtoValidade');
+        adicionarProduto: () => {
+            const nome = Estoque.nomeInput.value.trim();
+            const tipo = Estoque.tipoSelect.value;
+            const qtd = parseInt(Estoque.qtdInput.value);
+            const min = parseInt(Estoque.minInput.value);
+            const validade = Estoque.validadeInput.value;
 
-      const nome = nomeInput.value.trim();
-      const tipo = tipoSelect.value;
-      const qtd = parseInt(qtdInput.value);
-      const min = parseInt(minInput.value);
-      const validade = validadeInput.value;
+            if (!nome || !tipo || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0) {
+                return alert('Por favor, preencha todos os campos do produto corretamente (Quantidade e Mínimo devem ser números não negativos).');
+            }
 
-      if (!nome || !tipo || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0) {
-        return alert('Por favor, preencha todos os campos do produto corretamente (Quantidade e Mínimo devem ser números não negativos).');
-      }
+            const estoque = Utils.getStorage('estoque');
+            const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
 
-      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-      const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
+            if (itemExistenteIndex > -1) {
+                if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou ATUALIZAR (sobrescrever) o item? \n\nClique OK para ADICIONAR, ou CANCELAR para ATUALIZAR.`)) {
+                    estoque[itemExistenteIndex].qtd += qtd;
+                    if (validade) estoque[itemExistenteIndex].validade = validade;
+                    if (min) estoque[itemExistenteIndex].min = min;
+                    Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, adição de estoque)`);
+                    alert(`Adicionadas ${qtd} unidades de "${nome}" ao estoque.`);
+                } else {
+                    estoque[itemExistenteIndex] = { nome, tipo, qtd, min, validade };
+                    Estoque.registrarHistorico(`Atualizado: ${nome} (${tipo}, nova quantidade: ${qtd})`);
+                    alert(`Produto "${nome}" atualizado para ${qtd} unidades.`);
+                }
+            } else {
+                estoque.push({ nome, tipo, qtd, min, validade });
+                Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, novo item no estoque)`);
+                alert('Novo produto adicionado ao estoque!');
+            }
 
-      if (itemExistenteIndex > -1) {
-          // Se o item já existe, pergunta se quer adicionar à quantidade ou sobrescrever
-          if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou ATUALIZAR (sobrescrever) o item? \n\nClique OK para ADICIONAR, ou CANCELAR para ATUALIZAR.`)) {
-              estoque[itemExistenteIndex].qtd += qtd;
-              // Atualiza validade e mínimo se fornecidos na adição
-              if (validade) estoque[itemExistenteIndex].validade = validade;
-              if (min) estoque[itemExistenteIndex].min = min;
-              registrarHistorico(`+${qtd} ${nome} (${tipo}, adição de estoque)`);
-              alert(`Adicionadas ${qtd} unidades de "${nome}" ao estoque.`);
-          } else {
-              // Atualiza o item existente com os novos valores completos
-              estoque[itemExistenteIndex] = { nome, tipo, qtd, min, validade };
-              registrarHistorico(`Atualizado: ${nome} (${tipo}, nova quantidade: ${qtd})`);
-              alert(`Produto "${nome}" atualizado para ${qtd} unidades.`);
-          }
-      } else {
-          // Adiciona novo item se não existir
-          estoque.push({ nome, tipo, qtd, min, validade });
-          registrarHistorico(`+${qtd} ${nome} (${tipo}, novo item no estoque)`);
-          alert('Novo produto adicionado ao estoque!');
-      }
+            Utils.setStorage('estoque', estoque);
+            Utils.clearForm('produtoNome', 'produtoTipo', 'produtoQtd', 'produtoMin', 'produtoValidade');
+            Estoque.listarProdutos();
+        },
 
-      localStorage.setItem('estoque', JSON.stringify(estoque));
+        listarProdutos: () => {
+            Estoque.listElement.innerHTML = '';
+            const termoBusca = Estoque.buscaInput.value.toLowerCase();
+            const tipoFiltro = Estoque.filtroTipoSelect.value;
+            const estoque = Utils.getStorage('estoque');
 
-      nomeInput.value = '';
-      tipoSelect.value = '';
-      qtdInput.value = '';
-      minInput.value = '';
-      validadeInput.value = '';
+            const produtosFiltrados = estoque.filter(p => {
+                const nomeMatch = p.nome.toLowerCase().includes(termoBusca);
+                const tipoMatch = p.tipo.toLowerCase().includes(termoBusca);
+                const filtroTipoMatch = tipoFiltro === '' || p.tipo === tipoFiltro;
+                return (nomeMatch || tipoMatch) && filtroTipoMatch;
+            });
 
-      listarProdutos(); // Atualiza a lista
-    }
+            if (estoque.length === 0) {
+                Estoque.listElement.innerHTML = '<li class="empty-list-message">Nenhum produto em estoque.</li>';
+                return;
+            }
 
-    function listarProdutos() {
-      const listaEstoqueUl = document.getElementById('listaEstoque');
-      listaEstoqueUl.innerHTML = '';
-      const termoBusca = document.getElementById('buscaProduto').value.toLowerCase();
-      const tipoFiltro = document.getElementById('filtroTipoEstoque').value;
-      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+            if (produtosFiltrados.length === 0 && (termoBusca !== '' || tipoFiltro !== '')) {
+                Estoque.listElement.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com os filtros aplicados.</li>`;
+                return;
+            }
 
-      const produtosFiltrados = estoque.filter(p => {
-          const nomeMatch = p.nome.toLowerCase().includes(termoBusca);
-          const tipoMatch = p.tipo.toLowerCase().includes(termoBusca); // Permite buscar por tipo também
-          const filtroTipoMatch = tipoFiltro === '' || p.tipo === tipoFiltro;
-          return (nomeMatch || tipoMatch) && filtroTipoMatch;
-      });
+            produtosFiltrados.forEach((produto, index) => {
+                const li = Utils.createListItem(
+                    `<strong>${produto.nome}</strong> (${produto.tipo}) - ${produto.qtd} un. (Mín: ${produto.min} un.)${produto.validade ? ` - Venc: ${Utils.formatDate(produto.validade)}` : ''}`,
+                    `
+                        <button class="use" onclick="Estoque.usarProduto(${index})">
+                            <i class="fa-solid fa-minus"></i> Usar 1
+                        </button>
+                        <button class="edit" onclick="Utils.editItem('estoque', ${index}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
+                            <i class="fa-solid fa-pen"></i> Editar
+                        </button>
+                        <button class="delete" onclick="Utils.deleteItem('estoque', ${index}, Estoque.listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un.)\`)">
+                            <i class="fa-solid fa-trash"></i> Excluir
+                        </button>
+                    `
+                );
+                if (produto.qtd === 0) li.classList.add('falta');
+                else if (produto.min > 0 && produto.qtd < produto.min) li.classList.add('baixo');
+                Estoque.listElement.appendChild(li);
+            });
+        },
 
-      if (estoque.length === 0) {
-        listaEstoqueUl.innerHTML = '<li class="empty-list-message">Nenhum produto em estoque.</li>';
-        return;
-      }
+        usarProduto: (index) => {
+            const estoque = Utils.getStorage('estoque');
+            if (estoque[index].qtd > 0) {
+                if (confirm(`Deseja usar 1 unidade de "${estoque[index].nome}"?`)) {
+                    estoque[index].qtd--;
+                    Utils.setStorage('estoque', estoque);
+                    Estoque.registrarHistorico(`-1 ${estoque[index].nome} (${estoque[index].tipo})`);
+                    Estoque.listarProdutos();
+                    alert(`1 unidade de "${estoque[index].nome}" usada.`);
+                }
+            } else {
+                alert(`Não há mais unidades de "${estoque[index].nome}" no estoque para usar.`);
+            }
+        },
 
-      if (produtosFiltrados.length === 0 && (termoBusca !== '' || tipoFiltro !== '')) {
-        listaEstoqueUl.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com os filtros aplicados.</li>`;
-        return;
-      }
+        registrarHistorico: (texto) => {
+            const historico = Utils.getStorage('historicoEstoque');
+            const dataHora = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            historico.unshift(`${dataHora}: ${texto}`);
+            Utils.setStorage('historicoEstoque', historico.slice(0, 30));
+            Estoque.listarHistorico();
+        },
 
-      produtosFiltrados.forEach((produto, index) => {
-        const li = document.createElement('li');
-        if (produto.qtd === 0) li.classList.add('falta');
-        else if (produto.min > 0 && produto.qtd < produto.min) li.classList.add('baixo');
+        listarHistorico: () => {
+            Estoque.historicoListElement.innerHTML = '';
+            const hist = Utils.getStorage('historicoEstoque');
 
-        const validadeInfo = produto.validade ? ` - Venc: ${new Date(produto.validade + 'T00:00:00').toLocaleDateString('pt-BR')}` : '';
-        const itemText = `<strong>${produto.nome}</strong> (${produto.tipo}) - ${produto.qtd} un. (Mín: ${produto.min} un.)${validadeInfo}`;
-        li.innerHTML = `
-            <span class="item-details">${itemText}</span>
-            <div class="item-actions">
-                <button class="use" onclick="usarProduto(${index})">
-                    <i class="fa-solid fa-minus"></i> Usar 1
-                </button>
-                <button class="edit" onclick="editarItem('estoque', ${index}, [
-                    {id:'produtoNome', name:'nome', type:'text'},
-                    {id:'produtoTipo', name:'tipo', type:'select'},
-                    {id:'produtoQtd', name:'qtd', type:'number'},
-                    {id:'produtoMin', name:'min', type:'number'},
-                    {id:'produtoValidade', name:'validade', type:'date'}
-                ], listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
-                    <i class="fa-solid fa-pen"></i> Editar
-                </button>
-                <button class="delete" onclick="excluirItem('estoque', ${index}, listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un.)\`)">
-                    <i class="fa-solid fa-trash"></i> Excluir
-                </button>
-            </div>
-        `;
-        listaEstoqueUl.appendChild(li);
-      });
-    }
+            if (hist.length === 0) {
+                Estoque.historicoListElement.innerHTML = '<li class="empty-list-message">Nenhum histórico de estoque ainda.</li>';
+                return;
+            }
 
-    function usarProduto(index) {
-      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-      if (estoque[index].qtd > 0) {
-        if (confirm(`Deseja usar 1 unidade de "${estoque[index].nome}"?`)) {
-            estoque[index].qtd--;
-            localStorage.setItem('estoque', JSON.stringify(estoque));
-            registrarHistorico(`-1 ${estoque[index].nome} (${estoque[index].tipo})`);
-            listarProdutos(); // Atualiza a lista após o uso
-            alert(`1 unidade de "${estoque[index].nome}" usada.`);
+            hist.forEach((entry) => {
+                const li = document.createElement('li');
+                li.textContent = entry;
+                Estoque.historicoListElement.appendChild(li);
+            });
         }
-      } else {
-        alert(`Não há mais unidades de "${estoque[index].nome}" no estoque para usar.`);
-      }
-    }
-
-    function registrarHistorico(texto) {
-      const historico = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
-      const dataHora = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-      historico.unshift(`${dataHora}: ${texto}`);
-      localStorage.setItem('historicoEstoque', JSON.stringify(historico.slice(0, 30))); // Limita a 30 entradas
-      listarHistorico();
-    }
-
-    function listarHistorico() {
-      const listaHistoricoUl = document.getElementById('listaHistorico');
-      listaHistoricoUl.innerHTML = '';
-      const hist = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
-
-      if (hist.length === 0) {
-        listaHistoricoUl.innerHTML = '<li class="empty-list-message">Nenhum histórico de estoque ainda.</li>';
-        return;
-      }
-
-      hist.forEach((entry) => {
-        const li = document.createElement('li');
-        li.textContent = entry;
-        listaHistoricoUl.appendChild(li);
-      });
-    }
+    };
 
     // --- MÓDULO FINANCEIRO ---
+    const Financeiro = {
+        filtroMesSelect: document.getElementById('filtroMesFinanceiro'),
+        filtroAnoSelect: document.getElementById('filtroAnoFinanceiro'),
+        ganhosSpan: document.getElementById('ganhos'),
+        gastosSpan: document.getElementById('gastos'),
+        lucrosSpan: document.getElementById('lucros'),
+        detalhesGanhosDiv: document.getElementById('detalhesGanhos'),
+        detalhesGastosDiv: document.getElementById('detalhesGastos'),
+        listaGanhosDetalhesUl: document.getElementById('listaGanhosDetalhes'),
+        listaGastosDetalhesUl: document.getElementById('listaGastosDetalhes'),
 
-    function preencherFiltrosAnoFinanceiro() {
-        const selectAno = document.getElementById('filtroAnoFinanceiro');
-        selectAno.innerHTML = '<option value="">Todos os Anos</option>'; // Resetar
+        preencherFiltrosAno: () => {
+            Financeiro.filtroAnoSelect.innerHTML = '<option value="">Todos os Anos</option>';
 
-        const currentYear = new Date().getFullYear();
-        let allYears = new Set();
+            const currentYear = new Date().getFullYear();
+            let allYears = new Set();
 
-        // Coleta anos de pedidos
-        const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-        pedidos.forEach(p => {
-            if (p.data) allYears.add(new Date(p.data + 'T00:00:00').getFullYear());
-        });
+            const pedidos = Utils.getStorage('pedidos');
+            pedidos.forEach(p => {
+                if (p.data) allYears.add(new Date(p.data + 'T00:00:00').getFullYear());
+            });
 
-        // Coleta anos de despesas
-        const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-        despesas.forEach(d => {
-            if (d.data) allYears.add(new Date(d.data + 'T00:00:00').getFullYear());
-        });
+            const despesas = Utils.getStorage('despesas');
+            despesas.forEach(d => {
+                if (d.data) allYears.add(new Date(d.data + 'T00:00:00').getFullYear());
+            });
 
-        const sortedYears = Array.from(allYears).sort((a, b) => a - b);
+            const sortedYears = Array.from(allYears).sort((a, b) => a - b);
 
-        // Garante que o ano atual e o próximo ano estejam disponíveis, mesmo que sem dados
-        if (!sortedYears.includes(currentYear)) {
-            sortedYears.push(currentYear);
+            if (!sortedYears.includes(currentYear)) sortedYears.push(currentYear);
+            if (!sortedYears.includes(currentYear + 1)) sortedYears.push(currentYear + 1);
+            sortedYears.sort((a, b) => a - b);
+
+            sortedYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year.toString();
+                option.textContent = year.toString();
+                Financeiro.filtroAnoSelect.appendChild(option);
+            });
+            Financeiro.filtroAnoSelect.value = currentYear.toString();
+        },
+
+        atualizarFinanceiro: () => {
+            const pedidos = Utils.getStorage('pedidos');
+            const despesas = Utils.getStorage('despesas');
+
+            const filtroMes = Financeiro.filtroMesSelect.value;
+            const filtroAno = Financeiro.filtroAnoSelect.value;
+
+            const pedidosFiltrados = pedidos.filter(p => {
+                if (!p.data) return false;
+                const pedidoDate = new Date(p.data + 'T00:00:00');
+                const pedidoMonth = (pedidoDate.getMonth() + 1).toString().padStart(2, '0');
+                const pedidoYear = pedidoDate.getFullYear().toString();
+                return (filtroMes === '' || pedidoMonth === filtroMes) &&
+                       (filtroAno === '' || pedidoYear === filtroAno);
+            });
+
+            const despesasFiltradas = despesas.filter(d => {
+                if (!d.data) return false;
+                const despesaDate = new Date(d.data + 'T00:00:00');
+                const despesaMonth = (despesaDate.getMonth() + 1).toString().padStart(2, '0');
+                const despesaYear = despesaDate.getFullYear().toString();
+                return (filtroMes === '' || despesaMonth === filtroMes) &&
+                       (filtroAno === '' || despesaYear === filtroAno);
+            });
+
+            const ganhos = pedidosFiltrados.reduce((s, p) => s + p.valor, 0);
+            const gastos = despesasFiltradas.reduce((s, d) => s + d.valor, 0);
+            const lucros = ganhos - gastos;
+
+            Financeiro.ganhosSpan.textContent = ganhos.toFixed(2);
+            Financeiro.gastosSpan.textContent = gastos.toFixed(2);
+            Financeiro.lucrosSpan.textContent = lucros.toFixed(2);
+
+            Financeiro.listaGanhosDetalhesUl.innerHTML = '';
+            if (pedidosFiltrados.length === 0) {
+                Financeiro.listaGanhosDetalhesUl.innerHTML = '<li class="empty-list-message">Nenhum ganho registrado para o período selecionado.</li>';
+            } else {
+                pedidosFiltrados.forEach(p => {
+                    const dataFormatada = Utils.formatDate(p.data);
+                    const li = document.createElement('li');
+                    li.textContent = `${dataFormatada} - ${p.nome} (${p.produto}): R$ ${p.valor.toFixed(2)}`;
+                    Financeiro.listaGanhosDetalhesUl.appendChild(li);
+                });
+            }
+
+            Financeiro.listaGastosDetalhesUl.innerHTML = '';
+            if (despesasFiltradas.length === 0) {
+                Financeiro.listaGastosDetalhesUl.innerHTML = '<li class="empty-list-message">Nenhum gasto registrado para o período selecionado.</li>';
+            } else {
+                despesasFiltradas.forEach(d => {
+                    const dataFormatada = Utils.formatDate(d.data);
+                    const li = document.createElement('li');
+                    li.textContent = `${dataFormatada} - ${d.categoria} (${d.descricao}): R$ ${d.valor.toFixed(2)}`;
+                    Financeiro.listaGastosDetalhesUl.appendChild(li);
+                });
+            }
+        },
+
+        toggleDetalhesFinanceiros: (tipo) => {
+            // Fecha o outro painel se estiver aberto
+            if (tipo === 'ganhos' && Financeiro.detalhesGastosDiv.classList.contains('active')) {
+                Financeiro.detalhesGastosDiv.classList.remove('active');
+            } else if (tipo === 'gastos' && Financeiro.detalhesGanhosDiv.classList.contains('active')) {
+                Financeiro.detalhesGanhosDiv.classList.remove('active');
+            }
+
+            // Alterna o painel clicado
+            if (tipo === 'ganhos') {
+                Financeiro.detalhesGanhosDiv.classList.toggle('active');
+            } else if (tipo === 'gastos') {
+                Financeiro.detalhesGastosDiv.classList.toggle('active');
+            }
         }
-        if (!sortedYears.includes(currentYear + 1)) {
-            sortedYears.push(currentYear + 1);
-        }
-        sortedYears.sort((a, b) => a - b); // Re-ordena após adicionar
+    };
 
-        sortedYears.forEach(year => {
-            const option = document.createElement('option');
-            option.value = year.toString();
-            option.textContent = year.toString();
-            selectAno.appendChild(option);
-        });
-        selectAno.value = currentYear.toString(); // Seleciona o ano atual por padrão
-    }
-
-    function atualizarFinanceiro() {
-      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-
-      const filtroMes = document.getElementById('filtroMesFinanceiro').value;
-      const filtroAno = document.getElementById('filtroAnoFinanceiro').value;
-
-      const pedidosFiltrados = pedidos.filter(p => {
-          if (!p.data) return false; // Ignora pedidos sem data
-          const pedidoDate = new Date(p.data + 'T00:00:00'); // Garante fuso horário consistente
-          const pedidoMonth = (pedidoDate.getMonth() + 1).toString().padStart(2, '0');
-          const pedidoYear = pedidoDate.getFullYear().toString();
-          return (filtroMes === '' || pedidoMonth === filtroMes) &&
-                 (filtroAno === '' || pedidoYear === filtroAno);
-      });
-
-      const despesasFiltradas = despesas.filter(d => {
-          if (!d.data) return false; // Ignora despesas sem data
-          const despesaDate = new Date(d.data + 'T00:00:00'); // Garante fuso horário consistente
-          const despesaMonth = (despesaDate.getMonth() + 1).toString().padStart(2, '0');
-          const despesaYear = despesaDate.getFullYear().toString();
-          return (filtroMes === '' || despesaMonth === filtroMes) &&
-                 (filtroAno === '' || despesaYear === filtroAno);
-      });
-
-      const ganhos = pedidosFiltrados.reduce((s, p) => s + p.valor, 0);
-      const gastos = despesasFiltradas.reduce((s, d) => s + d.valor, 0);
-      const lucros = ganhos - gastos;
-
-      document.getElementById('ganhos').textContent = ganhos.toFixed(2);
-      document.getElementById('gastos').textContent = gastos.toFixed(2);
-      document.getElementById('lucros').textContent = lucros.toFixed(2);
-
-      // Atualiza listas de detalhes dos Ganhos
-      const listaGanhos = document.getElementById('listaGanhosDetalhes');
-      listaGanhos.innerHTML = '';
-      if (pedidosFiltrados.length === 0) {
-        listaGanhos.innerHTML = '<li class="empty-list-message">Nenhum ganho registrado para o período selecionado.</li>';
-      } else {
-        pedidosFiltrados.forEach(p => {
-            const dataFormatada = p.data ? new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data Indefinida';
-            const li = document.createElement('li');
-            li.textContent = `${dataFormatada} - ${p.nome} (${p.produto}): R$ ${p.valor.toFixed(2)}`;
-            listaGanhos.appendChild(li);
-        });
-      }
-
-      // Atualiza listas de detalhes dos Gastos
-      const listaGastos = document.getElementById('listaGastosDetalhes');
-      listaGastos.innerHTML = '';
-      if (despesasFiltradas.length === 0) {
-        listaGastos.innerHTML = '<li class="empty-list-message">Nenhum gasto registrado para o período selecionado.</li>';
-      } else {
-        despesasFiltradas.forEach(d => {
-            const dataFormatada = d.data ? new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data Indefinida';
-            const li = document.createElement('li');
-            li.textContent = `${dataFormatada} - ${d.categoria} (${d.descricao}): R$ ${d.valor.toFixed(2)}`;
-            listaGastos.appendChild(li);
-        });
-      }
-    }
-
-    function toggleDetalhesFinanceiros(tipo) {
-        const detalhesGanhosDiv = document.getElementById('detalhesGanhos');
-        const detalhesGastosDiv = document.getElementById('detalhesGastos');
-
-        // Fecha o outro painel se estiver aberto
-        if (tipo === 'ganhos' && detalhesGastosDiv.classList.contains('active')) {
-            detalhesGastosDiv.classList.remove('active');
-        } else if (tipo === 'gastos' && detalhesGanhosDiv.classList.contains('active')) {
-            detalhesGanhosDiv.classList.remove('active');
-        }
-
-        // Alterna o painel clicado
-        if (tipo === 'ganhos') {
-            detalhesGanhosDiv.classList.toggle('active');
-        } else if (tipo === 'gastos') {
-            detalhesGastosDiv.classList.toggle('active');
-        }
-    }
-
-    // --- Funções de Carga Inicial ---
-    // Esta função é chamada uma única vez ao entrar no app
-    function atualizarTudo() {
-      mostrar('clientes'); // Inicia na seção de Clientes por padrão
-      // As funções de listagem são chamadas dentro de 'mostrar()'
-    }
+    // Inicializa o app ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+        // Nada aqui, o App.entrar() é chamado pelo clique do botão na splash screen
+        // Isso permite a transição da splash
+    });
   </script>
 </body>
 </html>
