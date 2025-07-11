@@ -651,11 +651,7 @@
           listarPedidos();
           break;
         case 'despesas':
-          // Ao mostrar despesas, reseta o estado de visibilidade da lista
-          listaDespesasVisivel = false;
-          document.getElementById('listaDespesas').style.display = 'none';
-          document.getElementById('btnVerDespesas').innerHTML = '<i class="fa-solid fa-eye"></i> Ver Todas as Despesas';
-          // Para iniciar com a lista oculta e o botão no estado "Ver"
+          filtrarDespesas(); // Lista as despesas imediatamente
           break;
         case 'estoque':
           listarProdutos();
@@ -778,7 +774,7 @@
       telefoneInput.value = '';
       enderecoInput.value = '';
 
-      listarClientes();
+      listarClientes(); // Garante que a lista seja atualizada após salvar
       alert('Cliente salvo com sucesso!');
     }
 
@@ -789,22 +785,26 @@
 
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
 
+      // Se não houver clientes no total, exibe a mensagem de lista vazia
+      if (clientes.length === 0) {
+        listaClientesUl.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+        return; // Sai da função
+      }
+
+      // Filtra os clientes se houver um termo de busca
       const clientesFiltrados = clientes.filter(c =>
           c.nome.toLowerCase().includes(termoBusca) ||
           c.telefone.toLowerCase().includes(termoBusca) ||
           c.endereco.toLowerCase().includes(termoBusca)
       );
 
-      if (clientes.length === 0) {
-        listaClientesUl.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
-        return;
-      }
-
-      if (clientesFiltrados.length === 0 && termoBusca !== '') {
+      // Se houver clientes, mas nenhum corresponder ao filtro
+      if (clientesFiltrados.length === 0) {
         listaClientesUl.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
-        return;
+        return; // Sai da função
       }
 
+      // Se houver clientes (e/ou filtro aplicado) e clientes encontrados, exibe a lista
       clientesFiltrados.forEach((cliente, index) => {
         const li = document.createElement('li');
         const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
@@ -901,9 +901,6 @@
     }
 
     // --- MÓDULO DESPESAS ---
-
-    // Remover a variável listaDespesasVisivel e toggleListaDespesas.
-    // A lista de despesas agora estará sempre visível ou filtrada.
 
     function salvarDespesa() {
       const categoriaSelect = document.getElementById('categoriaDespesa');
@@ -1261,12 +1258,7 @@
     // Esta função é chamada uma única vez ao entrar no app
     function atualizarTudo() {
       mostrar('clientes'); // Inicia na seção de Clientes por padrão
-      listarClientes();
-      listarPedidos();
-      filtrarDespesas(); // Lista as despesas imediatamente (não oculta por padrão)
-      atualizarFinanceiro();
-      listarProdutos();
-      listarHistorico();
+      // As funções de listagem são chamadas dentro de 'mostrar()'
     }
   </script>
 </body>
