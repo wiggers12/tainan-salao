@@ -691,13 +691,13 @@
         // Coleta anos de pedidos
         const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
         pedidos.forEach(p => {
-            if (p.data) allYears.add(new Date(p.data).getFullYear());
+            if (p.data) allYears.add(new Date(p.data + 'T00:00:00').getFullYear());
         });
 
         // Coleta anos de despesas
         const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
         despesas.forEach(d => {
-            if (d.data) allYears.add(new Date(d.data).getFullYear());
+            if (d.data) allYears.add(new Date(d.data + 'T00:00:00').getFullYear());
         });
 
         const sortedYears = Array.from(allYears).sort((a, b) => a - b);
