@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Doce Sabor Caseiro</title>
   <style>
+    /* Estilos globais e da splash screen */
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body { background: #fff0f5; margin: 0; color: #333; }
     .splash {
@@ -18,6 +19,8 @@
       cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .container { display: none; padding: 20px; }
+
+    /* Estilos da barra de navegação */
     nav {
       display: flex; flex-wrap: wrap; justify-content: space-around;
       background: #f28ab2; padding: 12px 0; position: sticky; top: 0; z-index: 10;
@@ -25,12 +28,15 @@
     nav button {
       background: none; border: none; color: white; font-size: 1rem;
       font-weight: bold; cursor: pointer; transition: transform 0.2s;
+      display: flex; align-items: center; gap: 5px; /* Para alinhar texto e ícone */
     }
     nav button:hover { transform: scale(1.05); }
+
+    /* Estilos das seções */
     section {
       display: none; background: white; padding: 20px;
       margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      max-width: 600px; margin-left: auto; margin-right: auto; /* Centraliza as seções */
+      max-width: 600px; margin-left: auto; margin-right: auto;
     }
     section.active { display: block; }
     h2 {
@@ -45,14 +51,107 @@
       background: #f28ab2; color: white; padding: 10px 20px;
       border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
     }
+    button.edit, button.delete {
+        background: #ffc107; /* Amarelo para editar */
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 5px;
+        font-size: 0.8em;
+    }
+    button.delete {
+        background: #dc3545; /* Vermelho para excluir */
+    }
+    button.edit:hover, button.delete:hover {
+        opacity: 0.9;
+    }
+
+    /* Estilos das listas de itens */
     ul { list-style: none; padding: 0; margin-top: 10px; max-height: 300px; overflow-y: auto; }
     li {
       background: #ffe6ec; margin-bottom: 8px; padding: 10px;
       border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center; /* Para alinhar texto e botões */
+      flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
     }
-    .falta { background: #ffcdd2; }
-    .baixo { background: #fff3cd; }
+    li .item-details {
+        flex-grow: 1; /* Permite que os detalhes do item ocupem o espaço disponível */
+    }
+    li .item-actions {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px; /* Espaçamento caso quebre linha */
+    }
+    @media (min-width: 480px) {
+        li .item-actions {
+            margin-top: 0; /* Remove espaçamento se não quebrar linha */
+        }
+    }
+
+    /* Cores de status para estoque */
+    .falta { background: #ffcdd2; } /* Vermelho claro */
+    .baixo { background: #fff3cd; } /* Amarelo claro */
     .historico { font-size: 0.9rem; color: #555; }
+
+    /* Estilos do Financeiro aprimorado */
+    .financeiro-summary p {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+    .financeiro-detail-toggle {
+        background: #f28ab2;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+    .financeiro-list-container {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 10px;
+        background: #fefefe;
+        display: none; /* Inicia oculto */
+    }
+    .financeiro-list-container.active {
+        display: block;
+    }
+    .financeiro-list-container h4 {
+        color: #f28ab2;
+        margin-top: 0;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #f28ab2;
+        padding-bottom: 5px;
+    }
+    .financeiro-list-container ul {
+        max-height: none; /* Sobrescreve o max-height para este ul específico */
+        overflow-y: visible; /* Sobrescreve para este ul específico */
+        padding-left: 0;
+    }
+    .financeiro-list-container li {
+        background: #fff0f5; /* Cor mais clara para itens de detalhe */
+        font-size: 0.9em;
+        padding: 8px;
+        margin-bottom: 5px;
+        border: 1px solid #ffe6ec;
+    }
+    .financeiro-filters {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    .financeiro-filters select {
+        flex: 1;
+        min-width: 120px;
+        margin-bottom: 0; /* Remove margin-bottom padrão */
+    }
   </style>
 </head>
 <body>
@@ -68,7 +167,8 @@
       <button onclick="mostrar('pedidos')">🧁 Pedidos</button>
       <button onclick="mostrar('despesas')">💸 Despesas</button>
       <button onclick="mostrar('estoque')">📦 Estoque</button>
-      <button onclick="mostrar('financeiro')">💲 Financeiro</button> </nav>
+      <button onclick="mostrar('financeiro')">💲 Financeiro</button>
+    </nav>
 
     <section id="clientes" class="active">
       <h2>Cadastro de Clientes</h2>
@@ -190,15 +290,48 @@
 
     <section id="financeiro">
       <h2>Financeiro</h2>
-      <p>
-        <strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span>
-      </p>
-      <p>
-        <strong>Gastos:</strong> R$ <span id="gastos">0.00</span>
-      </p>
-      <p>
-        <strong>Lucros:</strong> R$ <span id="lucros">0.00</span>
-      </p>
+      <div class="financeiro-filters">
+        <select id="filtroMesFinanceiro" onchange="atualizarFinanceiro()">
+          <option value="">Todos os Meses</option>
+          <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+          <option value="03">Março</option><option value="04">Abril</option>
+          <option value="05">Maio</option><option value="06">Junho</option>
+          <option value="07">Julho</option><option value="08">Agosto</option>
+          <option value="09">Setembro</option><option value="10">Outubro</option>
+          <option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+        <select id="filtroAnoFinanceiro" onchange="atualizarFinanceiro()">
+          <option value="">Todos os Anos</option>
+          </select>
+      </div>
+
+      <div class="financeiro-summary">
+        <p>
+          <strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span>
+        </p>
+        <p>
+          <strong>Gastos:</strong> R$ <span id="gastos">0.00</span>
+        </p>
+        <p>
+          <strong>Lucros:</strong> R$ <span id="lucros">0.00</span>
+        </p>
+      </div>
+
+      <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('ganhos')">
+        Detalhes dos Ganhos
+      </button>
+      <div id="detalhesGanhos" class="financeiro-list-container">
+        <h4>Ganhos por Pedido</h4>
+        <ul id="listaGanhosDetalhes"></ul>
+      </div>
+
+      <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('gastos')">
+        Detalhes dos Gastos
+      </button>
+      <div id="detalhesGastos" class="financeiro-list-container">
+        <h4>Gastos por Despesa</h4>
+        <ul id="listaGastosDetalhes"></ul>
+      </div>
     </section>
   </div>
 
@@ -206,12 +339,69 @@
     function entrar() {
       document.getElementById('splash').style.display = 'none';
       document.getElementById('app').style.display = 'block';
+      preencherFiltrosAnoFinanceiro(); // Adicionado para preencher os anos disponíveis
       atualizarTudo();
     }
 
     function mostrar(secao) {
       document.querySelectorAll('section').forEach((s) => s.classList.remove('active'));
       document.getElementById(secao).classList.add('active');
+    }
+
+    // Funções genéricas de Edição e Exclusão
+    // Parâmetros:
+    //  - key: chave do localStorage (ex: 'clientes', 'pedidos')
+    //  - id: índice do item na lista
+    //  - formFields: array de IDs dos campos de formulário para preencher na edição
+    //  - listFunction: função que lista os itens (para atualizar a UI)
+    //  - itemToDisplay: função que retorna a string de exibição do item para o prompt de confirmação
+    function editarItem(key, id, formFields, listFunction, itemToDisplay) {
+        let items = JSON.parse(localStorage.getItem(key) || '[]');
+        const item = items[id];
+
+        if (!item) return;
+
+        // Preenche os campos do formulário
+        for (const field of formFields) {
+            const inputElement = document.getElementById(field.id);
+            if (inputElement) {
+                // Lida com tipos de campo específicos (ex: 'date', 'number')
+                if (field.type === 'date') {
+                    inputElement.value = item[field.name]; // Assume que o nome do campo corresponde à chave no objeto
+                } else if (field.type === 'number') {
+                     inputElement.value = parseFloat(item[field.name]);
+                }
+                else {
+                    inputElement.value = item[field.name];
+                }
+            }
+        }
+
+        // Remove o item original para que uma nova versão editada possa ser salva
+        if (confirm(`Deseja editar este item? O item original será removido ao salvar: ${itemToDisplay(item)}`)) {
+            items.splice(id, 1);
+            localStorage.setItem(key, JSON.stringify(items));
+            alert('Item pronto para edição nos campos acima. Lembre-se de salvar novamente!');
+            listFunction(); // Atualiza a lista para remover o item "editado" temporariamente
+        }
+    }
+
+    function excluirItem(key, id, listFunction, itemToDisplay) {
+        let items = JSON.parse(localStorage.getItem(key) || '[]');
+        const item = items[id];
+
+        if (!item) return;
+
+        if (confirm(`Tem certeza que deseja excluir: ${itemToDisplay(item)}?`)) {
+            items.splice(id, 1);
+            localStorage.setItem(key, JSON.stringify(items));
+            listFunction();
+            // Se for pedido ou despesa, atualizar o financeiro
+            if (key === 'pedidos' || key === 'despesas') {
+                atualizarFinanceiro();
+            }
+            alert('Item excluído com sucesso!');
+        }
     }
 
     // CLIENTES
@@ -225,16 +415,24 @@
       localStorage.setItem('clientes', JSON.stringify(clientes));
       clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
       listarClientes();
+      alert('Cliente salvo com sucesso!');
     }
     function listarClientes() {
       const termo = document.getElementById('buscaCliente').value.toLowerCase();
       const lista = document.getElementById('listaClientes');
       lista.innerHTML = '';
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-      clientes.forEach((c) => {
+      clientes.forEach((c, index) => {
         if (!c.nome.toLowerCase().includes(termo)) return;
         const li = document.createElement('li');
-        li.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
+        const itemText = `${c.nome} - ${c.telefone} (${c.endereco})`;
+        li.innerHTML = `
+            <span class="item-details">${itemText}</span>
+            <div class="item-actions">
+                <button class="edit" onclick="editarItem('clientes', ${index}, [{id:'clienteNome', name:'nome'}, {id:'clienteTelefone', name:'telefone'}, {id:'clienteEndereco', name:'endereco'}], listarClientes, (item) => \`${item.nome}\`)">Editar</button>
+                <button class="delete" onclick="excluirItem('clientes', ${index}, listarClientes, (item) => \`${item.nome}\`)">Excluir</button>
+            </div>
+        `;
         lista.appendChild(li);
       });
     }
@@ -246,21 +444,35 @@
       const valor = parseFloat(valorPedido.value);
       const entrega = formaEntrega.value;
       const data = dataEntrega.value;
-      if (!nome || !produto || isNaN(valor)) return alert('Preencha todos os campos');
+      if (!nome || !produto || isNaN(valor) || valor <= 0 || !data) return alert('Preencha todos os campos e o valor deve ser positivo.');
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
       pedidos.push({ nome, produto, valor, entrega, data });
       localStorage.setItem('pedidos', JSON.stringify(pedidos));
       pedidoCliente.value = tipoProduto.value = valorPedido.value = dataEntrega.value = '';
       listarPedidos();
       atualizarFinanceiro();
+      alert('Pedido salvo com sucesso!');
     }
     function listarPedidos() {
       const lista = document.getElementById('listaPedidos');
       lista.innerHTML = '';
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-      pedidos.forEach((p) => {
+      pedidos.forEach((p, index) => {
         const li = document.createElement('li');
-        li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} - ${p.entrega} (${p.data})`;
+        const itemText = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} - ${p.entrega} (${p.data})`;
+        li.innerHTML = `
+            <span class="item-details">${itemText}</span>
+            <div class="item-actions">
+                <button class="edit" onclick="editarItem('pedidos', ${index}, [
+                    {id:'pedidoCliente', name:'nome'},
+                    {id:'tipoProduto', name:'produto'},
+                    {id:'valorPedido', name:'valor', type:'number'},
+                    {id:'dataEntrega', name:'data', type:'date'},
+                    {id:'formaEntrega', name:'entrega'}
+                ], listarPedidos, (item) => \`Pedido de ${item.nome} (${item.produto})\`)">Editar</button>
+                <button class="delete" onclick="excluirItem('pedidos', ${index}, listarPedidos, (item) => \`Pedido de ${item.nome} (${item.produto})\`)">Excluir</button>
+            </div>
+        `;
         lista.appendChild(li);
       });
     }
@@ -274,8 +486,8 @@
       const data = document.getElementById('dataDespesa').value;
       const valor = parseFloat(document.getElementById('valorDespesa').value);
 
-      if (!descricao || !data || isNaN(valor)) {
-        alert('Preencha todos os campos corretamente!');
+      if (!descricao || !data || isNaN(valor) || valor <= 0) {
+        alert('Preencha todos os campos corretamente e o valor deve ser positivo!');
         return;
       }
 
@@ -308,13 +520,25 @@
         return;
       }
 
-      filtradas.forEach((d) => {
+      filtradas.forEach((d, index) => {
         const li = document.createElement('li');
         li.style.background = '#ffe6ec';
         li.style.marginBottom = '8px';
         li.style.padding = '10px';
         li.style.borderRadius = '6px';
-        li.textContent = `${d.data} | ${d.categoria} | ${d.descricao} - R$ ${d.valor.toFixed(2)}`;
+        const itemText = `${d.data} | ${d.categoria} | ${d.descricao} - R$ ${d.valor.toFixed(2)}`;
+        li.innerHTML = `
+            <span class="item-details">${itemText}</span>
+            <div class="item-actions">
+                <button class="edit" onclick="editarItem('despesas', ${index}, [
+                    {id:'categoriaDespesa', name:'categoria'},
+                    {id:'descricaoDespesa', name:'descricao'},
+                    {id:'dataDespesa', name:'data', type:'date'},
+                    {id:'valorDespesa', name:'valor', type:'number'}
+                ], filtrarDespesas, (item) => \`Despesa: ${item.descricao} (R$${item.valor.toFixed(2)})\`)">Editar</button>
+                <button class="delete" onclick="excluirItem('despesas', ${index}, filtrarDespesas, (item) => \`Despesa: ${item.descricao} (R$${item.valor.toFixed(2)})\`)">Excluir</button>
+            </div>
+        `;
         lista.appendChild(li);
       });
     }
@@ -341,29 +565,64 @@
       const qtd = parseInt(produtoQtd.value);
       const min = parseInt(produtoMin.value);
       const validade = produtoValidade.value;
-      if (!nome || isNaN(qtd)) return alert('Preencha nome e quantidade corretamente.');
+      if (!nome || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0) return alert('Preencha nome, quantidade e mínimo ideal corretamente (valores não negativos).');
+
       const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-      estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
+      const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
+
+      if (itemExistenteIndex > -1) {
+          // Se o item já existe, pergunta se quer atualizar a quantidade ou criar um novo
+          if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja adicionar ${qtd} à quantidade existente ou editar?`)) {
+              estoque[itemExistenteIndex].qtd += qtd;
+              if (validade) estoque[itemExistenteIndex].validade = validade; // Atualiza validade se fornecida
+              if (min) estoque[itemExistenteIndex].min = min; // Atualiza min se fornecido
+              registrarHistorico(`+${qtd} ${nome} (atualização)`);
+          } else {
+              // Se não quiser adicionar, apenas limpa os campos
+              produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
+              return;
+          }
+      } else {
+          // Adiciona novo item se não existir
+          estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
+          registrarHistorico(`+${qtd} ${nome} (novo)`);
+      }
+
       localStorage.setItem('estoque', JSON.stringify(estoque));
-      registrarHistorico(`+${qtd} ${nome}`);
       produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
       listarProdutos();
+      alert('Produto salvo/atualizado com sucesso!');
     }
+
     function listarProdutos() {
       const lista = document.getElementById('listaEstoque');
       lista.innerHTML = '';
       const filtro = buscaProduto.value.toLowerCase();
       const tipoFiltro = filtroTipo.value;
       const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-      estoque.forEach((p, i) => {
+      estoque.forEach((p, index) => {
         if (filtro && !p.nome.toLowerCase().includes(filtro)) return;
         if (tipoFiltro && p.tipo !== tipoFiltro) return;
         const li = document.createElement('li');
         if (p.qtd === 0) li.classList.add('falta');
         else if (p.min > 0 && p.qtd < p.min) li.classList.add('baixo');
-        li.innerHTML = `<strong>${p.nome}</strong> (${p.tipo}) - ${p.qtd} un. ${
+        const itemText = `<strong>${p.nome}</strong> (${p.tipo}) - ${p.qtd} un. ${
           p.validade ? ' - Venc: ' + p.validade : ''
-        } <button onclick="usarProduto(${i})">Usar</button>`;
+        }`;
+        li.innerHTML = `
+            <span class="item-details">${itemText}</span>
+            <div class="item-actions">
+                <button onclick="usarProduto(${index})">Usar</button>
+                <button class="edit" onclick="editarItem('estoque', ${index}, [
+                    {id:'produtoNome', name:'nome'},
+                    {id:'produtoTipo', name:'tipo'},
+                    {id:'produtoQtd', name:'qtd', type:'number'},
+                    {id:'produtoMin', name:'min', type:'number'},
+                    {id:'produtoValidade', name:'validade', type:'date'}
+                ], listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un.)\`)">Editar</button>
+                <button class="delete" onclick="excluirItem('estoque', ${index}, listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un.)\`)">Excluir</button>
+            </div>
+        `;
         lista.appendChild(li);
       });
     }
@@ -374,6 +633,9 @@
         localStorage.setItem('estoque', JSON.stringify(estoque));
         registrarHistorico(`-1 ${estoque[index].nome}`);
         listarProdutos();
+        alert(`1 unidade de "${estoque[index].nome}" usada.`);
+      } else {
+        alert(`Não há mais unidades de "${estoque[index].nome}" no estoque.`);
       }
     }
     function registrarHistorico(texto) {
@@ -394,26 +656,88 @@
       });
     }
 
-    // FINANCEIRO
+    // FINANCEIRO APRIMORADO
+    function preencherFiltrosAnoFinanceiro() {
+        const selectAno = document.getElementById('filtroAnoFinanceiro');
+        selectAno.innerHTML = '<option value="">Todos os Anos</option>'; // Resetar
+        const currentYear = new Date().getFullYear();
+        for (let i = currentYear - 5; i <= currentYear + 1; i++) { // Últimos 5 anos, ano atual e próximo
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.textContent = i.toString();
+            selectAno.appendChild(option);
+        }
+    }
+
     function atualizarFinanceiro() {
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
       const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      const ganhos = pedidos.reduce((s, p) => s + p.valor, 0);
-      const gastos = despesas.reduce((s, d) => s + d.valor, 0);
+
+      const filtroMes = document.getElementById('filtroMesFinanceiro').value;
+      const filtroAno = document.getElementById('filtroAnoFinanceiro').value;
+
+      const pedidosFiltrados = pedidos.filter(p => {
+          const pedidoDate = new Date(p.data + 'T00:00:00'); // Garante fuso horário para comparação correta
+          const pedidoMonth = (pedidoDate.getMonth() + 1).toString().padStart(2, '0');
+          const pedidoYear = pedidoDate.getFullYear().toString();
+          return (filtroMes === '' || pedidoMonth === filtroMes) &&
+                 (filtroAno === '' || pedidoYear === filtroAno);
+      });
+
+      const despesasFiltradas = despesas.filter(d => {
+          const despesaDate = new Date(d.data + 'T00:00:00');
+          const despesaMonth = (despesaDate.getMonth() + 1).toString().padStart(2, '0');
+          const despesaYear = despesaDate.getFullYear().toString();
+          return (filtroMes === '' || despesaMonth === filtroMes) &&
+                 (filtroAno === '' || despesaYear === filtroAno);
+      });
+
+      const ganhos = pedidosFiltrados.reduce((s, p) => s + p.valor, 0);
+      const gastos = despesasFiltradas.reduce((s, d) => s + d.valor, 0);
       const lucros = ganhos - gastos;
+
       document.getElementById('ganhos').textContent = ganhos.toFixed(2);
       document.getElementById('gastos').textContent = gastos.toFixed(2);
       document.getElementById('lucros').textContent = lucros.toFixed(2);
+
+      // Atualiza listas de detalhes
+      const listaGanhos = document.getElementById('listaGanhosDetalhes');
+      listaGanhos.innerHTML = '';
+      pedidosFiltrados.forEach(p => {
+          const li = document.createElement('li');
+          li.textContent = `${p.data} - ${p.nome} (${p.produto}): R$ ${p.valor.toFixed(2)}`;
+          listaGanhos.appendChild(li);
+      });
+
+      const listaGastos = document.getElementById('listaGastosDetalhes');
+      listaGastos.innerHTML = '';
+      despesasFiltradas.forEach(d => {
+          const li = document.createElement('li');
+          li.textContent = `${d.data} - ${d.categoria} (${d.descricao}): R$ ${d.valor.toFixed(2)}`;
+          listaGastos.appendChild(li);
+      });
+    }
+
+    function toggleDetalhesFinanceiros(tipo) {
+        const detalhesGanhosDiv = document.getElementById('detalhesGanhos');
+        const detalhesGastosDiv = document.getElementById('detalhesGastos');
+
+        if (tipo === 'ganhos') {
+            detalhesGanhosDiv.classList.toggle('active');
+            detalhesGastosDiv.classList.remove('active'); // Garante que apenas um esteja aberto
+        } else if (tipo === 'gastos') {
+            detalhesGastosDiv.classList.toggle('active');
+            detalhesGanhosDiv.classList.remove('active'); // Garante que apenas um esteja aberto
+        }
     }
 
     function atualizarTudo() {
       listarClientes();
       listarPedidos();
-      atualizarFinanceiro();
+      filtrarDespesas(); // Chama este para a lista de despesas inicial
+      atualizarFinanceiro(); // Chama este para o financeiro
       listarProdutos();
       listarHistorico();
-      // Não chame listarDespesas aqui, pois filtrarDespesas já faz o trabalho quando a seção é ativada ou a visibilidade é alternada.
-      // A visibilidade inicial da lista de despesas é 'none' por CSS.
     }
   </script>
 </body>
