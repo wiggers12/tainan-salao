@@ -756,12 +756,12 @@
         },
 
         // Função genérica para editar um item.
-        editItem: (key, id, formFields, listFunction, itemToDisplay) => {
+        editItem: (key, originalId, formFields, listFunction, itemToDisplay, customPrepareEdit = null) => {
             let items = Utils.getStorage(key);
-            const item = items[id];
+            const item = items[originalId]; // Usa o originalId
 
             if (!item) {
-                console.error('Item não encontrado para edição:', key, id);
+                console.error('Item não encontrado para edição:', key, originalId);
                 alert('Erro: Item não encontrado para edição.');
                 return;
             }
@@ -780,32 +780,41 @@
                 }
             });
 
+            // Se houver uma função customizada de preparação para edição (ex: para ingredientes do produto)
+            if (customPrepareEdit && typeof customPrepareEdit === 'function') {
+                customPrepareEdit(item);
+            }
+
+
             if (confirm(`Você está prestes a editar este item:\n\n${itemToDisplay(item)}\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Por favor, faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O item original será removido ao confirmar.`)) {
                 // Remove o item original da lista, ele será recadastrado com as alterações
-                items.splice(id, 1);
+                items.splice(originalId, 1);
                 Utils.setStorage(key, items);
                 listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
                 alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
             } else {
                 alert('Edição cancelada. O item original não foi alterado.');
                 Utils.clearForm(...formFields.map(f => f.id)); // Limpa os campos se cancelar a edição
+                if (customPrepareEdit) { // Limpa também estados temporários de edição
+                    customPrepareEdit(null); // Passa null para indicar que deve limpar
+                }
                 listFunction(); // Recarrega a lista para mostrar o item original
             }
         },
 
         // Função genérica para excluir um item.
-        deleteItem: (key, id, listFunction, itemToDisplay, onCompleteCallback = null) => {
+        deleteItem: (key, originalId, listFunction, itemToDisplay, onCompleteCallback = null) => {
             let items = Utils.getStorage(key);
-            const item = items[id];
+            const item = items[originalId]; // Usa o originalId
 
             if (!item) {
-                console.error('Item não encontrado para exclusão:', key, id);
+                console.error('Item não encontrado para exclusão:', key, originalId);
                 alert('Erro: Item não encontrado para exclusão.');
                 return;
             }
 
             if (confirm(`Tem certeza que deseja excluir o seguinte item?\n\n${itemToDisplay(item)}`)) {
-                items.splice(id, 1);
+                items.splice(originalId, 1);
                 Utils.setStorage(key, items);
                 listFunction(); // Atualiza a UI
                 if (onCompleteCallback && typeof onCompleteCallback === 'function') {
@@ -856,7 +865,8 @@
                 case 'produtos':
                     Produtos.carregarIngredientesParaSelect();
                     Produtos.listarProdutosFinais();
-                    Produtos.ingredientesTemporarios = []; // Garante que a lista temporária esteja limpa ao mudar para Produtos
+                    // Garante que a lista temporária esteja limpa ao mudar para Produtos
+                    Produtos.ingredientesTemporarios = []; 
                     Produtos.renderizarIngredientesTemporarios(); // Renderiza a lista temporária vazia
                     break;
                 case 'despesas':
@@ -931,15 +941,24 @@
                 return;
             }
 
-            if (clientesFiltrados.length === 0) { // Se há clientes, mas NENHUM corresponde à busca
+            if (clientesFiltrados.length === 0 && termoBusca !== '') { // Se há clientes, mas NENHUM corresponde à busca
                 Clientes.listElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
                 return;
             }
+            // Se não há termo de busca e nenhum cliente, ou se a busca retornou clientes
+            if (clientesFiltrados.length === 0 && termoBusca === '') {
+                 Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+                 return;
+            }
 
-            clientesFiltrados.forEach((cliente, index) => {
-                // É importante encontrar o índice original do item para edição/exclusão,
-                // já que o array filtrado tem índices diferentes.
-                const originalIndex = clientes.findIndex(c => c.nome === cliente.nome && c.telefone === cliente.telefone);
+
+            clientesFiltrados.forEach((cliente) => {
+                // É CRÍTICO encontrar o índice original do item no array NÃO filtrado
+                const originalIndex = clientes.findIndex(c => 
+                    c.nome === cliente.nome && 
+                    c.telefone === cliente.telefone && 
+                    c.endereco === cliente.endereco
+                );
 
                 const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
                 const actionsHtml = `
@@ -1009,14 +1028,18 @@
                 return;
             }
 
-            if (pedidosFiltrados.length === 0) {
+            if (pedidosFiltrados.length === 0 && termoBusca !== '') {
                 Pedidos.listElement.innerHTML = `<li class="empty-list-message">Nenhum pedido encontrado com "${termoBusca}".</li>`;
                 return;
+            }
+             if (pedidosFiltrados.length === 0 && termoBusca === '') {
+                 Pedidos.listElement.innerHTML = '<li class="empty-list-message">Nenhum pedido cadastrado ainda.</li>';
+                 return;
             }
 
             pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-            pedidosFiltrados.forEach((p, index) => {
+            pedidosFiltrados.forEach((p) => {
                 // Encontrar o índice original para a edição/exclusão
                 const originalIndex = pedidos.findIndex(item =>
                     item.nome === p.nome &&
@@ -1162,16 +1185,22 @@
                 return;
             }
 
-            if (produtosFiltrados.length === 0) {
+            if (produtosFiltrados.length === 0 && termoBusca !== '') {
                 Produtos.listElement.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com "${termoBusca}".</li>`;
                 return;
             }
+            if (produtosFiltrados.length === 0 && termoBusca === '') {
+                 Produtos.listElement.innerHTML = '<li class="empty-list-message">Nenhum produto final cadastrado ainda.</li>';
+                 return;
+            }
 
-            produtosFiltrados.forEach((produto, index) => {
+
+            produtosFiltrados.forEach((produto) => {
                 // Encontrar o índice original para a edição/exclusão
                 const originalIndex = produtos.findIndex(item =>
                     item.nome === produto.nome &&
-                    item.precoVenda === produto.precoVenda
+                    item.precoVenda === produto.precoVenda &&
+                    JSON.stringify(item.ingredientes || []) === JSON.stringify(produto.ingredientes || []) // Comparar ingredientes para unicidade
                 );
 
                 let ingredientesHtml = 'Nenhum ingrediente associado.';
@@ -1186,7 +1215,7 @@
                     Ingredientes: ${ingredientesHtml}
                 `;
                 const actionsHtml = `
-                    <button class="edit" onclick="Produtos.prepararEdicaoProdutoFinal(${originalIndex})">
+                    <button class="edit" onclick="Utils.editItem('produtosFinais', ${originalIndex}, Produtos.formFields, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`, Produtos.prepararEdicaoProdutoFinal)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
                     <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${originalIndex}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
@@ -1197,37 +1226,15 @@
             });
         },
 
-        prepararEdicaoProdutoFinal: (index) => {
-            const produtos = Utils.getStorage('produtosFinais');
-            const produto = produtos[index];
-
-            if (!produto) {
-                alert('Produto não encontrado para edição.');
-                return;
-            }
-
-            // Preenche os campos do formulário
-            Produtos.nomeInput.value = produto.nome || '';
-            Produtos.precoVendaInput.value = produto.precoVenda !== undefined ? parseFloat(produto.precoVenda) : '';
-            Produtos.custoProducaoInput.value = produto.custoProducao !== undefined ? parseFloat(produto.custoProducao) : '';
-            
-            // Carrega os ingredientes do produto para o array temporário e renderiza
-            Produtos.ingredientesTemporarios = [...(produto.ingredientes || [])];
-            Produtos.renderizarIngredientesTemporarios();
-
-            if (confirm(`Você está prestes a editar o produto "${produto.nome}".\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O produto original será removido ao confirmar.`)) {
-                // Remove o produto original da lista, ele será recadastrado com as alterações
-                produtos.splice(index, 1);
-                Utils.setStorage('produtosFinais', produtos);
-                Produtos.listarProdutosFinais(); // Atualiza a lista para refletir a remoção (temporária) do item original
-                alert('Produto pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
+        // Função auxiliar para preparar a edição de um produto final (para o Utils.editItem)
+        prepararEdicaoProdutoFinal: (produto) => {
+            if (produto) {
+                Produtos.ingredientesTemporarios = [...(produto.ingredientes || [])];
+                Produtos.renderizarIngredientesTemporarios();
             } else {
-                // Cancela a edição e limpa os campos
-                Utils.clearForm('produtoFinalNome', 'produtoFinalPrecoVenda', 'produtoFinalCustoProducao');
+                // Se null, significa que a edição foi cancelada e deve limpar
                 Produtos.ingredientesTemporarios = [];
                 Produtos.renderizarIngredientesTemporarios();
-                Produtos.listarProdutosFinais(); // Recarrega a lista para mostrar o item original
-                alert('Edição de produto final cancelada. O produto original não foi alterado.');
             }
         }
     };
@@ -1284,14 +1291,18 @@
                 return;
             }
 
-            if (despesasFiltradas.length === 0) {
+            if (despesasFiltradas.length === 0 && termoBusca !== '') {
                 Despesas.listElement.innerHTML = `<li class="empty-list-message">Nenhuma despesa encontrada com "${termoBusca}".</li>`;
                 return;
+            }
+            if (despesasFiltradas.length === 0 && termoBusca === '') {
+                 Despesas.listElement.innerHTML = '<li class="empty-list-message">Nenhuma despesa cadastrada ainda.</li>';
+                 return;
             }
 
             despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-            despesasFiltradas.forEach((d, index) => {
+            despesasFiltradas.forEach((d) => {
                 // Encontrar o índice original para a edição/exclusão
                 const originalIndex = despesas.findIndex(item =>
                     item.categoria === d.categoria &&
@@ -1391,12 +1402,17 @@
                 return;
             }
 
-            if (produtosFiltrados.length === 0) {
+            if (produtosFiltrados.length === 0 && termoBusca !== '') {
                 Estoque.listElement.innerHTML = `<li class="empty-list-message">Nenhum item de estoque encontrado com os filtros aplicados.</li>`;
                 return;
             }
+             if (produtosFiltrados.length === 0 && termoBusca === '') {
+                 Estoque.listElement.innerHTML = '<li class="empty-list-message">Nenhum item em estoque.</li>';
+                 return;
+            }
 
-            produtosFiltrados.forEach((produto, index) => {
+
+            produtosFiltrados.forEach((produto) => {
                 // Encontrar o índice original para a edição/exclusão
                 const originalIndex = estoque.findIndex(item =>
                     item.nome === produto.nome &&
@@ -1423,19 +1439,26 @@
             });
         },
 
-        usarProduto: (index) => {
+        usarProduto: (originalIndex) => { // Alterado para originalIndex
             const estoque = Utils.getStorage('estoque');
-            if (estoque[index].qtd > 0) {
-                if (confirm(`Deseja usar 1 unidade de "${estoque[index].nome}"?`)) {
-                    estoque[index].qtd--;
-                    Utils.setStorage('estoque', estoque);
-                    Estoque.registrarHistorico(`-1 ${estoque[index].nome} (${estoque[index].tipo})`);
-                    Estoque.listarProdutos();
+            const item = estoque[originalIndex];
+
+            if (!item) {
+                alert('Item não encontrado no estoque.');
+                return;
+            }
+
+            if (item.qtd > 0) {
+                if (confirm(`Deseja usar 1 unidade de "${item.nome}"?`)) {
+                    item.qtd--;
+                    Utils.setStorage('estoque', estoque); // Salva o array modificado
+                    Estoque.registrarHistorico(`-1 ${item.nome} (${item.tipo})`);
+                    Estoque.listarProdutos(); // Recarrega a lista
                     Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
-                    alert(`1 unidade de "${estoque[index].nome}" usada.`);
+                    alert(`1 unidade de "${item.nome}" usada.`);
                 }
             } else {
-                alert(`Não há mais unidades de "${estoque[index].nome}" no estoque para usar.`);
+                alert(`Não há mais unidades de "${item.nome}" no estoque para usar.`);
             }
         },
 
