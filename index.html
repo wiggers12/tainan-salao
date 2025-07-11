@@ -788,6 +788,8 @@
                 alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
             } else {
                 alert('Edição cancelada. O item original não foi alterado.');
+                Utils.clearForm(...formFields.map(f => f.id)); // Limpa os campos se cancelar a edição
+                listFunction(); // Recarrega a lista para mostrar o item original
             }
         },
 
@@ -854,6 +856,8 @@
                 case 'produtos':
                     Produtos.carregarIngredientesParaSelect();
                     Produtos.listarProdutosFinais();
+                    Produtos.ingredientesTemporarios = []; // Garante que a lista temporária esteja limpa ao mudar para Produtos
+                    Produtos.renderizarIngredientesTemporarios(); // Renderiza a lista temporária vazia
                     break;
                 case 'despesas':
                     Despesas.filtrarDespesas();
@@ -915,29 +919,34 @@
             Clientes.listElement.innerHTML = '';
             const clientes = Utils.getStorage('clientes');
 
-            if (clientes.length === 0) {
-                Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
-                return;
-            }
-
+            // Filtra os clientes
             const clientesFiltrados = clientes.filter(c =>
                 c.nome.toLowerCase().includes(termoBusca) ||
                 c.telefone.toLowerCase().includes(termoBusca) ||
                 c.endereco.toLowerCase().includes(termoBusca)
             );
 
-            if (clientesFiltrados.length === 0) {
+            if (clientes.length === 0) { // Se não há NENHUM cliente cadastrado
+                Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+                return;
+            }
+
+            if (clientesFiltrados.length === 0) { // Se há clientes, mas NENHUM corresponde à busca
                 Clientes.listElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
                 return;
             }
 
             clientesFiltrados.forEach((cliente, index) => {
+                // É importante encontrar o índice original do item para edição/exclusão,
+                // já que o array filtrado tem índices diferentes.
+                const originalIndex = clientes.findIndex(c => c.nome === cliente.nome && c.telefone === cliente.telefone);
+
                 const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('clientes', ${index}, Clientes.formFields, Clientes.listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
+                    <button class="edit" onclick="Utils.editItem('clientes', ${originalIndex}, Clientes.formFields, Clientes.listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('clientes', ${index}, Clientes.listarClientes, (item) => \`Nome: ${item.nome}\`)">
+                    <button class="delete" onclick="Utils.deleteItem('clientes', ${originalIndex}, Clientes.listarClientes, (item) => \`Nome: ${item.nome}\`)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -989,17 +998,18 @@
             Pedidos.listElement.innerHTML = '';
             const pedidos = Utils.getStorage('pedidos');
 
-            if (pedidos.length === 0) {
-                Pedidos.listElement.innerHTML = '<li class="empty-list-message">Nenhum pedido cadastrado ainda.</li>';
-                return;
-            }
-
+            // Filtra os pedidos
             const pedidosFiltrados = pedidos.filter(p =>
                 p.nome.toLowerCase().includes(termoBusca) ||
                 p.produto.toLowerCase().includes(termoBusca)
             );
 
-            if (pedidosFiltrados.length === 0 && termoBusca !== '') {
+            if (pedidos.length === 0) {
+                Pedidos.listElement.innerHTML = '<li class="empty-list-message">Nenhum pedido cadastrado ainda.</li>';
+                return;
+            }
+
+            if (pedidosFiltrados.length === 0) {
                 Pedidos.listElement.innerHTML = `<li class="empty-list-message">Nenhum pedido encontrado com "${termoBusca}".</li>`;
                 return;
             }
@@ -1007,13 +1017,22 @@
             pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
             pedidosFiltrados.forEach((p, index) => {
+                // Encontrar o índice original para a edição/exclusão
+                const originalIndex = pedidos.findIndex(item =>
+                    item.nome === p.nome &&
+                    item.produto === p.produto &&
+                    item.valor === p.valor &&
+                    item.data === p.data &&
+                    item.entrega === p.entrega
+                );
+
                 const dataFormatada = Utils.formatDate(p.data);
                 const itemText = `<strong>${p.nome}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('pedidos', ${index}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`)">
+                    <button class="edit" onclick="Utils.editItem('pedidos', ${originalIndex}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('pedidos', ${index}, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}\`, Financeiro.atualizarFinanceiro)">
+                    <button class="delete" onclick="Utils.deleteItem('pedidos', ${originalIndex}, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}\`, Financeiro.atualizarFinanceiro)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1045,7 +1064,7 @@
         carregarIngredientesParaSelect: () => {
             const estoque = Utils.getStorage('estoque');
             Produtos.ingredienteSelect.innerHTML = '<option value="">Selecione um Ingrediente/Item de Estoque</option>';
-            estoque.filter(item => item.tipo === 'Ingrediente').forEach((item, index) => {
+            estoque.filter(item => item.tipo === 'Ingrediente').forEach((item) => {
                 const option = document.createElement('option');
                 option.value = item.nome; // Usamos o nome como valor
                 option.textContent = `${item.nome} (Qtd: ${item.qtd})`;
@@ -1072,6 +1091,7 @@
 
             Produtos.renderizarIngredientesTemporarios();
             Utils.clearForm('ingredienteQuantidade'); // Limpa apenas a quantidade
+            Produtos.ingredienteSelect.value = ''; // Limpa o select
         },
 
         removerIngredienteTemp: (index) => {
@@ -1112,7 +1132,7 @@
             }
 
             const produtos = Utils.getStorage('produtosFinais');
-            products.push({ 
+            produtos.push({ 
                 nome, 
                 precoVenda, 
                 custoProducao, 
@@ -1132,21 +1152,28 @@
             Produtos.listElement.innerHTML = '';
             const produtos = Utils.getStorage('produtosFinais');
 
+            // Filtra os produtos
+            const produtosFiltrados = produtos.filter(p =>
+                p.nome.toLowerCase().includes(termoBusca)
+            );
+
             if (produtos.length === 0) {
                 Produtos.listElement.innerHTML = '<li class="empty-list-message">Nenhum produto final cadastrado ainda.</li>';
                 return;
             }
 
-            const produtosFiltrados = produtos.filter(p =>
-                p.nome.toLowerCase().includes(termoBusca)
-            );
-
-            if (produtosFiltrados.length === 0 && termoBusca !== '') {
+            if (produtosFiltrados.length === 0) {
                 Produtos.listElement.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com "${termoBusca}".</li>`;
                 return;
             }
 
             produtosFiltrados.forEach((produto, index) => {
+                // Encontrar o índice original para a edição/exclusão
+                const originalIndex = produtos.findIndex(item =>
+                    item.nome === produto.nome &&
+                    item.precoVenda === produto.precoVenda
+                );
+
                 let ingredientesHtml = 'Nenhum ingrediente associado.';
                 if (produto.ingredientes && produto.ingredientes.length > 0) {
                     ingredientesHtml = produto.ingredientes.map(i => `${i.nome}: ${i.quantidade}un.`).join(', ');
@@ -1159,10 +1186,10 @@
                     Ingredientes: ${ingredientesHtml}
                 `;
                 const actionsHtml = `
-                    <button class="edit" onclick="Produtos.prepararEdicaoProdutoFinal(${index})">
+                    <button class="edit" onclick="Produtos.prepararEdicaoProdutoFinal(${originalIndex})">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${index}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
+                    <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${originalIndex}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1199,6 +1226,7 @@
                 Utils.clearForm('produtoFinalNome', 'produtoFinalPrecoVenda', 'produtoFinalCustoProducao');
                 Produtos.ingredientesTemporarios = [];
                 Produtos.renderizarIngredientesTemporarios();
+                Produtos.listarProdutosFinais(); // Recarrega a lista para mostrar o item original
                 alert('Edição de produto final cancelada. O produto original não foi alterado.');
             }
         }
@@ -1256,7 +1284,7 @@
                 return;
             }
 
-            if (despesasFiltradas.length === 0 && termoBusca !== '') {
+            if (despesasFiltradas.length === 0) {
                 Despesas.listElement.innerHTML = `<li class="empty-list-message">Nenhuma despesa encontrada com "${termoBusca}".</li>`;
                 return;
             }
@@ -1264,13 +1292,21 @@
             despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
             despesasFiltradas.forEach((d, index) => {
+                // Encontrar o índice original para a edição/exclusão
+                const originalIndex = despesas.findIndex(item =>
+                    item.categoria === d.categoria &&
+                    item.descricao === d.descricao &&
+                    item.data === d.data &&
+                    item.valor === d.valor
+                );
+
                 const dataFormatada = Utils.formatDate(d.data);
                 const itemText = `<strong>${dataFormatada}</strong> | ${d.categoria} | ${d.descricao}<br>Valor: R$ ${d.valor.toFixed(2)}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('despesas', ${index}, Despesas.formFields, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
+                    <button class="edit" onclick="Utils.editItem('despesas', ${originalIndex}, Despesas.formFields, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('despesas', ${index}, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`, Financeiro.atualizarFinanceiro)">
+                    <button class="delete" onclick="Utils.deleteItem('despesas', ${originalIndex}, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`, Financeiro.atualizarFinanceiro)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1344,9 +1380,10 @@
 
             const produtosFiltrados = estoque.filter(p => {
                 const nomeMatch = p.nome.toLowerCase().includes(termoBusca);
-                const tipoMatch = p.tipo.toLowerCase().includes(termoBusca);
+                // Permite buscar tanto pelo nome quanto pelo tipo na barra de busca
+                const tipoMatchBusca = p.tipo.toLowerCase().includes(termoBusca); 
                 const filtroTipoMatch = tipoFiltro === '' || p.tipo === tipoFiltro;
-                return (nomeMatch || tipoMatch) && filtroTipoMatch;
+                return (nomeMatch || tipoMatchBusca) && filtroTipoMatch;
             });
 
             if (estoque.length === 0) {
@@ -1354,22 +1391,28 @@
                 return;
             }
 
-            if (produtosFiltrados.length === 0 && (termoBusca !== '' || tipoFiltro !== '')) {
+            if (produtosFiltrados.length === 0) {
                 Estoque.listElement.innerHTML = `<li class="empty-list-message">Nenhum item de estoque encontrado com os filtros aplicados.</li>`;
                 return;
             }
 
             produtosFiltrados.forEach((produto, index) => {
+                // Encontrar o índice original para a edição/exclusão
+                const originalIndex = estoque.findIndex(item =>
+                    item.nome === produto.nome &&
+                    item.tipo === produto.tipo
+                );
+
                 const li = Utils.createListItem(
                     `<strong>${produto.nome}</strong> (${produto.tipo}) - ${produto.qtd} un. (Mín: ${produto.min} un.)${produto.validade ? ` - Venc: ${Utils.formatDate(produto.validade)}` : ''}`,
                     `
-                        <button class="use" onclick="Estoque.usarProduto(${index})">
+                        <button class="use" onclick="Estoque.usarProduto(${originalIndex})">
                             <i class="fa-solid fa-minus"></i> Usar 1
                         </button>
-                        <button class="edit" onclick="Utils.editItem('estoque', ${index}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
+                        <button class="edit" onclick="Utils.editItem('estoque', ${originalIndex}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
                             <i class="fa-solid fa-pen"></i> Editar
                         </button>
-                        <button class="delete" onclick="Utils.deleteItem('estoque', ${index}, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un.)\`)">
+                        <button class="delete" onclick="Utils.deleteItem('estoque', ${originalIndex}, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un.)\`)">
                             <i class="fa-solid fa-trash"></i> Excluir
                         </button>
                     `
