@@ -176,7 +176,7 @@
       <input id="clienteTelefone" placeholder="Telefone" />
       <input id="clienteEndereco" placeholder="Endereço" />
       <button class="save" onclick="salvarCliente()">Salvar</button>
-      <input id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" />
+      <input id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" style="margin-top: 20px;" />
       <ul id="listaClientes"></ul>
     </section>
 
@@ -379,7 +379,7 @@
         if (confirm(`Deseja editar este item? O item original será removido ao confirmar a edição. Por favor, ajuste os campos e clique em 'Salvar' novamente. Item: ${itemToDisplay(item)}`)) {
             items.splice(id, 1); // Remove o item original
             localStorage.setItem(key, JSON.stringify(items));
-            listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
+            listFunction(); // Atualiza a lista para refletir a remoção (tempor&aacute;ria) do item original
             alert('Item pronto para edição nos campos acima. Lembre-se de preencher e salvar novamente!');
         } else {
             // Se o usuário cancelar a edição, os campos podem ficar preenchidos, mas o item não é removido
@@ -416,7 +416,7 @@
       clientes.push({ nome, telefone, endereco });
       localStorage.setItem('clientes', JSON.stringify(clientes));
       clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
-      listarClientes();
+      listarClientes(); // Garante que a lista é atualizada após salvar
       alert('Cliente salvo com sucesso!');
     }
     function listarClientes() {
@@ -583,8 +583,6 @@
               if (validade) estoque[itemExistenteIndex].validade = validade; // Atualiza validade se fornecida
               if (min) estoque[itemExistenteIndex].min = min; // Atualiza min se fornecido
               registrarHistorico(`+${qtd} ${nome} (atualização de estoque)`);
-              localStorage.setItem('estoque', JSON.stringify(estoque));
-              alert(`Quantidade de "${nome}" atualizada para ${estoque[itemExistenteIndex].qtd}.`);
           } else {
               // Se o usuário cancelou e não quer adicionar, não faz nada (ele pode usar editar depois)
               alert('Operação de adição cancelada. Use o botão EDITAR para modificar um item existente.');
@@ -595,13 +593,13 @@
       } else {
           // Adiciona novo item se não existir
           estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
-          localStorage.setItem('estoque', JSON.stringify(estoque));
           registrarHistorico(`+${qtd} ${nome} (novo item no estoque)`);
-          alert('Produto adicionado com sucesso!');
       }
 
+      localStorage.setItem('estoque', JSON.stringify(estoque));
       produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
       listarProdutos();
+      alert('Produto salvo/atualizado com sucesso!');
     }
 
     function listarProdutos() {
@@ -673,15 +671,42 @@
         const selectAno = document.getElementById('filtroAnoFinanceiro');
         selectAno.innerHTML = '<option value="">Todos os Anos</option>'; // Resetar
         const currentYear = new Date().getFullYear();
-        const firstYearWithData = Math.min(...(JSON.parse(localStorage.getItem('pedidos') || '[]').map(p => new Date(p.data).getFullYear()).concat(JSON.parse(localStorage.getItem('despesas') || '[]').map(d => new Date(d.data).getFullYear()))));
+        let allYears = new Set();
 
-        const startYear = isFinite(firstYearWithData) ? Math.min(firstYearWithData, currentYear - 5) : currentYear - 5; // Começa 5 anos antes ou no primeiro dado existente
-        for (let i = startYear; i <= currentYear + 1; i++) { // Últimos N anos, ano atual e próximo
-            const option = document.createElement('option');
-            option.value = i.toString();
-            option.textContent = i.toString();
-            selectAno.appendChild(option);
+        // Coleta anos de pedidos
+        const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+        pedidos.forEach(p => {
+            if (p.data) allYears.add(new Date(p.data).getFullYear());
+        });
+
+        // Coleta anos de despesas
+        const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+        despesas.forEach(d => {
+            if (d.data) allYears.add(new Date(d.data).getFullYear());
+        });
+
+        const sortedYears = Array.from(allYears).sort((a, b) => a - b);
+
+        // Garante que pelo menos o ano atual esteja visível
+        if (!sortedYears.includes(currentYear)) {
+            sortedYears.push(currentYear);
+            sortedYears.sort((a, b) => a - b);
         }
+
+        // Adiciona um ano futuro para o filtro, se não houver um
+        if (!sortedYears.includes(currentYear + 1)) {
+             sortedYears.push(currentYear + 1);
+             sortedYears.sort((a,b) => a - b);
+        }
+
+
+        sortedYears.forEach(year => {
+            const option = document.createElement('option');
+            option.value = year.toString();
+            option.textContent = year.toString();
+            selectAno.appendChild(option);
+        });
+        selectAno.value = currentYear.toString(); // Seleciona o ano atual por padrão
     }
 
     function atualizarFinanceiro() {
@@ -692,7 +717,9 @@
       const filtroAno = document.getElementById('filtroAnoFinanceiro').value;
 
       const pedidosFiltrados = pedidos.filter(p => {
-          const pedidoDate = new Date(p.data + 'T00:00:00'); // Garante fuso horário para comparação correta
+          // Adiciona 'T00:00:00' para garantir que a data seja interpretada em UTC ou no fuso horário local de forma consistente
+          // Evita problemas de fuso horário que podem alterar o dia
+          const pedidoDate = new Date(p.data + 'T00:00:00');
           const pedidoMonth = (pedidoDate.getMonth() + 1).toString().padStart(2, '0');
           const pedidoYear = pedidoDate.getFullYear().toString();
           return (filtroMes === '' || pedidoMonth === filtroMes) &&
