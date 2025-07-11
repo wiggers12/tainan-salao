@@ -1453,12 +1453,18 @@
             Dashboard.proximosPedidosList.innerHTML = '';
             const pedidos = Utils.getStorage('pedidos');
             const hoje = new Date();
+            // Ajusta 'hoje' para o início do dia para comparação
+            hoje.setHours(0, 0, 0, 0);
+
             const seteDias = new Date();
             seteDias.setDate(hoje.getDate() + 7);
+            // Ajusta 'seteDias' para o final do dia para comparação
+            seteDias.setHours(23, 59, 59, 999);
+
 
             const proximosPedidos = pedidos.filter(p => {
                 if (!p.data) return false;
-                const dataEntrega = new Date(p.data + 'T00:00:00');
+                const dataEntrega = new Date(p.data + 'T00:00:00'); // Garante que a data seja interpretada sem fuso horário
                 // Considera pedidos de hoje até os próximos 7 dias
                 return dataEntrega >= hoje && dataEntrega <= seteDias;
             });
@@ -1514,8 +1520,10 @@
             // Verifica se o cliente já existe para evitar duplicatas exatas ao salvar
             const clienteExistente = clientes.find(c => c.nome.toLowerCase() === nome.toLowerCase() && c.telefone === telefone);
             if (clienteExistente) {
-                // Se estiver em modo de edição, o item original já foi removido, então pode adicionar.
-                // Se não estiver em modo de edição e já existir, notifica.
+                // Se o cliente já existe e os dados são exatamente os mesmos, notifica e não salva novamente.
+                // Se for uma edição, o item original já foi removido por `Utils.editItem`, então o novo será salvo.
+                // Esta verificação é para prevenir duplicação acidental ao CLICAR SALVAR sem ter usado "Editar"
+                // ou ao salvar um cliente idêntico que já está na lista.
                 if (confirm('Este cliente parece já existir. Deseja realmente salvar um novo com os mesmos dados?')) {
                      // Continua e adiciona
                 } else {
@@ -1556,6 +1564,7 @@
                 Clientes.listElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
                 return;
             }
+            // A condição abaixo é redundante com a primeira, mas mantida para clareza
             if (clientesFiltrados.length === 0 && termoBusca === '') {
                  Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
                  return;
@@ -1732,10 +1741,11 @@
                  return;
             }
 
+
             pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
             pedidosFiltrados.forEach((p, index) => { // Use index para Utils.editItem/deleteItem
-                const dataFormatada = Utils.formatDate(p.data);
+                const dataFormatada = Utils.formatate(p.data);
                 const itemText = `<strong>${p.nomeCliente}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
                 const actionsHtml = `
                     <button class="edit" onclick="Utils.editItem('pedidos', ${index}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nomeCliente}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`, Pedidos.prepareEdit)">
@@ -1783,13 +1793,16 @@
         ingredientesTemporarios: [],
 
         init: () => {
-             Produtos.ingredienteSelect.addEventListener('change', Produtos.atualizarCustoProducaoProdutoFinal);
+             // Listener para atualizar o custo ao digitar no campo de quantidade de ingrediente temporário
              Produtos.ingredienteQuantidadeInput.addEventListener('input', Produtos.atualizarCustoProducaoProdutoFinal);
+             // Listener para atualizar o custo ao mudar o ingrediente selecionado (útil se o custo unitário for diferente)
+             Produtos.ingredienteSelect.addEventListener('change', Produtos.atualizarCustoProducaoProdutoFinal);
         },
 
         carregarIngredientesParaSelect: () => {
             const estoque = Utils.getStorage('estoque');
             Produtos.ingredienteSelect.innerHTML = '<option value="">Selecione um Ingrediente/Item de Estoque</option>';
+            // Filtra apenas ingredientes (se houver outros tipos, como embalagens)
             estoque.filter(item => item.tipo === 'Ingrediente').forEach((item) => {
                 const option = document.createElement('option');
                 option.value = item.nome; // Usamos o nome como valor
@@ -1813,14 +1826,14 @@
                  return Notificacao.show('error', `Ingrediente "${nomeIngrediente}" não encontrado no estoque.`);
             }
 
-            // Verifica se o ingrediente já foi adicionado
+            // Verifica se o ingrediente já foi adicionado na lista temporária
             const existe = Produtos.ingredientesTemporarios.find(i => i.nome === nomeIngrediente);
             if (existe) {
                 existe.quantidade += quantidade;
             } else {
                 Produtos.ingredientesTemporarios.push({
                     nome: nomeIngrediente,
-                    quantidade: quantity, // Usar 'quantity' em vez de 'quantidade' para consistência
+                    quantidade: quantidade, // Usar 'quantidade' aqui
                     custoUnitario: itemEstoque.custoUnitario || 0 // Pega o custo unitário do estoque
                 });
             }
@@ -2088,9 +2101,10 @@
 
                 if (confirmation) { // ADICIONAR
                     estoque[itemExistenteIndex].qtd += qtd;
-                    estoque[itemExistenteIndex].custoUnitario = custoUnitario; // Atualiza o custo unitário também
+                    // Atualiza custo unitário e validade apenas se foram fornecidos no input atual
+                    if (custoUnitario > 0) estoque[itemExistenteIndex].custoUnitario = custoUnitario;
                     if (validade) estoque[itemExistenteIndex].validade = validade;
-                    if (min) estoque[itemExistenteIndex].min = min;
+                    if (min >= 0) estoque[itemExistenteIndex].min = min; // Permite atualizar o mínimo
                     Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, adição de estoque)`, 'entrada'); // Tipo de movimentação
                     Notificacao.show('success', `Adicionadas ${qtd} unidades de "${nome}" ao estoque.`);
                 } else { // SOBRESCEVER
@@ -2207,7 +2221,7 @@
 
         registrarHistorico: (texto, tipoMovimentacao) => {
             const historico = Utils.getStorage('historicoEstoque');
-            const dataHora = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const dataHora = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             historico.unshift({ dataHora, texto, tipo: tipoMovimentacao }); // Adiciona tipo de movimentação
             Utils.setStorage('historicoEstoque', historico.slice(0, 50)); // Guarda mais histórico
             Estoque.listarHistorico();
