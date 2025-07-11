@@ -160,6 +160,14 @@
       font-size: 1.8rem;
       text-align: center;
     }
+    h3 {
+        color: #f08080;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        border-bottom: 1px dashed #f8bbd0;
+        padding-bottom: 5px;
+        font-size: 1.4rem;
+    }
 
     /* Formulários e Inputs */
     input, select, button.save, .search-bar input {
@@ -190,8 +198,8 @@
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
 
-    /* Botões de Ação (Editar, Excluir, Usar) */
-    button.edit, button.delete, button.use {
+    /* Botões de Ação (Editar, Excluir, Usar, Ver Detalhes) */
+    button.edit, button.delete, button.use, button.view-details {
         background: #ffc107; /* Amarelo para editar */
         color: white;
         border: none;
@@ -208,9 +216,14 @@
     button.use {
         background: #6c757d; /* Cinza para usar */
     }
+    button.view-details {
+        background: #2196f3; /* Azul para ver detalhes */
+    }
     button.edit:hover { background: #e0a800; transform: translateY(-1px); }
     button.delete:hover { background: #c82333; transform: translateY(-1px); }
     button.use:hover { background: #5a6268; transform: translateY(-1px); }
+    button.view-details:hover { background: #1976d2; transform: translateY(-1px); }
+
 
     /* Listas de Itens */
     ul {
@@ -432,6 +445,68 @@
         transform: scale(1.05);
     }
 
+    /* Estilos específicos da Agenda */
+    #agenda .client-detail-card {
+        background: #fff0f5;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #ffe6ec;
+    }
+    #agenda .client-detail-card h3 {
+        color: #e91e63;
+        margin-top: 0;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #f8bbd0;
+        padding-bottom: 8px;
+        text-align: left; /* Alinha o título do cliente à esquerda */
+    }
+    #agenda .client-detail-card p {
+        margin-bottom: 8px;
+        color: #555;
+    }
+    #agenda .client-detail-card strong {
+        color: #f08080;
+    }
+    #agenda .client-detail-card .back-button {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 15px;
+        font-weight: bold;
+        transition: background 0.3s ease;
+    }
+    #agenda .client-detail-card .back-button:hover {
+        background: #5a6268;
+    }
+    #agenda .pedido-history-list {
+        margin-top: 20px;
+        border-top: 1px dashed #f8bbd0;
+        padding-top: 15px;
+    }
+    #agenda .pedido-history-list li {
+        background: #fef1f2;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid #fcdcdc;
+        font-size: 0.9em;
+        line-height: 1.4;
+    }
+    #agenda .pedido-history-list li strong {
+        color: #e91e63;
+    }
+    #agenda .client-list-view {
+        display: block; /* Visível por padrão */
+    }
+    #agenda .client-details-view {
+        display: none; /* Oculto por padrão */
+    }
+
 
     /* Responsividade */
     @media (max-width: 768px) {
@@ -504,6 +579,7 @@
         <button id="navEstoque" onclick="App.mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
         <button id="navDespesas" onclick="App.mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
         <button id="navFinanceiro" onclick="App.mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
+        <button id="navAgenda" onclick="App.mostrar('agenda')"><i class="fa-solid fa-calendar-alt"></i> Agenda</button>
       </nav>
     </aside>
 
@@ -688,6 +764,35 @@
             <h4>Gastos por Despesa</h4>
             <ul id="listaGastosDetalhes"></ul>
           </div>
+        </section>
+
+        <section id="agenda">
+            <h2>Agenda de Clientes e Histórico</h2>
+
+            <div class="client-list-view" id="agendaClientListView">
+                <h3>Clientes Cadastrados</h3>
+                <div class="search-bar">
+                    <label for="buscaClienteAgenda">Buscar cliente na agenda:</label>
+                    <input id="buscaClienteAgenda" placeholder="Digite para buscar..." type="text" oninput="Agenda.listarClientesNaAgenda()" />
+                </div>
+                <ul id="listaClientesAgenda">
+                    </ul>
+            </div>
+
+            <div class="client-details-view" id="agendaClientDetailsView">
+                <button class="back-button" onclick="Agenda.voltarParaListaClientes()">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar para a lista
+                </button>
+                <div class="client-detail-card">
+                    <h3 id="agendaDetalheClienteNome"></h3>
+                    <p><strong>Telefone:</strong> <span id="agendaDetalheClienteTelefone"></span></p>
+                    <p><strong>Endereço:</strong> <span id="agendaDetalheClienteEndereco"></span></p>
+                </div>
+
+                <h3>Histórico de Pedidos</h3>
+                <ul id="listaPedidosCliente" class="pedido-history-list">
+                    </ul>
+            </div>
         </section>
     </main>
   </div>
@@ -880,6 +985,10 @@
                     Financeiro.atualizarFinanceiro();
                     document.getElementById('detalhesGanhos').classList.remove('active');
                     document.getElementById('detalhesGastos').classList.remove('active');
+                    break;
+                case 'agenda': // NOVO
+                    Agenda.listarClientesNaAgenda();
+                    Agenda.voltarParaListaClientes(); // Garante que a lista de clientes esteja visível
                     break;
             }
         },
@@ -1518,7 +1627,6 @@
             const sortedYears = Array.from(allYears).sort((a, b) => a - b);
 
             if (!sortedYears.includes(currentYear)) sortedYears.push(currentYear);
-            //if (!sortedYears.includes(currentYear + 1)) sortedYears.push(currentYear + 1); // Remover ou ajustar se não quiser anos futuros
             sortedYears.sort((a, b) => a - b);
 
             sortedYears.forEach(year => {
@@ -1602,6 +1710,97 @@
             } else if (tipo === 'gastos') {
                 Financeiro.detalhesGastosDiv.classList.toggle('active');
             }
+        }
+    };
+
+    // --- NOVO MÓDULO: AGENDA ---
+    const Agenda = {
+        listaClientesElement: document.getElementById('listaClientesAgenda'),
+        buscaInput: document.getElementById('buscaClienteAgenda'),
+        clientListView: document.getElementById('agendaClientListView'),
+        clientDetailsView: document.getElementById('agendaClientDetailsView'),
+        detalheClienteNome: document.getElementById('agendaDetalheClienteNome'),
+        detalheClienteTelefone: document.getElementById('agendaDetalheClienteTelefone'),
+        detalheClienteEndereco: document.getElementById('agendaDetalheClienteEndereco'),
+        listaPedidosCliente: document.getElementById('listaPedidosCliente'),
+
+        listarClientesNaAgenda: () => {
+            const termoBusca = Agenda.buscaInput.value.toLowerCase();
+            Agenda.listaClientesElement.innerHTML = '';
+            const clientes = Utils.getStorage('clientes');
+
+            const clientesFiltrados = clientes.filter(c =>
+                c.nome.toLowerCase().includes(termoBusca) ||
+                c.telefone.toLowerCase().includes(termoBusca) ||
+                c.endereco.toLowerCase().includes(termoBusca)
+            );
+
+            if (clientes.length === 0) {
+                Agenda.listaClientesElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+                return;
+            }
+
+            if (clientesFiltrados.length === 0 && termoBusca !== '') {
+                Agenda.listaClientesElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
+                return;
+            }
+             if (clientesFiltrados.length === 0 && termoBusca === '') {
+                 Agenda.listaClientesElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
+                 return;
+            }
+
+            clientesFiltrados.forEach((cliente) => {
+                const itemText = `
+                    <strong>${cliente.nome}</strong><br>
+                    Tel: ${cliente.telefone}
+                `;
+                const actionsHtml = `
+                    <button class="view-details" onclick="Agenda.verDetalhesCliente('${cliente.nome}', '${cliente.telefone}', '${cliente.endereco}')">
+                        <i class="fa-solid fa-eye"></i> Ver Histórico
+                    </button>
+                `;
+                Agenda.listaClientesElement.appendChild(Utils.createListItem(itemText, actionsHtml));
+            });
+        },
+
+        verDetalhesCliente: (nomeCliente, telefoneCliente, enderecoCliente) => {
+            Agenda.clientListView.style.display = 'none';
+            Agenda.clientDetailsView.style.display = 'block';
+
+            Agenda.detalheClienteNome.textContent = nomeCliente;
+            Agenda.detalheClienteTelefone.textContent = telefoneCliente;
+            Agenda.detalheClienteEndereco.textContent = enderecoCliente;
+
+            Agenda.listaPedidosCliente.innerHTML = '';
+            const pedidos = Utils.getStorage('pedidos');
+
+            // Filtra os pedidos feitos por este cliente
+            const pedidosDoCliente = pedidos.filter(p => p.nome.toLowerCase() === nomeCliente.toLowerCase());
+
+            if (pedidosDoCliente.length === 0) {
+                Agenda.listaPedidosCliente.innerHTML = '<li class="empty-list-message">Este cliente ainda não possui pedidos registrados.</li>';
+                return;
+            }
+
+            // Ordena os pedidos do mais recente para o mais antigo
+            pedidosDoCliente.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
+
+            pedidosDoCliente.forEach(p => {
+                const dataFormatada = Utils.formatDate(p.data);
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>Pedido de ${p.produto}</strong> em ${dataFormatada}<br>
+                    Valor: R$ ${p.valor.toFixed(2)}<br>
+                    Forma de Entrega: ${p.entrega}
+                `;
+                Agenda.listaPedidosCliente.appendChild(li);
+            });
+        },
+
+        voltarParaListaClientes: () => {
+            Agenda.clientDetailsView.style.display = 'none';
+            Agenda.clientListView.style.display = 'block';
+            Agenda.listarClientesNaAgenda(); // Recarrega a lista de clientes
         }
     };
 
