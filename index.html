@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Doce Sabor Caseiro</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
@@ -30,6 +30,7 @@
     section {
       display: none; background: white; padding: 20px;
       margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      max-width: 600px;
     }
     section.active { display: block; }
     h2 {
@@ -44,7 +45,7 @@
       background: #f28ab2; color: white; padding: 10px 20px;
       border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
     }
-    ul { list-style: none; padding: 0; margin-top: 10px; }
+    ul { list-style: none; padding: 0; margin-top: 10px; max-height: 300px; overflow-y: auto; }
     li {
       background: #ffe6ec; margin-bottom: 8px; padding: 10px;
       border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -55,6 +56,7 @@
   </style>
 </head>
 <body>
+
   <div class="splash" id="splash">
     <h1>Doce Sabor Caseiro</h1>
     <button onclick="entrar()">Entrar</button>
@@ -69,22 +71,24 @@
       <button onclick="mostrar('financeiro')">📊 Financeiro</button>
     </nav>
 
+    <!-- Clientes -->
     <section id="clientes" class="active">
       <h2>Cadastro de Clientes</h2>
-      <input id="clienteNome" placeholder="Nome do cliente">
-      <input id="clienteTelefone" placeholder="Telefone">
-      <input id="clienteEndereco" placeholder="Endereço">
+      <input id="clienteNome" placeholder="Nome do cliente" />
+      <input id="clienteTelefone" placeholder="Telefone" />
+      <input id="clienteEndereco" placeholder="Endereço" />
       <button class="save" onclick="salvarCliente()">Salvar</button>
-      <input id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()">
+      <input id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" />
       <ul id="listaClientes"></ul>
     </section>
 
+    <!-- Pedidos -->
     <section id="pedidos">
       <h2>Pedidos</h2>
-      <input id="pedidoCliente" placeholder="Nome do cliente">
-      <input id="tipoProduto" placeholder="Tipo de produto">
-      <input id="valorPedido" type="number" placeholder="Valor (R$)">
-      <input id="dataEntrega" type="date">
+      <input id="pedidoCliente" placeholder="Nome do cliente" />
+      <input id="tipoProduto" placeholder="Tipo de produto" />
+      <input id="valorPedido" type="number" placeholder="Valor (R$)" />
+      <input id="dataEntrega" type="date" />
       <select id="formaEntrega">
         <option value="Entregar">Entregar</option>
         <option value="Retirar">Retirar</option>
@@ -93,31 +97,91 @@
       <ul id="listaPedidos"></ul>
     </section>
 
+    <!-- Despesas -->
     <section id="despesas">
       <h2>Despesas</h2>
-      <select id="tipoDespesa">
-        <option>Mercadorias</option>
-        <option>Loja</option>
-        <option>Pessoais</option>
-      </select>
-      <input id="valorDespesa" type="number" placeholder="Valor (R$)">
-      <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
-      <ul id="listaDespesas"></ul>
+
+      <div style="background:#fff0f5; padding:16px; border-radius:12px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.1); max-width:500px;">
+        <label style="display:block; margin-bottom:8px; font-weight:600; color:#b64d6d;">
+          Categoria:
+          <select id="categoriaDespesa" style="width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc;">
+            <option>Mercadorias</option>
+            <option>Loja</option>
+            <option>Pessoais</option>
+          </select>
+        </label>
+
+        <label style="display:block; margin-bottom:8px; font-weight:600; color:#b64d6d;">
+          Descrição da despesa:
+          <input type="text" id="descricaoDespesa" placeholder="Descrição..." style="width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+
+        <label style="display:block; margin-bottom:8px; font-weight:600; color:#b64d6d;">
+          Data da despesa:
+          <input type="date" id="dataDespesa" style="width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+
+        <label style="display:block; margin-bottom:12px; font-weight:600; color:#b64d6d;">
+          Valor (R$):
+          <input type="number" step="0.01" min="0" id="valorDespesa" placeholder="0,00" style="width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+
+        <button
+          class="save"
+          onclick="salvarDespesa()"
+          style="background:#f28ab2; color:#fff; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;"
+        >
+          Salvar
+        </button>
+      </div>
+
+      <div style="max-width:500px; margin-bottom:16px;">
+        <label for="buscaDescricaoDespesa" style="font-weight:600; color:#b64d6d;">Buscar despesas pelo nome:</label>
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <input
+            type="text"
+            id="buscaDescricaoDespesa"
+            placeholder="Digite descrição para buscar..."
+            style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;"
+            onkeydown="if(event.key==='Enter'){filtrarDespesas()}"
+          />
+          <button
+            onclick="filtrarDespesas()"
+            style="background:#f28ab2; color:#fff; border:none; border-radius:6px; padding:0 16px; cursor:pointer; font-weight:bold;"
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+
+      <button
+        id="btnVerDespesas"
+        onclick="toggleListaDespesas()"
+        style="background:#b64d6d; color:#fff; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-bottom:12px; max-width:500px;"
+      >
+        Ver despesas
+      </button>
+
+      <ul
+        id="listaDespesas"
+        style="max-width:500px; max-height:300px; overflow-y:auto; margin-top:12px; padding-left:0; list-style:none; display:none;"
+      ></ul>
     </section>
 
+    <!-- Estoque -->
     <section id="estoque">
       <h2>Controle de Estoque</h2>
-      <input id="produtoNome" placeholder="Nome do Produto">
+      <input id="produtoNome" placeholder="Nome do Produto" />
       <select id="produtoTipo">
         <option value="Ingrediente">Ingrediente</option>
         <option value="Embalagem">Embalagem</option>
         <option value="Produto Final">Produto Final</option>
       </select>
-      <input id="produtoQtd" type="number" placeholder="Quantidade">
-      <input id="produtoMin" type="number" placeholder="Mínimo Ideal">
-      <input id="produtoValidade" type="date" placeholder="Validade">
+      <input id="produtoQtd" type="number" placeholder="Quantidade" />
+      <input id="produtoMin" type="number" placeholder="Mínimo Ideal" />
+      <input id="produtoValidade" type="date" placeholder="Validade" />
       <button onclick="adicionarProduto()">Adicionar Produto</button>
-      <input id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()">
+      <input id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()" />
       <select id="filtroTipo" onchange="listarProdutos()">
         <option value="">Todos</option>
         <option value="Ingrediente">Ingrediente</option>
@@ -129,11 +193,18 @@
       <ul id="listaHistorico" class="historico"></ul>
     </section>
 
+    <!-- Financeiro -->
     <section id="financeiro">
       <h2>Financeiro</h2>
-      <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
-      <p><strong>Gastos:</strong> R$ <span id="gastos">0.00</span></p>
-      <p><strong>Lucros:</strong> R$ <span id="lucros">0.00</span></p>
+      <p>
+        <strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span>
+      </p>
+      <p>
+        <strong>Gastos:</strong> R$ <span id="gastos">0.00</span>
+      </p>
+      <p>
+        <strong>Lucros:</strong> R$ <span id="lucros">0.00</span>
+      </p>
     </section>
   </div>
 
@@ -143,11 +214,13 @@
       document.getElementById('app').style.display = 'block';
       atualizarTudo();
     }
+
     function mostrar(secao) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('section').forEach((s) => s.classList.remove('active'));
       document.getElementById(secao).classList.add('active');
     }
 
+    // CLIENTES
     function salvarCliente() {
       const nome = clienteNome.value.trim();
       const telefone = clienteTelefone.value.trim();
@@ -164,13 +237,15 @@
       const lista = document.getElementById('listaClientes');
       lista.innerHTML = '';
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-      clientes.forEach(c => {
+      clientes.forEach((c) => {
         if (!c.nome.toLowerCase().includes(termo)) return;
         const li = document.createElement('li');
         li.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
         lista.appendChild(li);
       });
     }
+
+    // PEDIDOS
     function salvarPedido() {
       const nome = pedidoCliente.value.trim();
       const produto = tipoProduto.value.trim();
@@ -182,55 +257,89 @@
       pedidos.push({ nome, produto, valor, entrega, data });
       localStorage.setItem('pedidos', JSON.stringify(pedidos));
       pedidoCliente.value = tipoProduto.value = valorPedido.value = dataEntrega.value = '';
-      listarPedidos(); atualizarFinanceiro();
+      listarPedidos();
+      atualizarFinanceiro();
     }
     function listarPedidos() {
       const lista = document.getElementById('listaPedidos');
       lista.innerHTML = '';
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-      pedidos.forEach(p => {
+      pedidos.forEach((p) => {
         const li = document.createElement('li');
         li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} - ${p.entrega} (${p.data})`;
         lista.appendChild(li);
       });
     }
+
+    // DESPESAS
+    let listaDespesasVisivel = false;
+
     function salvarDespesa() {
-      const tipo = tipoDespesa.value;
-      const valor = parseFloat(valorDespesa.value);
-      if (!tipo || isNaN(valor)) return alert('Preencha todos os campos');
-      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      despesas.push({ tipo, valor });
+      const categoria = document.getElementById('categoriaDespesa').value;
+      const descricao = document.getElementById('descricaoDespesa').value.trim();
+      const data = document.getElementById('dataDespesa').value;
+      const valor = parseFloat(document.getElementById('valorDespesa').value);
+
+      if (!descricao || !data || isNaN(valor)) {
+        alert('Preencha todos os campos corretamente!');
+        return;
+      }
+
+      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      despesas.push({ categoria, descricao, data, valor });
       localStorage.setItem('despesas', JSON.stringify(despesas));
-      valorDespesa.value = '';
-      listarDespesas(); atualizarFinanceiro();
+
+      // Limpa campos após salvar
+      document.getElementById('descricaoDespesa').value = '';
+      document.getElementById('dataDespesa').value = '';
+      document.getElementById('valorDespesa').value = '';
+
+      alert('Despesa salva com sucesso! Para ver a lista, clique em "Ver despesas".');
     }
-    function listarDespesas() {
+
+    function filtrarDespesas() {
+      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      const termo = document.getElementById('buscaDescricaoDespesa').value.toLowerCase();
       const lista = document.getElementById('listaDespesas');
       lista.innerHTML = '';
-      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      despesas.forEach(d => {
+
+      const filtradas = despesas.filter((d) => d.descricao.toLowerCase().includes(termo));
+
+      if (filtradas.length === 0) {
+        lista.innerHTML = '<li style="color:#999; font-style:italic;">Nenhuma despesa encontrada.</li>';
+        return;
+      }
+
+      filtradas.forEach((d) => {
         const li = document.createElement('li');
-        li.textContent = `${d.tipo} - R$${d.valor.toFixed(2)}`;
+        li.style.background = '#ffe6ec';
+        li.style.marginBottom = '8px';
+        li.style.padding = '10px';
+        li.style.borderRadius = '6px';
+        li.textContent = `${d.data} | ${d.categoria} | ${d.descricao} - R$ ${d.valor.toFixed(2)}`;
         lista.appendChild(li);
       });
     }
-    function atualizarFinanceiro() {
-      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-      const ganhos = pedidos.reduce((s, p) => s + p.valor, 0);
-      const gastos = despesas.reduce((s, d) => s + d.valor, 0);
-      const lucros = ganhos - gastos;
-      document.getElementById('ganhos').textContent = ganhos.toFixed(2);
-      document.getElementById('gastos').textContent = gastos.toFixed(2);
-      document.getElementById('lucros').textContent = lucros.toFixed(2);
+
+    function toggleListaDespesas() {
+      listaDespesasVisivel = !listaDespesasVisivel;
+      const lista = document.getElementById('listaDespesas');
+      lista.style.display = listaDespesasVisivel ? 'block' : 'none';
+
+      if (listaDespesasVisivel) filtrarDespesas();
+
+      const btn = document.getElementById('btnVerDespesas');
+      btn.textContent = listaDespesasVisivel ? 'Ocultar despesas' : 'Ver despesas';
     }
+
+    // ESTOQUE
     function adicionarProduto() {
       const nome = produtoNome.value.trim();
       const tipo = produtoTipo.value;
       const qtd = parseInt(produtoQtd.value);
       const min = parseInt(produtoMin.value);
       const validade = produtoValidade.value;
-      if (!nome || isNaN(qtd)) return alert("Preencha nome e quantidade corretamente.");
+      if (!nome || isNaN(qtd)) return alert('Preencha nome e quantidade corretamente.');
       const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
       estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
       localStorage.setItem('estoque', JSON.stringify(estoque));
@@ -250,7 +359,9 @@
         const li = document.createElement('li');
         if (p.qtd === 0) li.classList.add('falta');
         else if (p.min > 0 && p.qtd < p.min) li.classList.add('baixo');
-        li.innerHTML = `<strong>${p.nome}</strong> (${p.tipo}) - ${p.qtd} un. ${p.validade ? ' - Venc: ' + p.validade : ''} <button onclick="usarProduto(${i})">Usar</button>`;
+        li.innerHTML = `<strong>${p.nome}</strong> (${p.tipo}) - ${p.qtd} un. ${
+          p.validade ? ' - Venc: ' + p.validade : ''
+        } <button onclick="usarProduto(${i})">Usar</button>`;
         lista.appendChild(li);
       });
     }
@@ -274,14 +385,54 @@
       const lista = document.getElementById('listaHistorico');
       lista.innerHTML = '';
       const hist = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
-      hist.forEach(entry => {
+      hist.forEach((entry) => {
         const li = document.createElement('li');
         li.textContent = entry;
         lista.appendChild(li);
       });
     }
+
+    // FINANCEIRO
+    function atualizarFinanceiro() {
+      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      const ganhos = pedidos.reduce((s, p) => s + p.valor, 0);
+      const gastos = despesas.reduce((s, d) => s + d.valor, 0);
+      const lucros = ganhos - gastos;
+      document.getElementById('ganhos').textContent = ganhos.toFixed(2);
+      document.getElementById('gastos').textContent = gastos.toFixed(2);
+      document.getElementById('lucros').textContent = lucros.toFixed(2);
+    }
+
     function atualizarTudo() {
-      listarClientes(); listarPedidos(); listarDespesas(); atualizarFinanceiro(); listarProdutos(); listarHistorico();
+      listarClientes();
+      listarPedidos();
+      listarDespesas();
+      atualizarFinanceiro();
+      listarProdutos();
+      listarHistorico();
+    }
+
+    // AQUI listarDespesas mostra todas (sem filtro)
+    function listarDespesas() {
+      let despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      const lista = document.getElementById('listaDespesas');
+      lista.innerHTML = '';
+
+      if (despesas.length === 0) {
+        lista.innerHTML = '<li style="color:#999; font-style:italic;">Nenhuma despesa cadastrada.</li>';
+        return;
+      }
+
+      despesas.forEach((d) => {
+        const li = document.createElement('li');
+        li.style.background = '#ffe6ec';
+        li.style.marginBottom = '8px';
+        li.style.padding = '10px';
+        li.style.borderRadius = '6px';
+        li.textContent = `${d.data} | ${d.categoria} | ${d.descricao} - R$ ${d.valor.toFixed(2)}`;
+        lista.appendChild(li);
+      });
     }
   </script>
 </body>
