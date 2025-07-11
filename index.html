@@ -162,7 +162,7 @@
     }
 
     /* Formulários e Inputs */
-    input, select, button.save {
+    input, select, button.save, .search-bar input {
       width: 100%;
       padding: 12px;
       margin-bottom: 15px; /* Mais espaço entre campos */
@@ -171,7 +171,7 @@
       font-size: 1rem;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    input:focus, select:focus {
+    input:focus, select:focus, .search-bar input:focus {
       border-color: #f08080;
       box-shadow: 0 0 0 3px rgba(240, 128, 128, 0.2); /* Sombra ao focar */
       outline: none;
@@ -358,6 +358,59 @@
         margin-bottom: 0;
     }
 
+    /* Adicionado: Campo para adicionar ingredientes em Produtos */
+    .ingrediente-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 8px;
+        background: #fdf6f7;
+        border: 1px solid #ffe6ec;
+        border-radius: 8px;
+    }
+    .ingrediente-item input[type="text"], .ingrediente-item input[type="number"] {
+        margin-bottom: 0; /* Remove margem padrão para esses inputs */
+        flex: 1;
+    }
+    .ingrediente-item button {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+    .ingrediente-item button:hover {
+        background: #c82333;
+    }
+    #listaIngredientesProduto {
+        margin-top: 15px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        background: #fcfcfc;
+    }
+
+    /* Barra de Busca dedicada */
+    .search-bar {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #fff0f5;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .search-bar label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #e91e63;
+    }
+
     /* Botão para abrir/fechar sidebar em mobile */
     .sidebar-toggle {
         display: none; /* Inicia oculto em desktop */
@@ -410,9 +463,11 @@
         margin-top: 60px; /* Para não ficar atrás do botão de toggle */
       }
       section { padding: 15px; margin-top: 15px; }
-      input, select, button.save { padding: 10px; margin-bottom: 10px; }
+      input, select, button.save, .search-bar input { padding: 10px; margin-bottom: 10px; }
       li { padding: 12px; }
       li .item-actions { width: 100%; justify-content: flex-end; }
+      .search-bar { padding: 10px; }
+
 
       .sidebar-toggle {
           display: block; /* Mostra o botão em mobile */
@@ -445,8 +500,9 @@
       <nav>
         <button id="navClientes" onclick="App.mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
         <button id="navPedidos" onclick="App.mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
-        <button id="navDespesas" onclick="App.mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
+        <button id="navProdutos" onclick="App.mostrar('produtos')"><i class="fa-solid fa-box-open"></i> Produtos</button>
         <button id="navEstoque" onclick="App.mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
+        <button id="navDespesas" onclick="App.mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
         <button id="navFinanceiro" onclick="App.mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
       </nav>
     </aside>
@@ -460,7 +516,10 @@
           <button class="save" onclick="Clientes.salvarCliente()">Salvar Cliente</button>
 
           <h3>Clientes Cadastrados</h3>
-          <input id="buscaCliente" placeholder="Buscar cliente por nome, telefone ou endereço..." oninput="Clientes.listarClientes()" />
+          <div class="search-bar">
+            <label for="buscaCliente">Buscar cliente por nome, telefone ou endereço:</label>
+            <input id="buscaCliente" placeholder="Digite para buscar..." type="text" oninput="Clientes.listarClientes()" />
+          </div>
           <ul id="listaClientes"></ul>
         </section>
 
@@ -478,7 +537,70 @@
           <button class="save" onclick="Pedidos.salvarPedido()">Salvar Pedido</button>
 
           <h3>Pedidos Salvos</h3>
+          <div class="search-bar">
+            <label for="buscaPedido">Buscar pedido por cliente ou produto:</label>
+            <input id="buscaPedido" placeholder="Digite para buscar..." type="text" oninput="Pedidos.listarPedidos()" />
+          </div>
           <ul id="listaPedidos"></ul>
+        </section>
+
+        <section id="produtos">
+            <h2>Cadastro de Produtos Finais</h2>
+            <input id="produtoFinalNome" placeholder="Nome do Produto (ex: Bolo de Cenoura)" type="text" />
+            <input id="produtoFinalPrecoVenda" type="number" step="0.01" min="0" placeholder="Preço de Venda (R$)" />
+            <input id="produtoFinalCustoProducao" type="number" step="0.01" min="0" placeholder="Custo de Produção (R$) - Opcional" />
+
+            <div style="background:#fefefe; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                <h4>Ingredientes do Produto</h4>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <select id="ingredienteSelect" style="flex:2;">
+                        <option value="">Selecione um Ingrediente/Item de Estoque</option>
+                        </select>
+                    <input type="number" id="ingredienteQuantidade" min="0" placeholder="Qtd. Usada" style="flex:1;" />
+                    <button onclick="Produtos.adicionarIngredienteAoProdutoTemp()" style="background:#4CAF50; color:white; border:none; border-radius:8px; padding:10px 15px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <ul id="listaIngredientesProduto">
+                    <li class="empty-list-message">Nenhum ingrediente adicionado a este produto ainda.</li>
+                </ul>
+            </div>
+
+            <button class="save" onclick="Produtos.salvarProdutoFinal()">Salvar Produto</button>
+
+            <h3>Produtos Cadastrados</h3>
+            <div class="search-bar">
+                <label for="buscaProdutoFinal">Buscar produto final por nome:</label>
+                <input id="buscaProdutoFinal" placeholder="Digite para buscar..." type="text" oninput="Produtos.listarProdutosFinais()" />
+            </div>
+            <ul id="listaProdutosFinais"></ul>
+        </section>
+
+        <section id="estoque">
+          <h2>Controle de Estoque (Ingredientes e Embalagens)</h2>
+          <input id="produtoNome" placeholder="Nome do Ingrediente/Embalagem" type="text" />
+          <select id="produtoTipo">
+            <option value="">Selecione o Tipo</option>
+            <option value="Ingrediente">Ingrediente</option>
+            <option value="Embalagem">Embalagem</option>
+          </select>
+          <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
+          <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
+          <input id="produtoValidade" type="date" />
+          <button class="save" onclick="Estoque.adicionarProduto()">Adicionar/Atualizar Item de Estoque</button>
+
+          <h3>Itens em Estoque</h3>
+          <div class="search-bar">
+            <label for="buscaProdutoEstoque">Buscar item de estoque por nome:</label>
+            <input id="buscaProdutoEstoque" placeholder="Digite para buscar..." type="text" oninput="Estoque.listarProdutos()" />
+          </div>
+          <select id="filtroTipoEstoque" onchange="Estoque.listarProdutos()" style="margin-bottom:20px;">
+            <option value="">Filtrar por Tipo (Todos)</option>
+            <option value="Ingrediente">Ingrediente</option>
+            <option value="Embalagem">Embalagem</option>
+          </select>
+          <ul id="listaEstoque"></ul>
+
+          <h3>Histórico de Movimentações</h3>
+          <ul id="listaHistorico" class="historico"></ul>
         </section>
 
         <section id="despesas">
@@ -509,54 +631,17 @@
           </div>
 
           <h3>Despesas Registradas</h3>
-          <div style="margin-bottom:20px;">
-            <label for="buscaDescricaoDespesa" style="font-weight:600; color:#e91e63;">Buscar Despesas:</label>
-            <div style="display:flex; gap:10px; margin-top:8px;">
-              <input
-                type="text"
-                id="buscaDescricaoDespesa"
-                placeholder="Buscar por descrição..."
-                style="flex:1;"
-                onkeydown="if(event.key==='Enter'){Despesas.filtrarDespesas()}"
-              />
-              <button
-                onclick="Despesas.filtrarDespesas()"
-                style="background:#f08080; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold; transition:all 0.3s ease;"
-              >
-                <i class="fa-solid fa-magnifying-glass"></i>
-              </button>
-            </div>
+          <div class="search-bar">
+            <label for="buscaDescricaoDespesa">Buscar despesas por descrição:</label>
+            <input
+              type="text"
+              id="buscaDescricaoDespesa"
+              placeholder="Digite para buscar..."
+              oninput="Despesas.filtrarDespesas()"
+            />
           </div>
 
           <ul id="listaDespesas"></ul>
-        </section>
-
-        <section id="estoque">
-          <h2>Controle de Estoque</h2>
-          <input id="produtoNome" placeholder="Nome do Produto/Ingrediente" type="text" />
-          <select id="produtoTipo">
-            <option value="">Selecione o Tipo</option>
-            <option value="Ingrediente">Ingrediente</option>
-            <option value="Embalagem">Embalagem</option>
-            <option value="Produto Final">Produto Final</option>
-          </select>
-          <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
-          <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
-          <input id="produtoValidade" type="date" />
-          <button class="save" onclick="Estoque.adicionarProduto()">Adicionar/Atualizar Produto</button>
-
-          <h3>Itens em Estoque</h3>
-          <input id="buscaProduto" placeholder="Buscar produto por nome..." oninput="Estoque.listarProdutos()" style="margin-top:20px;" />
-          <select id="filtroTipoEstoque" onchange="Estoque.listarProdutos()" style="margin-bottom:20px;">
-            <option value="">Filtrar por Tipo (Todos)</option>
-            <option value="Ingrediente">Ingrediente</option>
-            <option value="Embalagem">Embalagem</option>
-            <option value="Produto Final">Produto Final</option>
-          </select>
-          <ul id="listaEstoque"></ul>
-
-          <h3>Histórico de Movimentações</h3>
-          <ul id="listaHistorico" class="historico"></ul>
         </section>
 
         <section id="financeiro">
@@ -766,6 +851,10 @@
                 case 'pedidos':
                     Pedidos.listarPedidos();
                     break;
+                case 'produtos':
+                    Produtos.carregarIngredientesParaSelect();
+                    Produtos.listarProdutosFinais();
+                    break;
                 case 'despesas':
                     Despesas.filtrarDespesas();
                     break;
@@ -872,6 +961,7 @@
         valorInput: document.getElementById('valorPedido'),
         dataInput: document.getElementById('dataEntrega'),
         formaEntregaSelect: document.getElementById('formaEntrega'),
+        buscaInput: document.getElementById('buscaPedido'),
 
         salvarPedido: () => {
             const nomeCliente = Pedidos.clienteInput.value.trim();
@@ -895,6 +985,7 @@
         },
 
         listarPedidos: () => {
+            const termoBusca = Pedidos.buscaInput.value.toLowerCase();
             Pedidos.listElement.innerHTML = '';
             const pedidos = Utils.getStorage('pedidos');
 
@@ -903,9 +994,19 @@
                 return;
             }
 
-            pedidos.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
+            const pedidosFiltrados = pedidos.filter(p =>
+                p.nome.toLowerCase().includes(termoBusca) ||
+                p.produto.toLowerCase().includes(termoBusca)
+            );
 
-            pedidos.forEach((p, index) => {
+            if (pedidosFiltrados.length === 0 && termoBusca !== '') {
+                Pedidos.listElement.innerHTML = `<li class="empty-list-message">Nenhum pedido encontrado com "${termoBusca}".</li>`;
+                return;
+            }
+
+            pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
+
+            pedidosFiltrados.forEach((p, index) => {
                 const dataFormatada = Utils.formatDate(p.data);
                 const itemText = `<strong>${p.nome}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
                 const actionsHtml = `
@@ -920,6 +1021,189 @@
             });
         }
     };
+
+    // --- MÓDULO PRODUTOS (PRODUTOS FINAIS) ---
+    const Produtos = {
+        formFields: [
+            {id:'produtoFinalNome', name:'nome', type:'text'},
+            {id:'produtoFinalPrecoVenda', name:'precoVenda', type:'number'},
+            {id:'produtoFinalCustoProducao', name:'custoProducao', type:'number'}
+            // Ingredientes serão tratados separadamente
+        ],
+        listElement: document.getElementById('listaProdutosFinais'),
+        nomeInput: document.getElementById('produtoFinalNome'),
+        precoVendaInput: document.getElementById('produtoFinalPrecoVenda'),
+        custoProducaoInput: document.getElementById('produtoFinalCustoProducao'),
+        ingredienteSelect: document.getElementById('ingredienteSelect'),
+        ingredienteQuantidadeInput: document.getElementById('ingredienteQuantidade'),
+        listaIngredientesProdutoUl: document.getElementById('listaIngredientesProduto'),
+        buscaInput: document.getElementById('buscaProdutoFinal'),
+        
+        // Array temporário para armazenar ingredientes enquanto o produto está sendo cadastrado/editado
+        ingredientesTemporarios: [],
+
+        carregarIngredientesParaSelect: () => {
+            const estoque = Utils.getStorage('estoque');
+            Produtos.ingredienteSelect.innerHTML = '<option value="">Selecione um Ingrediente/Item de Estoque</option>';
+            estoque.filter(item => item.tipo === 'Ingrediente').forEach((item, index) => {
+                const option = document.createElement('option');
+                option.value = item.nome; // Usamos o nome como valor
+                option.textContent = `${item.nome} (Qtd: ${item.qtd})`;
+                Produtos.ingredienteSelect.appendChild(option);
+            });
+        },
+
+        adicionarIngredienteAoProdutoTemp: () => {
+            const nomeIngrediente = Produtos.ingredienteSelect.value;
+            const quantidade = parseInt(Produtos.ingredienteQuantidadeInput.value);
+
+            if (!nomeIngrediente || isNaN(quantidade) || quantidade <= 0) {
+                return alert('Por favor, selecione um ingrediente e informe uma quantidade válida.');
+            }
+
+            // Verifica se o ingrediente já foi adicionado
+            const existe = Produtos.ingredientesTemporarios.find(i => i.nome === nomeIngrediente);
+            if (existe) {
+                // Atualiza a quantidade se já existe
+                existe.quantidade += quantidade;
+            } else {
+                Produtos.ingredientesTemporarios.push({ nome: nomeIngrediente, quantidade: quantidade });
+            }
+
+            Produtos.renderizarIngredientesTemporarios();
+            Utils.clearForm('ingredienteQuantidade'); // Limpa apenas a quantidade
+        },
+
+        removerIngredienteTemp: (index) => {
+            Produtos.ingredientesTemporarios.splice(index, 1);
+            Produtos.renderizarIngredientesTemporarios();
+        },
+
+        renderizarIngredientesTemporarios: () => {
+            Produtos.listaIngredientesProdutoUl.innerHTML = '';
+            if (Produtos.ingredientesTemporarios.length === 0) {
+                Produtos.listaIngredientesProdutoUl.innerHTML = '<li class="empty-list-message">Nenhum ingrediente adicionado a este produto ainda.</li>';
+                return;
+            }
+
+            Produtos.ingredientesTemporarios.forEach((ingrediente, index) => {
+                const li = document.createElement('li');
+                li.className = 'ingrediente-item';
+                li.innerHTML = `
+                    <span>${ingrediente.nome}: ${ingrediente.quantidade} un.</span>
+                    <button onclick="Produtos.removerIngredienteTemp(${index})"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                Produtos.listaIngredientesProdutoUl.appendChild(li);
+            });
+        },
+
+        salvarProdutoFinal: () => {
+            const nome = Produtos.nomeInput.value.trim();
+            const precoVenda = parseFloat(Produtos.precoVendaInput.value);
+            const custoProducao = parseFloat(Produtos.custoProducaoInput.value) || 0; // Opcional
+
+            if (!nome || isNaN(precoVenda) || precoVenda <= 0) {
+                return alert('Por favor, preencha o nome do produto e o preço de venda corretamente.');
+            }
+            if (Produtos.ingredientesTemporarios.length === 0) {
+                if (!confirm('Você não adicionou nenhum ingrediente a este produto. Deseja continuar mesmo assim?')) {
+                    return;
+                }
+            }
+
+            const produtos = Utils.getStorage('produtosFinais');
+            products.push({ 
+                nome, 
+                precoVenda, 
+                custoProducao, 
+                ingredientes: [...Produtos.ingredientesTemporarios] // Copia o array
+            });
+            Utils.setStorage('produtosFinais', produtos);
+
+            Utils.clearForm('produtoFinalNome', 'produtoFinalPrecoVenda', 'produtoFinalCustoProducao');
+            Produtos.ingredientesTemporarios = []; // Limpa os ingredientes temporários
+            Produtos.renderizarIngredientesTemporarios(); // Atualiza a lista na UI
+            Produtos.listarProdutosFinais();
+            alert('Produto final salvo com sucesso!');
+        },
+
+        listarProdutosFinais: () => {
+            const termoBusca = Produtos.buscaInput.value.toLowerCase();
+            Produtos.listElement.innerHTML = '';
+            const produtos = Utils.getStorage('produtosFinais');
+
+            if (produtos.length === 0) {
+                Produtos.listElement.innerHTML = '<li class="empty-list-message">Nenhum produto final cadastrado ainda.</li>';
+                return;
+            }
+
+            const produtosFiltrados = produtos.filter(p =>
+                p.nome.toLowerCase().includes(termoBusca)
+            );
+
+            if (produtosFiltrados.length === 0 && termoBusca !== '') {
+                Produtos.listElement.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com "${termoBusca}".</li>`;
+                return;
+            }
+
+            produtosFiltrados.forEach((produto, index) => {
+                let ingredientesHtml = 'Nenhum ingrediente associado.';
+                if (produto.ingredientes && produto.ingredientes.length > 0) {
+                    ingredientesHtml = produto.ingredientes.map(i => `${i.nome}: ${i.quantidade}un.`).join(', ');
+                }
+
+                const itemText = `
+                    <strong>${produto.nome}</strong><br>
+                    Preço Venda: R$ ${produto.precoVenda.toFixed(2)}<br>
+                    Custo Produção: R$ ${produto.custoProducao.toFixed(2)}<br>
+                    Ingredientes: ${ingredientesHtml}
+                `;
+                const actionsHtml = `
+                    <button class="edit" onclick="Produtos.prepararEdicaoProdutoFinal(${index})">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${index}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                `;
+                Produtos.listElement.appendChild(Utils.createListItem(itemText, actionsHtml));
+            });
+        },
+
+        prepararEdicaoProdutoFinal: (index) => {
+            const produtos = Utils.getStorage('produtosFinais');
+            const produto = produtos[index];
+
+            if (!produto) {
+                alert('Produto não encontrado para edição.');
+                return;
+            }
+
+            // Preenche os campos do formulário
+            Produtos.nomeInput.value = produto.nome || '';
+            Produtos.precoVendaInput.value = produto.precoVenda !== undefined ? parseFloat(produto.precoVenda) : '';
+            Produtos.custoProducaoInput.value = produto.custoProducao !== undefined ? parseFloat(produto.custoProducao) : '';
+            
+            // Carrega os ingredientes do produto para o array temporário e renderiza
+            Produtos.ingredientesTemporarios = [...(produto.ingredientes || [])];
+            Produtos.renderizarIngredientesTemporarios();
+
+            if (confirm(`Você está prestes a editar o produto "${produto.nome}".\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O produto original será removido ao confirmar.`)) {
+                // Remove o produto original da lista, ele será recadastrado com as alterações
+                produtos.splice(index, 1);
+                Utils.setStorage('produtosFinais', produtos);
+                Produtos.listarProdutosFinais(); // Atualiza a lista para refletir a remoção (temporária) do item original
+                alert('Produto pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
+            } else {
+                // Cancela a edição e limpa os campos
+                Utils.clearForm('produtoFinalNome', 'produtoFinalPrecoVenda', 'produtoFinalCustoProducao');
+                Produtos.ingredientesTemporarios = [];
+                Produtos.renderizarIngredientesTemporarios();
+                alert('Edição de produto final cancelada. O produto original não foi alterado.');
+            }
+        }
+    };
+
 
     // --- MÓDULO DESPESAS ---
     const Despesas = {
@@ -995,7 +1279,7 @@
         }
     };
 
-    // --- MÓDULO ESTOQUE ---
+    // --- MÓDULO ESTOQUE (INGREDIENTES E EMBALAGENS) ---
     const Estoque = {
         formFields: [
             {id:'produtoNome', name:'nome', type:'text'},
@@ -1011,7 +1295,7 @@
         qtdInput: document.getElementById('produtoQtd'),
         minInput: document.getElementById('produtoMin'),
         validadeInput: document.getElementById('produtoValidade'),
-        buscaInput: document.getElementById('buscaProduto'),
+        buscaInput: document.getElementById('buscaProdutoEstoque'), // Novo ID para a busca de estoque
         filtroTipoSelect: document.getElementById('filtroTipoEstoque'),
 
         adicionarProduto: () => {
@@ -1022,14 +1306,14 @@
             const validade = Estoque.validadeInput.value;
 
             if (!nome || !tipo || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0) {
-                return alert('Por favor, preencha todos os campos do produto corretamente (Quantidade e Mínimo devem ser números não negativos).');
+                return alert('Por favor, preencha todos os campos do item de estoque corretamente (Quantidade e Mínimo devem ser números não negativos).');
             }
 
             const estoque = Utils.getStorage('estoque');
             const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
 
             if (itemExistenteIndex > -1) {
-                if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou ATUALIZAR (sobrescrever) o item? \n\nClique OK para ADICIONAR, ou CANCELAR para ATUALIZAR.`)) {
+                if (confirm(`O item "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou ATUALIZAR (sobrescrever) o item? \n\nClique OK para ADICIONAR, ou CANCELAR para ATUALIZAR.`)) {
                     estoque[itemExistenteIndex].qtd += qtd;
                     if (validade) estoque[itemExistenteIndex].validade = validade;
                     if (min) estoque[itemExistenteIndex].min = min;
@@ -1038,17 +1322,18 @@
                 } else {
                     estoque[itemExistenteIndex] = { nome, tipo, qtd, min, validade };
                     Estoque.registrarHistorico(`Atualizado: ${nome} (${tipo}, nova quantidade: ${qtd})`);
-                    alert(`Produto "${nome}" atualizado para ${qtd} unidades.`);
+                    alert(`Item "${nome}" atualizado para ${qtd} unidades.`);
                 }
             } else {
                 estoque.push({ nome, tipo, qtd, min, validade });
                 Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, novo item no estoque)`);
-                alert('Novo produto adicionado ao estoque!');
+                alert('Novo item adicionado ao estoque!');
             }
 
             Utils.setStorage('estoque', estoque);
             Utils.clearForm('produtoNome', 'produtoTipo', 'produtoQtd', 'produtoMin', 'produtoValidade');
             Estoque.listarProdutos();
+            Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
         },
 
         listarProdutos: () => {
@@ -1065,12 +1350,12 @@
             });
 
             if (estoque.length === 0) {
-                Estoque.listElement.innerHTML = '<li class="empty-list-message">Nenhum produto em estoque.</li>';
+                Estoque.listElement.innerHTML = '<li class="empty-list-message">Nenhum item em estoque.</li>';
                 return;
             }
 
             if (produtosFiltrados.length === 0 && (termoBusca !== '' || tipoFiltro !== '')) {
-                Estoque.listElement.innerHTML = `<li class="empty-list-message">Nenhum produto encontrado com os filtros aplicados.</li>`;
+                Estoque.listElement.innerHTML = `<li class="empty-list-message">Nenhum item de estoque encontrado com os filtros aplicados.</li>`;
                 return;
             }
 
@@ -1081,10 +1366,10 @@
                         <button class="use" onclick="Estoque.usarProduto(${index})">
                             <i class="fa-solid fa-minus"></i> Usar 1
                         </button>
-                        <button class="edit" onclick="Utils.editItem('estoque', ${index}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
+                        <button class="edit" onclick="Utils.editItem('estoque', ${index}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
                             <i class="fa-solid fa-pen"></i> Editar
                         </button>
-                        <button class="delete" onclick="Utils.deleteItem('estoque', ${index}, Estoque.listarProdutos, (item) => \`Produto: ${item.nome} (${item.qtd} un.)\`)">
+                        <button class="delete" onclick="Utils.deleteItem('estoque', ${index}, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un.)\`)">
                             <i class="fa-solid fa-trash"></i> Excluir
                         </button>
                     `
@@ -1103,6 +1388,7 @@
                     Utils.setStorage('estoque', estoque);
                     Estoque.registrarHistorico(`-1 ${estoque[index].nome} (${estoque[index].tipo})`);
                     Estoque.listarProdutos();
+                    Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
                     alert(`1 unidade de "${estoque[index].nome}" usada.`);
                 }
             } else {
@@ -1166,7 +1452,7 @@
             const sortedYears = Array.from(allYears).sort((a, b) => a - b);
 
             if (!sortedYears.includes(currentYear)) sortedYears.push(currentYear);
-            if (!sortedYears.includes(currentYear + 1)) sortedYears.push(currentYear + 1);
+            //if (!sortedYears.includes(currentYear + 1)) sortedYears.push(currentYear + 1); // Remover ou ajustar se não quiser anos futuros
             sortedYears.sort((a, b) => a - b);
 
             sortedYears.forEach(year => {
