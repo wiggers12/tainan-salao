@@ -36,7 +36,7 @@
     section {
       display: none; background: white; padding: 20px;
       margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      max-width: 600px; margin-left: auto; margin-right: auto;
+      max-width: 600px; margin-left: auto; margin-right: auto; /* Centraliza as seções */
     }
     section.active { display: block; }
     h2 {
@@ -352,7 +352,7 @@
     // Parâmetros:
     //  - key: chave do localStorage (ex: 'clientes', 'pedidos')
     //  - id: índice do item na lista
-    //  - formFields: array de IDs dos campos de formulário para preencher na edição
+    //  - formFields: array de objetos {id: 'inputId', name: 'propertyName', type: 'text'|'number'|'date'|'select'}
     //  - listFunction: função que lista os itens (para atualizar a UI)
     //  - itemToDisplay: função que retorna a string de exibição do item para o prompt de confirmação
     function editarItem(key, id, formFields, listFunction, itemToDisplay) {
@@ -361,28 +361,30 @@
 
         if (!item) return;
 
-        // Preenche os campos do formulário
+        // Preenche os campos do formulário com os dados do item selecionado
         for (const field of formFields) {
             const inputElement = document.getElementById(field.id);
             if (inputElement) {
-                // Lida com tipos de campo específicos (ex: 'date', 'number')
                 if (field.type === 'date') {
-                    inputElement.value = item[field.name]; // Assume que o nome do campo corresponde à chave no objeto
+                    inputElement.value = item[field.name] || ''; // Garante string vazia se nulo
                 } else if (field.type === 'number') {
-                     inputElement.value = parseFloat(item[field.name]);
-                }
-                else {
-                    inputElement.value = item[field.name];
+                    inputElement.value = item[field.name] !== undefined ? parseFloat(item[field.name]) : '';
+                } else {
+                    inputElement.value = item[field.name] || '';
                 }
             }
         }
 
-        // Remove o item original para que uma nova versão editada possa ser salva
-        if (confirm(`Deseja editar este item? O item original será removido ao salvar: ${itemToDisplay(item)}`)) {
-            items.splice(id, 1);
+        // Confirmação para remover o item original, esperando o usuário salvar a versão editada
+        if (confirm(`Deseja editar este item? O item original será removido ao confirmar a edição. Por favor, ajuste os campos e clique em 'Salvar' novamente. Item: ${itemToDisplay(item)}`)) {
+            items.splice(id, 1); // Remove o item original
             localStorage.setItem(key, JSON.stringify(items));
-            alert('Item pronto para edição nos campos acima. Lembre-se de salvar novamente!');
-            listFunction(); // Atualiza a lista para remover o item "editado" temporariamente
+            listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
+            alert('Item pronto para edição nos campos acima. Lembre-se de preencher e salvar novamente!');
+        } else {
+            // Se o usuário cancelar a edição, os campos podem ficar preenchidos, mas o item não é removido
+            // Para maior clareza, podemos limpar os campos ou reverter a interface
+            // Por simplicidade, vamos apenas não remover o item se ele cancelar
         }
     }
 
@@ -409,7 +411,7 @@
       const nome = clienteNome.value.trim();
       const telefone = clienteTelefone.value.trim();
       const endereco = clienteEndereco.value.trim();
-      if (!nome || !telefone || !endereco) return alert('Preencha todos os campos');
+      if (!nome || !telefone || !endereco) return alert('Preencha todos os campos!');
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
       clientes.push({ nome, telefone, endereco });
       localStorage.setItem('clientes', JSON.stringify(clientes));
@@ -429,7 +431,11 @@
         li.innerHTML = `
             <span class="item-details">${itemText}</span>
             <div class="item-actions">
-                <button class="edit" onclick="editarItem('clientes', ${index}, [{id:'clienteNome', name:'nome'}, {id:'clienteTelefone', name:'telefone'}, {id:'clienteEndereco', name:'endereco'}], listarClientes, (item) => \`${item.nome}\`)">Editar</button>
+                <button class="edit" onclick="editarItem('clientes', ${index}, [
+                    {id:'clienteNome', name:'nome', type:'text'},
+                    {id:'clienteTelefone', name:'telefone', type:'text'},
+                    {id:'clienteEndereco', name:'endereco', type:'text'}
+                ], listarClientes, (item) => \`${item.nome}\`)">Editar</button>
                 <button class="delete" onclick="excluirItem('clientes', ${index}, listarClientes, (item) => \`${item.nome}\`)">Excluir</button>
             </div>
         `;
@@ -444,13 +450,13 @@
       const valor = parseFloat(valorPedido.value);
       const entrega = formaEntrega.value;
       const data = dataEntrega.value;
-      if (!nome || !produto || isNaN(valor) || valor <= 0 || !data) return alert('Preencha todos os campos e o valor deve ser positivo.');
+      if (!nome || !produto || isNaN(valor) || valor <= 0 || !data) return alert('Preencha todos os campos e o valor deve ser positivo!');
       const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
       pedidos.push({ nome, produto, valor, entrega, data });
       localStorage.setItem('pedidos', JSON.stringify(pedidos));
       pedidoCliente.value = tipoProduto.value = valorPedido.value = dataEntrega.value = '';
       listarPedidos();
-      atualizarFinanceiro();
+      atualizarFinanceiro(); // Atualiza financeiro ao salvar/excluir pedido
       alert('Pedido salvo com sucesso!');
     }
     function listarPedidos() {
@@ -464,11 +470,11 @@
             <span class="item-details">${itemText}</span>
             <div class="item-actions">
                 <button class="edit" onclick="editarItem('pedidos', ${index}, [
-                    {id:'pedidoCliente', name:'nome'},
-                    {id:'tipoProduto', name:'produto'},
+                    {id:'pedidoCliente', name:'nome', type:'text'},
+                    {id:'tipoProduto', name:'produto', type:'text'},
                     {id:'valorPedido', name:'valor', type:'number'},
                     {id:'dataEntrega', name:'data', type:'date'},
-                    {id:'formaEntrega', name:'entrega'}
+                    {id:'formaEntrega', name:'entrega', type:'select'}
                 ], listarPedidos, (item) => \`Pedido de ${item.nome} (${item.produto})\`)">Editar</button>
                 <button class="delete" onclick="excluirItem('pedidos', ${index}, listarPedidos, (item) => \`Pedido de ${item.nome} (${item.produto})\`)">Excluir</button>
             </div>
@@ -499,7 +505,7 @@
       document.getElementById('dataDespesa').value = '';
       document.getElementById('valorDespesa').value = '';
 
-      atualizarFinanceiro();
+      atualizarFinanceiro(); // Atualiza financeiro ao salvar/excluir despesa
       listaDespesasVisivel = true;
       document.getElementById('listaDespesas').style.display = 'block';
       document.getElementById('btnVerDespesas').textContent = 'Ocultar despesas';
@@ -531,8 +537,8 @@
             <span class="item-details">${itemText}</span>
             <div class="item-actions">
                 <button class="edit" onclick="editarItem('despesas', ${index}, [
-                    {id:'categoriaDespesa', name:'categoria'},
-                    {id:'descricaoDespesa', name:'descricao'},
+                    {id:'categoriaDespesa', name:'categoria', type:'select'},
+                    {id:'descricaoDespesa', name:'descricao', type:'text'},
                     {id:'dataDespesa', name:'data', type:'date'},
                     {id:'valorDespesa', name:'valor', type:'number'}
                 ], filtrarDespesas, (item) => \`Despesa: ${item.descricao} (R$${item.valor.toFixed(2)})\`)">Editar</button>
@@ -571,27 +577,31 @@
       const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
 
       if (itemExistenteIndex > -1) {
-          // Se o item já existe, pergunta se quer atualizar a quantidade ou criar um novo
-          if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja adicionar ${qtd} à quantidade existente ou editar?`)) {
+          // Se o item já existe, pergunta se quer adicionar à quantidade ou sobrescrever
+          if (confirm(`O produto "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou SOBRESCREVER o item? \n\nClique OK para ADICIONAR, ou CANCELAR para SOBRESCREVER (você pode então usar o botão EDITAR para ajustar o item).`)) {
               estoque[itemExistenteIndex].qtd += qtd;
               if (validade) estoque[itemExistenteIndex].validade = validade; // Atualiza validade se fornecida
               if (min) estoque[itemExistenteIndex].min = min; // Atualiza min se fornecido
-              registrarHistorico(`+${qtd} ${nome} (atualização)`);
+              registrarHistorico(`+${qtd} ${nome} (atualização de estoque)`);
+              localStorage.setItem('estoque', JSON.stringify(estoque));
+              alert(`Quantidade de "${nome}" atualizada para ${estoque[itemExistenteIndex].qtd}.`);
           } else {
-              // Se não quiser adicionar, apenas limpa os campos
+              // Se o usuário cancelou e não quer adicionar, não faz nada (ele pode usar editar depois)
+              alert('Operação de adição cancelada. Use o botão EDITAR para modificar um item existente.');
+              // Limpa campos para nova entrada ou para não confundir o usuário
               produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
               return;
           }
       } else {
           // Adiciona novo item se não existir
           estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
-          registrarHistorico(`+${qtd} ${nome} (novo)`);
+          localStorage.setItem('estoque', JSON.stringify(estoque));
+          registrarHistorico(`+${qtd} ${nome} (novo item no estoque)`);
+          alert('Produto adicionado com sucesso!');
       }
 
-      localStorage.setItem('estoque', JSON.stringify(estoque));
       produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
       listarProdutos();
-      alert('Produto salvo/atualizado com sucesso!');
     }
 
     function listarProdutos() {
@@ -614,8 +624,8 @@
             <div class="item-actions">
                 <button onclick="usarProduto(${index})">Usar</button>
                 <button class="edit" onclick="editarItem('estoque', ${index}, [
-                    {id:'produtoNome', name:'nome'},
-                    {id:'produtoTipo', name:'tipo'},
+                    {id:'produtoNome', name:'nome', type:'text'},
+                    {id:'produtoTipo', name:'tipo', type:'select'},
                     {id:'produtoQtd', name:'qtd', type:'number'},
                     {id:'produtoMin', name:'min', type:'number'},
                     {id:'produtoValidade', name:'validade', type:'date'}
@@ -629,20 +639,22 @@
     function usarProduto(index) {
       const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
       if (estoque[index].qtd > 0) {
-        estoque[index].qtd--;
-        localStorage.setItem('estoque', JSON.stringify(estoque));
-        registrarHistorico(`-1 ${estoque[index].nome}`);
-        listarProdutos();
-        alert(`1 unidade de "${estoque[index].nome}" usada.`);
+        if (confirm(`Deseja usar 1 unidade de "${estoque[index].nome}"?`)) {
+            estoque[index].qtd--;
+            localStorage.setItem('estoque', JSON.stringify(estoque));
+            registrarHistorico(`-1 ${estoque[index].nome}`);
+            listarProdutos();
+            alert(`1 unidade de "${estoque[index].nome}" usada.`);
+        }
       } else {
         alert(`Não há mais unidades de "${estoque[index].nome}" no estoque.`);
       }
     }
     function registrarHistorico(texto) {
       const historico = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
-      const data = new Date().toLocaleString();
+      const data = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
       historico.unshift(`${data}: ${texto}`);
-      localStorage.setItem('historicoEstoque', JSON.stringify(historico.slice(0, 20)));
+      localStorage.setItem('historicoEstoque', JSON.stringify(historico.slice(0, 20))); // Limita a 20 entradas
       listarHistorico();
     }
     function listarHistorico() {
@@ -661,7 +673,10 @@
         const selectAno = document.getElementById('filtroAnoFinanceiro');
         selectAno.innerHTML = '<option value="">Todos os Anos</option>'; // Resetar
         const currentYear = new Date().getFullYear();
-        for (let i = currentYear - 5; i <= currentYear + 1; i++) { // Últimos 5 anos, ano atual e próximo
+        const firstYearWithData = Math.min(...(JSON.parse(localStorage.getItem('pedidos') || '[]').map(p => new Date(p.data).getFullYear()).concat(JSON.parse(localStorage.getItem('despesas') || '[]').map(d => new Date(d.data).getFullYear()))));
+
+        const startYear = isFinite(firstYearWithData) ? Math.min(firstYearWithData, currentYear - 5) : currentYear - 5; // Começa 5 anos antes ou no primeiro dado existente
+        for (let i = startYear; i <= currentYear + 1; i++) { // Últimos N anos, ano atual e próximo
             const option = document.createElement('option');
             option.value = i.toString();
             option.textContent = i.toString();
@@ -734,7 +749,7 @@
     function atualizarTudo() {
       listarClientes();
       listarPedidos();
-      filtrarDespesas(); // Chama este para a lista de despesas inicial
+      filtrarDespesas(); // Chama este para a lista de despesas inicial (já inclui termo de busca vazio)
       atualizarFinanceiro(); // Chama este para o financeiro
       listarProdutos();
       listarHistorico();
