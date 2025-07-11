@@ -17,6 +17,8 @@
       margin: 0;
       color: #333;
       line-height: 1.6;
+      display: flex; /* Para layout flexbox com sidebar */
+      min-height: 100vh; /* Garante que o corpo ocupa toda a altura */
     }
 
     /* Splash Screen */
@@ -26,11 +28,16 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      width: 100%; /* Ocupa toda a largura antes de sumir */
       background: linear-gradient(to bottom right, #ffb6c1, #f08080); /* Gradiente rosa-avermelhado */
       color: white;
       text-align: center;
       transition: opacity 1s ease-in-out;
       opacity: 1;
+      position: absolute; /* Para que não afete o layout principal ao desaparecer */
+      top: 0;
+      left: 0;
+      z-index: 2000; /* Garante que fique acima de tudo */
     }
     .splash.fade-out {
         opacity: 0;
@@ -60,57 +67,85 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
 
-    /* Layout Principal do App */
+    /* Layout Principal do App (com sidebar) */
     .container {
-      display: none;
-      padding: 20px;
-      max-width: 900px; /* Largura máxima para centralizar o conteúdo */
-      margin: 0 auto; /* Centraliza */
+      display: none; /* Inicia oculto */
+      flex-grow: 1; /* Permite que o container ocupe o espaço restante */
+      max-width: 1200px; /* Largura máxima para o layout total */
+      margin: 0 auto; /* Centraliza o conteúdo geral */
+      display: flex; /* Para sidebar e conteúdo principal */
+      padding: 0; /* Remove padding do container para gerenciar com sidebar */
     }
 
-    /* Navegação */
-    nav {
+    /* Sidebar (Barra Lateral) */
+    .sidebar {
+      width: 250px; /* Largura padrão da sidebar */
+      background: #f08080; /* Cor da sidebar */
+      padding: 20px 0;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center; /* Centraliza os botões */
-      background: #f08080; /* Cor mais forte para a nav */
-      padding: 15px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000; /* Garante que fique acima de outros elementos */
-      border-radius: 10px; /* Bordas arredondadas na nav */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      gap: 15px; /* Espaçamento entre botões */
+      flex-direction: column;
+      flex-shrink: 0; /* Não encolhe */
+      border-radius: 0 15px 15px 0; /* Borda arredondada no lado direito */
+      z-index: 1000; /* Garante que fique acima de outros elementos menores */
     }
-    nav button {
+
+    .sidebar h2 {
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        font-family: 'Pacifico', cursive;
+        font-size: 2rem;
+        border-bottom: 2px solid rgba(255,255,255,0.3);
+        padding-bottom: 15px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* Espaçamento entre botões */
+      padding: 0 15px; /* Padding interno da navegação */
+      background: none; /* Remove background da nav padrão */
+      box-shadow: none; /* Remove sombra da nav padrão */
+    }
+    .sidebar nav button {
       background: none;
       border: none;
       color: white;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
-      padding: 10px 15px;
-      border-radius: 8px;
+      padding: 15px 20px; /* Maior padding para os botões */
+      border-radius: 10px; /* Bordas arredondadas */
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 8px; /* Espaço entre ícone e texto */
+      gap: 12px; /* Mais espaço entre ícone e texto */
+      text-align: left; /* Alinha texto à esquerda */
     }
-    nav button:hover, nav button.active {
-      background: rgba(255,255,255,0.2); /* Fundo sutil ao hover/ativo */
-      transform: translateY(-2px);
+    .sidebar nav button:hover, .sidebar nav button.active {
+      background: rgba(255,255,255,0.25); /* Fundo mais visível ao hover/ativo */
+      transform: translateX(5px); /* Efeito cascata sutil */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Sombra para o item ativo */
     }
-    nav button.active {
-        box-shadow: inset 0 0 8px rgba(0,0,0,0.1); /* Sombra interna para o botão ativo */
+    .sidebar nav button.active {
+        background: rgba(255,255,255,0.35); /* Fundo mais forte para o item ativo */
     }
 
+    /* Conteúdo Principal (seções) */
+    .main-content {
+      flex-grow: 1; /* Ocupa o resto do espaço */
+      padding: 20px;
+      overflow-y: auto; /* Permite rolagem dentro do conteúdo se for muito alto */
+    }
 
-    /* Seções */
     section {
       display: none;
       background: white;
       padding: 25px;
-      margin-top: 25px;
+      margin-bottom: 25px; /* Espaço entre as seções caso haja mais de uma */
       border-radius: 15px; /* Bordas mais arredondadas */
       box-shadow: 0 5px 20px rgba(0,0,0,0.08); /* Sombra mais suave */
     }
@@ -323,25 +358,73 @@
         margin-bottom: 0;
     }
 
+    /* Botão para abrir/fechar sidebar em mobile */
+    .sidebar-toggle {
+        display: none; /* Inicia oculto em desktop */
+        background: #f08080;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1001;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+    .sidebar-toggle:hover {
+        transform: scale(1.05);
+    }
+
+
     /* Responsividade */
     @media (max-width: 768px) {
+      body { flex-direction: column; } /* Pilha a sidebar e o conteúdo */
       .splash h1 { font-size: 3.5rem; }
       .splash button { font-size: 1.1rem; padding: 10px 20px; }
-      nav { justify-content: space-around; gap: 8px; }
-      nav button { font-size: 0.9rem; padding: 8px 10px; gap: 5px; }
-      h2 { font-size: 1.5rem; }
+
+      .sidebar {
+        width: 0; /* Começa fechada */
+        padding: 0;
+        overflow: hidden; /* Esconde conteúdo */
+        position: fixed; /* Fixa a sidebar na tela */
+        height: 100%;
+        left: 0;
+        top: 0;
+        transition: width 0.3s ease, padding 0.3s ease;
+        border-radius: 0; /* Remove borda arredondada em mobile */
+      }
+      .sidebar.active {
+        width: 220px; /* Abre a sidebar */
+        padding: 20px 0;
+      }
+      .sidebar h2 { font-size: 1.8rem; }
+      .sidebar nav button { font-size: 1rem; padding: 12px 15px; gap: 8px; }
+
+      .main-content {
+        width: 100%; /* Ocupa toda a largura */
+        padding: 15px;
+        margin-top: 60px; /* Para não ficar atrás do botão de toggle */
+      }
       section { padding: 15px; margin-top: 15px; }
       input, select, button.save { padding: 10px; margin-bottom: 10px; }
       li { padding: 12px; }
-      li .item-actions { width: 100%; justify-content: flex-end; } /* Alinha botões à direita em telas pequenas */
+      li .item-actions { width: 100%; justify-content: flex-end; }
+
+      .sidebar-toggle {
+          display: block; /* Mostra o botão em mobile */
+      }
     }
 
     @media (max-width: 480px) {
       .splash h1 { font-size: 2.8rem; }
-      nav { flex-direction: column; align-items: center; }
-      nav button { width: 90%; margin-bottom: 5px; }
-      .container { padding: 10px; }
+      .sidebar.active { width: 180px; } /* Sidebar um pouco menor em telas muito pequenas */
+      .sidebar nav button { font-size: 0.95rem; }
       h2 { font-size: 1.3rem; }
+      .main-content { padding: 10px; }
     }
   </style>
 </head>
@@ -352,170 +435,176 @@
     <button onclick="entrar()">Entrar</button>
   </div>
 
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+
   <div class="container" id="app">
-    <nav>
-      <button id="navClientes" onclick="mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
-      <button id="navPedidos" onclick="mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
-      <button id="navDespesas" onclick="mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
-      <button id="navEstoque" onclick="mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
-      <button id="navFinanceiro" onclick="mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
-    </nav>
+    <aside class="sidebar" id="sidebar">
+      <h2>Menu</h2>
+      <nav>
+        <button id="navClientes" onclick="mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
+        <button id="navPedidos" onclick="mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
+        <button id="navDespesas" onclick="mostrar('despesas')"><i class="fa-solid fa-sack-dollar"></i> Despesas</button>
+        <button id="navEstoque" onclick="mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
+        <button id="navFinanceiro" onclick="mostrar('financeiro')"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
+      </nav>
+    </aside>
 
-    <section id="clientes" class="active">
-      <h2>Cadastro de Clientes</h2>
-      <input id="clienteNome" placeholder="Nome Completo" type="text" />
-      <input id="clienteTelefone" placeholder="Telefone (ex: 51999998888)" type="tel" pattern="[0-9]{11}" title="Telefone com 11 dígitos (DDD + número)" />
-      <input id="clienteEndereco" placeholder="Endereço Completo" type="text" />
-      <button class="save" onclick="salvarCliente()">Salvar Cliente</button>
+    <main class="main-content">
+        <section id="clientes" class="active">
+          <h2>Cadastro de Clientes</h2>
+          <input id="clienteNome" placeholder="Nome Completo" type="text" />
+          <input id="clienteTelefone" placeholder="Telefone (ex: 51999998888)" type="tel" pattern="[0-9]{11}" title="Telefone com 11 dígitos (DDD + número)" />
+          <input id="clienteEndereco" placeholder="Endereço Completo" type="text" />
+          <button class="save" onclick="salvarCliente()">Salvar Cliente</button>
 
-      <input id="buscaCliente" placeholder="Buscar cliente por nome, telefone ou endereço..." oninput="listarClientes()" />
-      <ul id="listaClientes"></ul>
-    </section>
+          <h3>Clientes Cadastrados</h3>
+          <input id="buscaCliente" placeholder="Buscar cliente por nome, telefone ou endereço..." oninput="listarClientes()" />
+          <ul id="listaClientes"></ul>
+        </section>
 
-    <section id="pedidos">
-      <h2>Registro de Pedidos</h2>
-      <input id="pedidoCliente" placeholder="Nome do Cliente para o Pedido" type="text" />
-      <input id="tipoProduto" placeholder="Tipo de Produto (ex: Bolo, Torta, Doce)" type="text" />
-      <input id="valorPedido" type="number" step="0.01" min="0" placeholder="Valor Total (R$)" />
-      <input id="dataEntrega" type="date" />
-      <select id="formaEntrega">
-        <option value="">Selecione a Forma de Entrega</option>
-        <option value="Entregar">Entrega (Delivery)</option>
-        <option value="Retirar">Retirada no Local</option>
-      </select>
-      <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
-      <ul id="listaPedidos"></ul>
-    </section>
-
-    <section id="despesas">
-      <h2>Registro de Despesas</h2>
-
-      <div style="background:#fff0f5; padding:20px; border-radius:15px; margin-bottom:20px; box-shadow:0 1px 6px rgba(0,0,0,0.05);">
-        <label for="categoriaDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Categoria:</label>
-        <select id="categoriaDespesa" style="margin-bottom:12px;">
-          <option value="">Selecione a Categoria</option>
-          <option>Mercadorias</option>
-          <option>Loja</option>
-          <option>Pessoais</option>
-          <option>Marketing</option>
-          <option>Manutenção</option>
-          <option>Outros</option>
-        </select>
-
-        <label for="descricaoDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Descrição da Despesa:</label>
-        <input type="text" id="descricaoDespesa" placeholder="Ex: Farinha de trigo, Aluguel, Propaganda..." />
-
-        <label for="dataDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Data da Despesa:</label>
-        <input type="date" id="dataDespesa" />
-
-        <label for="valorDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Valor (R$):</label>
-        <input type="number" step="0.01" min="0" id="valorDespesa" placeholder="0.00" />
-
-        <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
-      </div>
-
-      <div style="margin-bottom:20px;">
-        <label for="buscaDescricaoDespesa" style="font-weight:600; color:#e91e63;">Buscar Despesas:</label>
-        <div style="display:flex; gap:10px; margin-top:8px;">
-          <input
-            type="text"
-            id="buscaDescricaoDespesa"
-            placeholder="Buscar por descrição..."
-            style="flex:1;"
-            onkeydown="if(event.key==='Enter'){filtrarDespesas()}"
-          />
-          <button
-            onclick="filtrarDespesas()"
-            style="background:#f08080; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold; transition:all 0.3s ease;"
-          >
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </div>
-      </div>
-
-      <button
-        id="btnVerDespesas"
-        onclick="toggleListaDespesas()"
-        style="background:#6c757d; color:#fff; padding:10px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; margin-bottom:15px; width:100%; transition:all 0.3s ease;"
-      >
-        <i class="fa-solid fa-eye"></i> Ver Todas as Despesas
-      </button>
-
-      <ul id="listaDespesas" style="display:none;"></ul>
-    </section>
-
-    <section id="estoque">
-      <h2>Controle de Estoque</h2>
-      <input id="produtoNome" placeholder="Nome do Produto/Ingrediente" type="text" />
-      <select id="produtoTipo">
-        <option value="">Selecione o Tipo</option>
-        <option value="Ingrediente">Ingrediente</option>
-        <option value="Embalagem">Embalagem</option>
-        <option value="Produto Final">Produto Final</option>
-      </select>
-      <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
-      <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
-      <input id="produtoValidade" type="date" />
-      <button class="save" onclick="adicionarProduto()">Adicionar/Atualizar Produto</button>
-
-      <input id="buscaProduto" placeholder="Buscar produto por nome..." oninput="listarProdutos()" style="margin-top:20px;" />
-      <select id="filtroTipoEstoque" onchange="listarProdutos()" style="margin-bottom:20px;">
-        <option value="">Filtrar por Tipo (Todos)</option>
-        <option value="Ingrediente">Ingrediente</option>
-        <option value="Embalagem">Embalagem</option>
-        <option value="Produto Final">Produto Final</option>
-      </select>
-      <ul id="listaEstoque"></ul>
-
-      <h3>Histórico de Movimentações</h3>
-      <ul id="listaHistorico" class="historico"></ul>
-    </section>
-
-    <section id="financeiro">
-      <h2>Visão Financeira</h2>
-      <div class="financeiro-filters">
-        <select id="filtroMesFinanceiro" onchange="atualizarFinanceiro()">
-          <option value="">Todos os Meses</option>
-          <option value="01">Janeiro</option><option value="02">Fevereiro</option>
-          <option value="03">Março</option><option value="04">Abril</option>
-          <option value="05">Maio</option><option value="06">Junho</option>
-          <option value="07">Julho</option><option value="08">Agosto</option>
-          <option value="09">Setembro</option><option value="10">Outubro</option>
-          <option value="11">Novembro</option><option value="12">Dezembro</option>
-        </select>
-        <select id="filtroAnoFinanceiro" onchange="atualizarFinanceiro()">
-          <option value="">Todos os Anos</option>
+        <section id="pedidos">
+          <h2>Registro de Pedidos</h2>
+          <input id="pedidoCliente" placeholder="Nome do Cliente para o Pedido" type="text" />
+          <input id="tipoProduto" placeholder="Tipo de Produto (ex: Bolo, Torta, Doce)" type="text" />
+          <input id="valorPedido" type="number" step="0.01" min="0" placeholder="Valor Total (R$)" />
+          <input id="dataEntrega" type="date" />
+          <select id="formaEntrega">
+            <option value="">Selecione a Forma de Entrega</option>
+            <option value="Entregar">Entrega (Delivery)</option>
+            <option value="Retirar">Retirada no Local</option>
           </select>
-      </div>
+          <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
 
-      <div class="financeiro-summary">
-        <p>
-          <strong>Ganhos Totais:</strong> R$ <span id="ganhos">0.00</span>
-        </p>
-        <p>
-          <strong>Gastos Totais:</strong> R$ <span id="gastos">0.00</span>
-        </p>
-        <p>
-          <strong>Lucro/Prejuízo:</strong> R$ <span id="lucros">0.00</span>
-        </p>
-      </div>
+          <h3>Pedidos Salvos</h3>
+          <ul id="listaPedidos"></ul>
+        </section>
 
-      <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('ganhos')">
-        <i class="fa-solid fa-circle-plus"></i> Detalhes dos Ganhos
-      </button>
-      <div id="detalhesGanhos" class="financeiro-list-container">
-        <h4>Ganhos por Pedido</h4>
-        <ul id="listaGanhosDetalhes"></ul>
-      </div>
+        <section id="despesas">
+          <h2>Registro de Despesas</h2>
 
-      <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('gastos')">
-        <i class="fa-solid fa-circle-minus"></i> Detalhes dos Gastos
-      </button>
-      <div id="detalhesGastos" class="financeiro-list-container">
-        <h4>Gastos por Despesa</h4>
-        <ul id="listaGastosDetalhes"></ul>
-      </div>
-    </section>
+          <div style="background:#fff0f5; padding:20px; border-radius:15px; margin-bottom:20px; box-shadow:0 1px 6px rgba(0,0,0,0.05);">
+            <label for="categoriaDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Categoria:</label>
+            <select id="categoriaDespesa" style="margin-bottom:12px;">
+              <option value="">Selecione a Categoria</option>
+              <option>Mercadorias</option>
+              <option>Loja</option>
+              <option>Pessoais</option>
+              <option>Marketing</option>
+              <option>Manutenção</option>
+              <option>Outros</option>
+            </select>
+
+            <label for="descricaoDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Descrição da Despesa:</label>
+            <input type="text" id="descricaoDespesa" placeholder="Ex: Farinha de trigo, Aluguel, Propaganda..." />
+
+            <label for="dataDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Data da Despesa:</label>
+            <input type="date" id="dataDespesa" />
+
+            <label for="valorDespesa" style="display:block; margin-bottom:8px; font-weight:600; color:#e91e63;">Valor (R$):</label>
+            <input type="number" step="0.01" min="0" id="valorDespesa" placeholder="0.00" />
+
+            <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
+          </div>
+
+          <h3>Despesas Registradas</h3>
+          <div style="margin-bottom:20px;">
+            <label for="buscaDescricaoDespesa" style="font-weight:600; color:#e91e63;">Buscar Despesas:</label>
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              <input
+                type="text"
+                id="buscaDescricaoDespesa"
+                placeholder="Buscar por descrição..."
+                style="flex:1;"
+                onkeydown="if(event.key==='Enter'){filtrarDespesas()}"
+              />
+              <button
+                onclick="filtrarDespesas()"
+                style="background:#f08080; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold; transition:all 0.3s ease;"
+              >
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+          </div>
+
+          <ul id="listaDespesas"></ul>
+        </section>
+
+        <section id="estoque">
+          <h2>Controle de Estoque</h2>
+          <input id="produtoNome" placeholder="Nome do Produto/Ingrediente" type="text" />
+          <select id="produtoTipo">
+            <option value="">Selecione o Tipo</option>
+            <option value="Ingrediente">Ingrediente</option>
+            <option value="Embalagem">Embalagem</option>
+            <option value="Produto Final">Produto Final</option>
+          </select>
+          <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
+          <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
+          <input id="produtoValidade" type="date" />
+          <button class="save" onclick="adicionarProduto()">Adicionar/Atualizar Produto</button>
+
+          <h3>Itens em Estoque</h3>
+          <input id="buscaProduto" placeholder="Buscar produto por nome..." oninput="listarProdutos()" style="margin-top:20px;" />
+          <select id="filtroTipoEstoque" onchange="listarProdutos()" style="margin-bottom:20px;">
+            <option value="">Filtrar por Tipo (Todos)</option>
+            <option value="Ingrediente">Ingrediente</option>
+            <option value="Embalagem">Embalagem</option>
+            <option value="Produto Final">Produto Final</option>
+          </select>
+          <ul id="listaEstoque"></ul>
+
+          <h3>Histórico de Movimentações</h3>
+          <ul id="listaHistorico" class="historico"></ul>
+        </section>
+
+        <section id="financeiro">
+          <h2>Visão Financeira</h2>
+          <div class="financeiro-filters">
+            <select id="filtroMesFinanceiro" onchange="atualizarFinanceiro()">
+              <option value="">Todos os Meses</option>
+              <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+              <option value="03">Março</option><option value="04">Abril</option>
+              <option value="05">Maio</option><option value="06">Junho</option>
+              <option value="07">Julho</option><option value="08">Agosto</option>
+              <option value="09">Setembro</option><option value="10">Outubro</option>
+              <option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+            <select id="filtroAnoFinanceiro" onchange="atualizarFinanceiro()">
+              <option value="">Todos os Anos</option>
+              </select>
+          </div>
+
+          <div class="financeiro-summary">
+            <p>
+              <strong>Ganhos Totais:</strong> R$ <span id="ganhos">0.00</span>
+            </p>
+            <p>
+              <strong>Gastos Totais:</strong> R$ <span id="gastos">0.00</span>
+            </p>
+            <p>
+              <strong>Lucro/Prejuízo:</strong> R$ <span id="lucros">0.00</span>
+            </p>
+          </div>
+
+          <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('ganhos')">
+            <i class="fa-solid fa-circle-plus"></i> Detalhes dos Ganhos
+          </button>
+          <div id="detalhesGanhos" class="financeiro-list-container">
+            <h4>Ganhos por Pedido</h4>
+            <ul id="listaGanhosDetalhes"></ul>
+          </div>
+
+          <button class="financeiro-detail-toggle" onclick="toggleDetalhesFinanceiros('gastos')">
+            <i class="fa-solid fa-circle-minus"></i> Detalhes dos Gastos
+          </button>
+          <div id="detalhesGastos" class="financeiro-list-container">
+            <h4>Gastos por Despesa</h4>
+            <ul id="listaGastosDetalhes"></ul>
+          </div>
+        </section>
+    </main>
   </div>
 
   <script>
@@ -527,32 +616,57 @@
       splash.classList.add('fade-out'); // Adiciona classe para iniciar a transição
       setTimeout(() => {
         splash.style.display = 'none';
-        app.style.display = 'block';
+        app.style.display = 'flex'; // Muda para flex para o layout com sidebar
         preencherFiltrosAnoFinanceiro();
         atualizarTudo(); // Carrega todos os dados iniciais
       }, 900); // Tempo para a transição (um pouco menos que o tempo total da transição CSS)
     }
 
+    // Botão de toggle da sidebar para mobile
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('active');
+    }
+
     function mostrar(secaoId) {
-      // Remove 'active' de todas as seções e botões de navegação
+      // Fecha a sidebar em mobile ao clicar no item do menu
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('active');
+      }
+
+      // Remove 'active' de todas as seções e botões de navegação da sidebar
       document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
 
       // Adiciona 'active' à seção e botão clicado
       document.getElementById(secaoId).classList.add('active');
       document.getElementById(`nav${secaoId.charAt(0).toUpperCase() + secaoId.slice(1)}`).classList.add('active'); // Ex: navClientes
 
-      // Certifica-se que as listas visíveis estão atualizadas ao mudar de seção
-      if (secaoId === 'despesas') {
-          // Se a lista de despesas estiver visível, recarrega-a
-          if (document.getElementById('listaDespesas').style.display === 'block') {
-              filtrarDespesas();
-          }
-      } else if (secaoId === 'estoque') {
+      // Chama a função de listagem para a seção ativa para garantir atualização
+      switch (secaoId) {
+        case 'clientes':
+          listarClientes();
+          break;
+        case 'pedidos':
+          listarPedidos();
+          break;
+        case 'despesas':
+          // Ao mostrar despesas, reseta o estado de visibilidade da lista
+          listaDespesasVisivel = false;
+          document.getElementById('listaDespesas').style.display = 'none';
+          document.getElementById('btnVerDespesas').innerHTML = '<i class="fa-solid fa-eye"></i> Ver Todas as Despesas';
+          // Para iniciar com a lista oculta e o botão no estado "Ver"
+          break;
+        case 'estoque':
           listarProdutos();
           listarHistorico();
-      } else if (secaoId === 'financeiro') {
+          break;
+        case 'financeiro':
           atualizarFinanceiro();
+          // Garante que os detalhes estejam fechados ao entrar na seção
+          document.getElementById('detalhesGanhos').classList.remove('active');
+          document.getElementById('detalhesGastos').classList.remove('active');
+          break;
       }
     }
 
@@ -601,14 +715,7 @@
             alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
         } else {
             // Se o usuário cancelar a edição, os campos podem ficar preenchidos, mas o item não é removido.
-            // Poderíamos limpar os campos aqui, mas deixá-los preenchidos pode ser útil se o usuário mudar de ideia.
-            // Para este cenário, o item original permanece inalterado na lista.
             alert('Edição cancelada. O item original não foi alterado.');
-            // Opcional: Limpar os campos para evitar confusão se o usuário não for salvar
-            // for (const field of formFields) {
-            //     const inputElement = document.getElementById(field.id);
-            //     if (inputElement) inputElement.value = '';
-            // }
         }
     }
 
@@ -764,6 +871,9 @@
         return;
       }
 
+      // Ordena os pedidos pela data (mais recente primeiro)
+      pedidos.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
+
       pedidos.forEach((p, index) => {
         const li = document.createElement('li');
         // Formata a data para exibir como DD/MM/YYYY
@@ -792,7 +902,8 @@
 
     // --- MÓDULO DESPESAS ---
 
-    let listaDespesasVisivel = false; // Estado para controlar a visibilidade da lista de despesas
+    // Remover a variável listaDespesasVisivel e toggleListaDespesas.
+    // A lista de despesas agora estará sempre visível ou filtrada.
 
     function salvarDespesa() {
       const categoriaSelect = document.getElementById('categoriaDespesa');
@@ -820,10 +931,7 @@
       valorInput.value = '';
 
       atualizarFinanceiro();
-      // Garante que a lista de despesas esteja visível e atualizada após salvar
-      listaDespesasVisivel = true;
-      document.getElementById('listaDespesas').style.display = 'block';
-      document.getElementById('btnVerDespesas').innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ocultar Despesas';
+      // Apenas filtra as despesas, sem controle de visibilidade via botão
       filtrarDespesas();
       alert('Despesa salva com sucesso!');
     }
@@ -849,6 +957,10 @@
         return;
       }
 
+      // Ordena as despesas pela data (mais recente primeiro)
+      despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
+
+
       despesasFiltradas.forEach((d, index) => {
         const li = document.createElement('li');
         const dataFormatada = d.data ? new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data Indefinida';
@@ -871,22 +983,6 @@
         `;
         listaDespesasUl.appendChild(li);
       });
-    }
-
-    function toggleListaDespesas() {
-      listaDespesasVisivel = !listaDespesasVisivel;
-      const lista = document.getElementById('listaDespesas');
-      const btn = document.getElementById('btnVerDespesas');
-
-      if (listaDespesasVisivel) {
-        lista.style.display = 'block';
-        filtrarDespesas(); // Carrega as despesas ao mostrar
-        btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Ocultar Despesas';
-      } else {
-        lista.style.display = 'none';
-        lista.innerHTML = ''; // Limpa a lista quando oculta
-        btn.innerHTML = '<i class="fa-solid fa-eye"></i> Ver Todas as Despesas';
-      }
     }
 
     // --- MÓDULO ESTOQUE ---
@@ -1167,8 +1263,7 @@
       mostrar('clientes'); // Inicia na seção de Clientes por padrão
       listarClientes();
       listarPedidos();
-      // Não chama filtrarDespesas() ou toggleListaDespesas() aqui para que a lista de despesas comece oculta
-      // e só seja carregada se o usuário clicar em "Ver Despesas".
+      filtrarDespesas(); // Lista as despesas imediatamente (não oculta por padrão)
       atualizarFinanceiro();
       listarProdutos();
       listarHistorico();
