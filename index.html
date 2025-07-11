@@ -1,388 +1,288 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Doce Sabor Caseiro</title>
   <style>
-    :root {
-      --rosa: #f28ab2;
-      --fundo-claro: #fff0f5;
-      --fundo-escuro: #1c1c1c;
-      --texto-claro: #333;
-      --texto-escuro: #f5f5f5;
-    }
-
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-    body {
-      background: var(--fundo-claro);
-      color: var(--texto-claro);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background: var(--fundo-escuro);
-      color: var(--texto-escuro);
-    }
-
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #fff0f5; margin: 0; color: #333; }
     .splash {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100vh; background: var(--rosa); color: white; text-align: center;
+      height: 100vh; background: #f28ab2; color: white; text-align: center;
     }
-
     .splash h1 { font-size: 3rem; margin-bottom: 20px; }
     .splash button {
-      background: white; color: var(--rosa); font-size: 1.2rem;
+      background: white; color: #f28ab2; font-size: 1.2rem;
       border: none; padding: 12px 24px; border-radius: 8px;
       cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-
     .container { display: none; padding: 20px; }
-
     nav {
-      display: flex; justify-content: space-around;
-      background: var(--rosa); padding: 12px 0; position: sticky; top: 0;
-      z-index: 10;
+      display: flex; flex-wrap: wrap; justify-content: space-around;
+      background: #f28ab2; padding: 12px 0; position: sticky; top: 0; z-index: 10;
     }
-
     nav button {
       background: none; border: none; color: white; font-size: 1rem;
-      font-weight: bold; cursor: pointer;
+      font-weight: bold; cursor: pointer; transition: transform 0.2s;
     }
-
-    .modo-escuro-btn {
-      position: absolute; top: 12px; right: 12px;
-      background: black; color: white; padding: 5px 10px;
-      border-radius: 8px; font-size: 0.8rem; border: none; cursor: pointer;
-    }
-
+    nav button:hover { transform: scale(1.05); }
     section {
       display: none; background: white; padding: 20px;
-      margin-top: 20px; border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
-
-    body.dark section {
-      background: #2e2e2e;
-    }
-
     section.active { display: block; }
-
     h2 {
-      color: var(--rosa); margin-bottom: 16px;
-      border-bottom: 2px solid var(--rosa); padding-bottom: 4px;
+      color: #f28ab2; margin-bottom: 16px;
+      border-bottom: 2px solid #f28ab2; padding-bottom: 4px;
     }
-
     input, select {
       width: 100%; padding: 10px; margin-bottom: 12px;
       border: 1px solid #ccc; border-radius: 8px;
     }
-
     button.save {
-      background: var(--rosa); color: white; padding: 10px 20px;
+      background: #f28ab2; color: white; padding: 10px 20px;
       border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
     }
-
-    .listagem {
-      margin-top: 20px; border-top: 1px dashed #aaa; padding-top: 10px;
+    ul { list-style: none; padding: 0; margin-top: 10px; }
+    li {
+      background: #ffe6ec; margin-bottom: 8px; padding: 10px;
+      border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-
-    ul { list-style: none; padding: 0; }
-    ul li {
-      background: #ffe6ec; margin-bottom: 10px; padding: 10px;
-      border-radius: 6px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    body.dark ul li {
-      background: #3a3a3a;
-      color: #eee;
-    }
-
-    .info { flex: 1; }
-    .botoes button {
-      margin-left: 5px; padding: 4px 8px; font-size: 0.8rem;
-      border: none; border-radius: 4px; cursor: pointer;
-    }
-
-    .editar { background: #ffc107; color: #000; }
-    .excluir { background: #dc3545; color: #fff; }
-
-    .filtros {
-      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
-    }
-    .financeiro p { margin: 6px 0; }
+    .falta { background: #ffcdd2; }
+    .baixo { background: #fff3cd; }
+    .historico { font-size: 0.9rem; color: #555; }
   </style>
 </head>
 <body>
+  <div class="splash" id="splash">
+    <h1>Doce Sabor Caseiro</h1>
+    <button onclick="entrar()">Entrar</button>
+  </div>
 
-<div class="splash" id="splash">
-  <h1>🍰 Doce Sabor Caseiro</h1>
-  <button onclick="entrar()">Entrar</button>
-</div>
+  <div class="container" id="app">
+    <nav>
+      <button onclick="mostrar('clientes')">📋 Clientes</button>
+      <button onclick="mostrar('pedidos')">🧁 Pedidos</button>
+      <button onclick="mostrar('despesas')">💸 Despesas</button>
+      <button onclick="mostrar('estoque')">📦 Estoque</button>
+      <button onclick="mostrar('financeiro')">📊 Financeiro</button>
+    </nav>
 
-<div class="container" id="app">
-  <button class="modo-escuro-btn" onclick="alternarModo()">🌙 Modo Escuro</button>
-  <nav>
-    <button onclick="mostrar('clientes')">👤 Clientes</button>
-    <button onclick="mostrar('pedidos')">🧁 Pedidos</button>
-    <button onclick="mostrar('despesas')">💸 Despesas</button>
-    <button onclick="mostrar('estoque')">📦 Estoque</button>
-    <button onclick="mostrar('financeiro')">📊 Financeiro</button>
-  </nav>
-
-  <!-- Seção Clientes -->
-  <section id="clientes" class="active">
-    <h2>👤 Cadastro de Clientes</h2>
-    <input id="clienteNome" placeholder="Nome">
-    <input id="clienteTelefone" placeholder="Telefone">
-    <input id="clienteEndereco" placeholder="Endereço">
-    <button class="save" onclick="salvarCliente()">Salvar</button>
-
-    <div class="listagem">
-      <input id="buscaCliente" placeholder="🔍 Buscar cliente..." oninput="listarClientes()">
+    <section id="clientes" class="active">
+      <h2>Cadastro de Clientes</h2>
+      <input id="clienteNome" placeholder="Nome do cliente">
+      <input id="clienteTelefone" placeholder="Telefone">
+      <input id="clienteEndereco" placeholder="Endereço">
+      <button class="save" onclick="salvarCliente()">Salvar</button>
+      <input id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()">
       <ul id="listaClientes"></ul>
-    </div>
-  </section>
+    </section>
 
-  <!-- Seção Pedidos -->
-  <section id="pedidos">
-    <h2>🧁 Pedidos</h2>
-    <input id="pedidoCliente" placeholder="Cliente">
-    <input id="tipoProduto" placeholder="Produto">
-    <input id="valorPedido" type="number" placeholder="Valor (R$)">
-    <input id="dataEntrega" type="date" placeholder="Data de Entrega">
-    <select id="formaEntrega">
-      <option value="Entregar">Entregar</option>
-      <option value="Retirar">Retirar</option>
-    </select>
-    <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
-
-    <div class="filtros">
-      <input id="filtroPedido" placeholder="🔍 Filtrar por nome ou produto..." oninput="listarPedidos()">
-      <select id="ordenarPedido" onchange="listarPedidos()">
-        <option value="recente">Mais recente</option>
-        <option value="alfabetico">A-Z</option>
+    <section id="pedidos">
+      <h2>Pedidos</h2>
+      <input id="pedidoCliente" placeholder="Nome do cliente">
+      <input id="tipoProduto" placeholder="Tipo de produto">
+      <input id="valorPedido" type="number" placeholder="Valor (R$)">
+      <input id="dataEntrega" type="date">
+      <select id="formaEntrega">
+        <option value="Entregar">Entregar</option>
+        <option value="Retirar">Retirar</option>
       </select>
-    </div>
-    <ul id="listaPedidos"></ul>
-  </section>
+      <button class="save" onclick="salvarPedido()">Salvar Pedido</button>
+      <ul id="listaPedidos"></ul>
+    </section>
 
-  <!-- Seção Despesas -->
-  <section id="despesas">
-    <h2>💸 Despesas</h2>
-    <select id="tipoDespesa">
-      <option>Mercadorias</option>
-      <option>Loja</option>
-      <option>Pessoais</option>
-    </select>
-    <input id="valorDespesa" type="number" placeholder="Valor (R$)">
-    <button class="save" onclick="salvarDespesa()">Salvar</button>
-    <ul id="listaDespesas"></ul>
-  </section>
+    <section id="despesas">
+      <h2>Despesas</h2>
+      <select id="tipoDespesa">
+        <option>Mercadorias</option>
+        <option>Loja</option>
+        <option>Pessoais</option>
+      </select>
+      <input id="valorDespesa" type="number" placeholder="Valor (R$)">
+      <button class="save" onclick="salvarDespesa()">Salvar Despesa</button>
+      <ul id="listaDespesas"></ul>
+    </section>
 
-  <!-- Seção Estoque -->
-  <section id="estoque">
-    <h2>📦 Estoque</h2>
-    <input id="produtoNome" placeholder="Produto">
-    <input id="produtoQtd" type="number" placeholder="Quantidade">
-    <button class="save" onclick="adicionarProduto()">Adicionar</button>
+    <section id="estoque">
+      <h2>Controle de Estoque</h2>
+      <input id="produtoNome" placeholder="Nome do Produto">
+      <select id="produtoTipo">
+        <option value="Ingrediente">Ingrediente</option>
+        <option value="Embalagem">Embalagem</option>
+        <option value="Produto Final">Produto Final</option>
+      </select>
+      <input id="produtoQtd" type="number" placeholder="Quantidade">
+      <input id="produtoMin" type="number" placeholder="Mínimo Ideal">
+      <input id="produtoValidade" type="date" placeholder="Validade">
+      <button onclick="adicionarProduto()">Adicionar Produto</button>
+      <input id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()">
+      <select id="filtroTipo" onchange="listarProdutos()">
+        <option value="">Todos</option>
+        <option value="Ingrediente">Ingrediente</option>
+        <option value="Embalagem">Embalagem</option>
+        <option value="Produto Final">Produto Final</option>
+      </select>
+      <ul id="listaEstoque"></ul>
+      <h3>Histórico</h3>
+      <ul id="listaHistorico" class="historico"></ul>
+    </section>
 
-    <input id="filtroEstoque" placeholder="🔍 Buscar produto..." oninput="listarEstoque()">
-    <ul id="listaEstoque"></ul>
-  </section>
+    <section id="financeiro">
+      <h2>Financeiro</h2>
+      <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
+      <p><strong>Gastos:</strong> R$ <span id="gastos">0.00</span></p>
+      <p><strong>Lucros:</strong> R$ <span id="lucros">0.00</span></p>
+    </section>
+  </div>
 
-  <!-- Seção Financeiro -->
-  <section id="financeiro" class="financeiro">
-    <h2>📊 Financeiro</h2>
-    <p><strong>Ganhos:</strong> R$ <span id="ganhos">0.00</span></p>
-    <p><strong>Gastos:</strong> R$ <span id="gastos">0.00</span></p>
-    <p><strong>Lucros:</strong> R$ <span id="lucros">0.00</span></p>
-    <p><em>📅 Relatório mensal será gerado automaticamente.</em></p>
-  </section>
-</div>
+  <script>
+    function entrar() {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      atualizarTudo();
+    }
+    function mostrar(secao) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(secao).classList.add('active');
+    }
 
-<script>
-  let clienteEditando = null;
-
-  function entrar() {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    atualizarTudo();
-  }
-
-  function alternarModo() {
-    document.body.classList.toggle('dark');
-  }
-
-  function mostrar(secao) {
-    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-    document.getElementById(secao).classList.add('active');
-  }
-
-  function salvarCliente() {
-    const nome = clienteNome.value.trim();
-    const telefone = clienteTelefone.value.trim();
-    const endereco = clienteEndereco.value.trim();
-    if (!nome || !telefone || !endereco) return alert('Preencha todos os campos');
-    let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-    if (clienteEditando !== null) {
-      clientes[clienteEditando] = { nome, telefone, endereco };
-      clienteEditando = null;
-    } else {
+    function salvarCliente() {
+      const nome = clienteNome.value.trim();
+      const telefone = clienteTelefone.value.trim();
+      const endereco = clienteEndereco.value.trim();
+      if (!nome || !telefone || !endereco) return alert('Preencha todos os campos');
+      const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
       clientes.push({ nome, telefone, endereco });
+      localStorage.setItem('clientes', JSON.stringify(clientes));
+      clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
+      listarClientes();
     }
-    localStorage.setItem('clientes', JSON.stringify(clientes));
-    clienteNome.value = clienteTelefone.value = clienteEndereco.value = '';
-    listarClientes();
-  }
-
-  function listarClientes() {
-    const termo = document.getElementById('buscaCliente').value.toLowerCase();
-    const lista = document.getElementById('listaClientes');
-    lista.innerHTML = '';
-    const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-    clientes.filter(c => c.nome.toLowerCase().includes(termo)).forEach((c, i) => {
-      const li = document.createElement('li');
-      const div = document.createElement('div');
-      div.className = 'info';
-      div.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
-
-      const acoes = document.createElement('div');
-      acoes.className = 'botoes';
-
-      const btnEditar = document.createElement('button');
-      btnEditar.className = 'editar';
-      btnEditar.textContent = 'Editar';
-      btnEditar.onclick = () => {
-        clienteNome.value = c.nome;
-        clienteTelefone.value = c.telefone;
-        clienteEndereco.value = c.endereco;
-        clienteEditando = i;
-      };
-
-      const btnExcluir = document.createElement('button');
-      btnExcluir.className = 'excluir';
-      btnExcluir.textContent = 'Excluir';
-      btnExcluir.onclick = () => {
-        if (confirm("Excluir cliente?")) {
-          clientes.splice(i, 1);
-          localStorage.setItem('clientes', JSON.stringify(clientes));
-          listarClientes();
-        }
-      };
-
-      acoes.appendChild(btnEditar);
-      acoes.appendChild(btnExcluir);
-      li.appendChild(div);
-      li.appendChild(acoes);
-      lista.appendChild(li);
-    });
-  }
-
-  function salvarPedido() {
-    const nome = pedidoCliente.value.trim();
-    const produto = tipoProduto.value.trim();
-    const valor = parseFloat(valorPedido.value);
-    const entrega = formaEntrega.value;
-    const data = dataEntrega.value;
-    if (!nome || !produto || isNaN(valor) || !data) return alert('Preencha todos os campos');
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    pedidos.push({ nome, produto, valor, entrega, data });
-    localStorage.setItem('pedidos', JSON.stringify(pedidos));
-    pedidoCliente.value = tipoProduto.value = valorPedido.value = dataEntrega.value = '';
-    listarPedidos(); atualizarFinanceiro();
-  }
-
-  function listarPedidos() {
-    const lista = document.getElementById('listaPedidos');
-    lista.innerHTML = '';
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    const filtro = document.getElementById('filtroPedido').value.toLowerCase();
-    const ordem = document.getElementById('ordenarPedido').value;
-
-    let filtrados = pedidos.filter(p => 
-      p.nome.toLowerCase().includes(filtro) ||
-      p.produto.toLowerCase().includes(filtro)
-    );
-
-    if (ordem === 'alfabetico') {
-      filtrados.sort((a, b) => a.nome.localeCompare(b.nome));
-    } else {
-      filtrados.reverse(); // mais recente primeiro
+    function listarClientes() {
+      const termo = document.getElementById('buscaCliente').value.toLowerCase();
+      const lista = document.getElementById('listaClientes');
+      lista.innerHTML = '';
+      const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+      clientes.forEach(c => {
+        if (!c.nome.toLowerCase().includes(termo)) return;
+        const li = document.createElement('li');
+        li.textContent = `${c.nome} - ${c.telefone} (${c.endereco})`;
+        lista.appendChild(li);
+      });
     }
-
-    filtrados.forEach(p => {
-      const li = document.createElement('li');
-      li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} (${p.entrega}) - Entrega: ${p.data}`;
-      lista.appendChild(li);
-    });
-  }
-
-  function salvarDespesa() {
-    const tipo = tipoDespesa.value;
-    const valor = parseFloat(valorDespesa.value);
-    if (!tipo || isNaN(valor)) return alert('Preencha todos os campos');
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-    despesas.push({ tipo, valor });
-    localStorage.setItem('despesas', JSON.stringify(despesas));
-    valorDespesa.value = '';
-    listarDespesas(); atualizarFinanceiro();
-  }
-
-  function listarDespesas() {
-    const lista = document.getElementById('listaDespesas');
-    lista.innerHTML = '';
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-    despesas.forEach(d => {
-      const li = document.createElement('li');
-      li.textContent = `${d.tipo} - R$${d.valor.toFixed(2)}`;
-      lista.appendChild(li);
-    });
-  }
-
-  function adicionarProduto() {
-    const nome = produtoNome.value.trim();
-    const qtd = parseInt(produtoQtd.value);
-    if (!nome || isNaN(qtd)) return alert('Preencha todos os campos');
-    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    estoque.push({ nome, qtd });
-    localStorage.setItem('estoque', JSON.stringify(estoque));
-    produtoNome.value = produtoQtd.value = '';
-    listarEstoque();
-  }
-
-  function listarEstoque() {
-    const termo = document.getElementById('filtroEstoque').value.toLowerCase();
-    const lista = document.getElementById('listaEstoque');
-    lista.innerHTML = '';
-    const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
-    estoque.filter(e => e.nome.toLowerCase().includes(termo)).forEach(e => {
-      const li = document.createElement('li');
-      li.textContent = `${e.nome} - ${e.qtd} unidade(s)${e.qtd === 0 ? ' (Em falta)' : ''}`;
-      lista.appendChild(li);
-    });
-  }
-
-  function atualizarFinanceiro() {
-    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
-    const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
-    const ganhos = pedidos.reduce((soma, p) => soma + p.valor, 0);
-    const gastos = despesas.reduce((soma, d) => soma + d.valor, 0);
-    const lucros = ganhos - gastos;
-    document.getElementById('ganhos').textContent = ganhos.toFixed(2);
-    document.getElementById('gastos').textContent = gastos.toFixed(2);
-    document.getElementById('lucros').textContent = lucros.toFixed(2);
-  }
-
-  function atualizarTudo() {
-    listarClientes();
-    listarPedidos();
-    listarDespesas();
-    listarEstoque();
-    atualizarFinanceiro();
-  }
-</script>
-
+    function salvarPedido() {
+      const nome = pedidoCliente.value.trim();
+      const produto = tipoProduto.value.trim();
+      const valor = parseFloat(valorPedido.value);
+      const entrega = formaEntrega.value;
+      const data = dataEntrega.value;
+      if (!nome || !produto || isNaN(valor)) return alert('Preencha todos os campos');
+      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+      pedidos.push({ nome, produto, valor, entrega, data });
+      localStorage.setItem('pedidos', JSON.stringify(pedidos));
+      pedidoCliente.value = tipoProduto.value = valorPedido.value = dataEntrega.value = '';
+      listarPedidos(); atualizarFinanceiro();
+    }
+    function listarPedidos() {
+      const lista = document.getElementById('listaPedidos');
+      lista.innerHTML = '';
+      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+      pedidos.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.nome} - ${p.produto} - R$${p.valor.toFixed(2)} - ${p.entrega} (${p.data})`;
+        lista.appendChild(li);
+      });
+    }
+    function salvarDespesa() {
+      const tipo = tipoDespesa.value;
+      const valor = parseFloat(valorDespesa.value);
+      if (!tipo || isNaN(valor)) return alert('Preencha todos os campos');
+      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      despesas.push({ tipo, valor });
+      localStorage.setItem('despesas', JSON.stringify(despesas));
+      valorDespesa.value = '';
+      listarDespesas(); atualizarFinanceiro();
+    }
+    function listarDespesas() {
+      const lista = document.getElementById('listaDespesas');
+      lista.innerHTML = '';
+      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      despesas.forEach(d => {
+        const li = document.createElement('li');
+        li.textContent = `${d.tipo} - R$${d.valor.toFixed(2)}`;
+        lista.appendChild(li);
+      });
+    }
+    function atualizarFinanceiro() {
+      const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+      const ganhos = pedidos.reduce((s, p) => s + p.valor, 0);
+      const gastos = despesas.reduce((s, d) => s + d.valor, 0);
+      const lucros = ganhos - gastos;
+      document.getElementById('ganhos').textContent = ganhos.toFixed(2);
+      document.getElementById('gastos').textContent = gastos.toFixed(2);
+      document.getElementById('lucros').textContent = lucros.toFixed(2);
+    }
+    function adicionarProduto() {
+      const nome = produtoNome.value.trim();
+      const tipo = produtoTipo.value;
+      const qtd = parseInt(produtoQtd.value);
+      const min = parseInt(produtoMin.value);
+      const validade = produtoValidade.value;
+      if (!nome || isNaN(qtd)) return alert("Preencha nome e quantidade corretamente.");
+      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+      estoque.push({ nome, tipo, qtd, min: isNaN(min) ? 0 : min, validade });
+      localStorage.setItem('estoque', JSON.stringify(estoque));
+      registrarHistorico(`+${qtd} ${nome}`);
+      produtoNome.value = produtoQtd.value = produtoMin.value = produtoValidade.value = '';
+      listarProdutos();
+    }
+    function listarProdutos() {
+      const lista = document.getElementById('listaEstoque');
+      lista.innerHTML = '';
+      const filtro = buscaProduto.value.toLowerCase();
+      const tipoFiltro = filtroTipo.value;
+      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+      estoque.forEach((p, i) => {
+        if (filtro && !p.nome.toLowerCase().includes(filtro)) return;
+        if (tipoFiltro && p.tipo !== tipoFiltro) return;
+        const li = document.createElement('li');
+        if (p.qtd === 0) li.classList.add('falta');
+        else if (p.min > 0 && p.qtd < p.min) li.classList.add('baixo');
+        li.innerHTML = `<strong>${p.nome}</strong> (${p.tipo}) - ${p.qtd} un. ${p.validade ? ' - Venc: ' + p.validade : ''} <button onclick="usarProduto(${i})">Usar</button>`;
+        lista.appendChild(li);
+      });
+    }
+    function usarProduto(index) {
+      const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
+      if (estoque[index].qtd > 0) {
+        estoque[index].qtd--;
+        localStorage.setItem('estoque', JSON.stringify(estoque));
+        registrarHistorico(`-1 ${estoque[index].nome}`);
+        listarProdutos();
+      }
+    }
+    function registrarHistorico(texto) {
+      const historico = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
+      const data = new Date().toLocaleString();
+      historico.unshift(`${data}: ${texto}`);
+      localStorage.setItem('historicoEstoque', JSON.stringify(historico.slice(0, 20)));
+      listarHistorico();
+    }
+    function listarHistorico() {
+      const lista = document.getElementById('listaHistorico');
+      lista.innerHTML = '';
+      const hist = JSON.parse(localStorage.getItem('historicoEstoque') || '[]');
+      hist.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = entry;
+        lista.appendChild(li);
+      });
+    }
+    function atualizarTudo() {
+      listarClientes(); listarPedidos(); listarDespesas(); atualizarFinanceiro(); listarProdutos(); listarHistorico();
+    }
+  </script>
 </body>
 </html>
