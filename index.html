@@ -60,12 +60,56 @@
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
       transition: all 0.3s ease;
+      animation: pulse 1.5s infinite; /* Animação de pulso para o botão */
     }
     .splash button:hover {
       background: #eee;
       transform: translateY(-3px);
       box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      animation: none; /* Remove a animação ao hover */
     }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Mensagem de Boas-Vindas */
+    .welcome-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(to bottom right, #ffb6c1, #f08080);
+      color: white;
+      font-family: 'Pacifico', cursive;
+      font-size: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
+      z-index: 2500;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      animation: fadeInZoom 0.8s ease-out forwards;
+    }
+    .welcome-message.active {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.8s ease-in-out, visibility 0s linear 0s;
+    }
+    @keyframes fadeInZoom {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .welcome-message.fade-out-welcome {
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+    }
+
 
     /* Layout Principal do App (com sidebar) */
     .container {
@@ -746,6 +790,8 @@
       body { flex-direction: column; } /* Pilha a sidebar e o conteúdo */
       .splash h1 { font-size: 3.5rem; }
       .splash button { font-size: 1.1rem; padding: 10px 20px; }
+      .welcome-message { font-size: 3rem; } /* Ajuste para mobile */
+
 
       .sidebar {
         width: 0; /* Começa fechada */
@@ -789,6 +835,7 @@
 
     @media (max-width: 480px) {
       .splash h1 { font-size: 2.8rem; }
+      .welcome-message { font-size: 2.5rem; } /* Ajuste para telas menores ainda */
       .sidebar.active { width: 180px; } /* Sidebar um pouco menor em telas muito pequenas */
       .sidebar nav button { font-size: 0.95rem; }
       h2 { font-size: 1.3rem; }
@@ -803,6 +850,10 @@
     <button onclick="App.entrar()">Entrar</button>
   </div>
 
+  <div class="welcome-message" id="welcomeMessage">
+    Seja bem-vindo(a)!
+  </div>
+
   <button class="sidebar-toggle" id="sidebarToggle" onclick="App.toggleSidebar()">
     <i class="fas fa-bars"></i>
   </button>
@@ -811,8 +862,8 @@
     <aside class="sidebar" id="sidebar">
       <h2>Menu</h2>
       <nav>
-        <button id="navDashboard" onclick="App.mostrar('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
         <button id="navClientes" onclick="App.mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
+        <button id="navDashboard" onclick="App.mostrar('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
         <button id="navPedidos" onclick="App.mostrar('pedidos')"><i class="fa-solid fa-cookie-bite"></i> Pedidos</button>
         <button id="navProdutos" onclick="App.mostrar('produtos')"><i class="fa-solid fa-box-open"></i> Produtos</button>
         <button id="navEstoque" onclick="App.mostrar('estoque')"><i class="fa-solid fa-boxes-stacked"></i> Estoque</button>
@@ -823,7 +874,7 @@
     </aside>
 
     <main class="main-content">
-        <section id="dashboard" class="active">
+        <section id="dashboard">
             <h2>Dashboard</h2>
             <div class="dashboard-grid">
                 <div class="dashboard-card finance-summary">
@@ -855,7 +906,7 @@
             </div>
         </section>
 
-        <section id="clientes">
+        <section id="clientes" class="active">
           <h2>Cadastro de Clientes</h2>
           <input id="clienteNome" placeholder="Nome Completo" type="text" />
           <input id="clienteTelefone" placeholder="Telefone (ex: 51999998888)" type="tel" pattern="[0-9]{11}" title="Telefone com 11 dígitos (DDD + número)" />
@@ -1292,14 +1343,26 @@
     const App = {
         entrar: () => {
             const splash = document.getElementById('splash');
+            const welcomeMessage = document.getElementById('welcomeMessage');
             const app = document.getElementById('app');
-            splash.classList.add('fade-out');
+
+            splash.classList.add('fade-out'); // Inicia o fade-out da splash screen
+
             setTimeout(() => {
-                splash.style.display = 'none';
-                app.style.display = 'flex';
+                splash.style.display = 'none'; // Esconde a splash screen completamente
+                welcomeMessage.classList.add('active'); // Mostra a mensagem de boas-vindas
+            }, 900); // Tempo para o fade-out da splash
+
+            setTimeout(() => {
+                welcomeMessage.classList.add('fade-out-welcome'); // Inicia o fade-out da mensagem de boas-vindas
+            }, 2500); // Tempo de exibição da mensagem de boas-vindas
+
+            setTimeout(() => {
+                welcomeMessage.style.display = 'none'; // Esconde a mensagem de boas-vindas completamente
+                app.style.display = 'flex'; // Mostra o app principal
                 Financeiro.preencherFiltrosAno(); // Preenche filtros de ano ao carregar
-                App.atualizarTudo();
-            }, 900);
+                App.atualizarTudo(); // Inicia o app no módulo Clientes
+            }, 3300); // Tempo total para o fade-out da mensagem de boas-vindas
         },
 
         toggleSidebar: () => {
@@ -1358,8 +1421,8 @@
         },
 
         atualizarTudo: () => {
-            // Define a seção inicial ao carregar o app
-            App.mostrar('dashboard'); // Mostra o dashboard como seção inicial
+            // Define a seção inicial ao carregar o app: Clientes
+            App.mostrar('clientes');
         }
     };
 
@@ -1745,7 +1808,7 @@
             pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
             pedidosFiltrados.forEach((p, index) => { // Use index para Utils.editItem/deleteItem
-                const dataFormatada = Utils.formatate(p.data);
+                const dataFormatada = Utils.formatDate(p.data);
                 const itemText = `<strong>${p.nomeCliente}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
                 const actionsHtml = `
                     <button class="edit" onclick="Utils.editItem('pedidos', ${index}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nomeCliente}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`, Pedidos.prepareEdit)">
@@ -2537,7 +2600,8 @@
         // Inicializa os módulos que precisam de event listeners
         Pedidos.init();
         Produtos.init();
-        // Não chame App.entrar() aqui, ele é chamado pelo clique do botão na splash screen
+        // A função App.entrar() agora é chamada pelo clique do botão na splash screen
+        // Não chame App.atualizarTudo() aqui, ele será chamado após a saudação de boas-vindas
     });
   </script>
 </body>
