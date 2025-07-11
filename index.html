@@ -75,42 +75,6 @@
         100% { transform: scale(1); }
     }
 
-    /* Mensagem de Boas-Vindas */
-    .welcome-message {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background: linear-gradient(to bottom right, #ffb6c1, #f08080);
-      color: white;
-      font-family: 'Pacifico', cursive;
-      font-size: 4rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
-      z-index: 2500;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-      animation: fadeInZoom 0.8s ease-out forwards;
-    }
-    .welcome-message.active {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.8s ease-in-out, visibility 0s linear 0s;
-    }
-    @keyframes fadeInZoom {
-        from { opacity: 0; transform: scale(0.8); }
-        to { opacity: 1; transform: scale(1); }
-    }
-    .welcome-message.fade-out-welcome {
-        opacity: 0;
-        transition: opacity 0.8s ease-in-out;
-    }
-
-
     /* Layout Principal do App (com sidebar) */
     .container {
       display: none; /* Inicia oculto */
