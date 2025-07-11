@@ -379,7 +379,7 @@
         if (confirm(`Deseja editar este item? O item original será removido ao confirmar a edição. Por favor, ajuste os campos e clique em 'Salvar' novamente. Item: ${itemToDisplay(item)}`)) {
             items.splice(id, 1); // Remove o item original
             localStorage.setItem(key, JSON.stringify(items));
-            listFunction(); // Atualiza a lista para refletir a remoção (tempor&aacute;ria) do item original
+            listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
             alert('Item pronto para edição nos campos acima. Lembre-se de preencher e salvar novamente!');
         } else {
             // Se o usuário cancelar a edição, os campos podem ficar preenchidos, mas o item não é removido
@@ -424,8 +424,23 @@
       const lista = document.getElementById('listaClientes');
       lista.innerHTML = '';
       const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-      clientes.forEach((c, index) => {
-        if (!c.nome.toLowerCase().includes(termo)) return;
+      
+      // Filtra os clientes com base no termo de busca
+      const clientesFiltrados = clientes.filter(c => 
+          c.nome.toLowerCase().includes(termo) ||
+          c.telefone.toLowerCase().includes(termo) ||
+          c.endereco.toLowerCase().includes(termo)
+      );
+
+      if (clientesFiltrados.length === 0 && termo !== '') {
+        lista.innerHTML = '<li style="color:#999; font-style:italic;">Nenhum cliente encontrado com este termo.</li>';
+        return;
+      } else if (clientesFiltrados.length === 0) {
+        lista.innerHTML = '<li style="color:#999; font-style:italic;">Nenhum cliente cadastrado ainda.</li>';
+        return;
+      }
+
+      clientesFiltrados.forEach((c, index) => {
         const li = document.createElement('li');
         const itemText = `${c.nome} - ${c.telefone} (${c.endereco})`;
         li.innerHTML = `
@@ -609,7 +624,7 @@
       const tipoFiltro = filtroTipo.value;
       const estoque = JSON.parse(localStorage.getItem('estoque') || '[]');
       estoque.forEach((p, index) => {
-        if (filtro && !p.nome.toLowerCase().includes(filtro)) return;
+        if (filtro && !p.nome.toLowerCase().includes(filtro) && !p.tipo.toLowerCase().includes(filtro)) return; // Busca por nome e tipo
         if (tipoFiltro && p.tipo !== tipoFiltro) return;
         const li = document.createElement('li');
         if (p.qtd === 0) li.classList.add('falta');
