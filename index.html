@@ -198,8 +198,8 @@
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
 
-    /* Botões de Ação (Editar, Excluir, Usar, Ver Detalhes) */
-    button.edit, button.delete, button.use, button.view-details {
+    /* Botões de Ação (Editar, Excluir, Usar, Ver Detalhes, Adicionar/Remover Qtd) */
+    button.edit, button.delete, button.use, button.view-details, button.add-qty, button.remove-qty {
         background: #ffc107; /* Amarelo para editar */
         color: white;
         border: none;
@@ -219,10 +219,19 @@
     button.view-details {
         background: #2196f3; /* Azul para ver detalhes */
     }
+    button.add-qty {
+        background: #4CAF50; /* Verde para adicionar quantidade */
+    }
+    button.remove-qty {
+        background: #f44336; /* Vermelho para remover quantidade */
+    }
+
     button.edit:hover { background: #e0a800; transform: translateY(-1px); }
     button.delete:hover { background: #c82333; transform: translateY(-1px); }
     button.use:hover { background: #5a6268; transform: translateY(-1px); }
     button.view-details:hover { background: #1976d2; transform: translateY(-1px); }
+    button.add-qty:hover { background: #388E3C; transform: translateY(-1px); }
+    button.remove-qty:hover { background: #d32f2f; transform: translateY(-1px); }
 
 
     /* Listas de Itens */
@@ -507,6 +516,99 @@
         display: none; /* Oculto por padrão */
     }
 
+    /* ESTILOS PARA NOTIFICAÇÕES (TOASTS) */
+    #notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 300px;
+    }
+    .notification {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: slideIn 0.3s forwards;
+        border-left: 5px solid;
+    }
+    .notification.success { border-color: #4CAF50; }
+    .notification.error { border-color: #f44336; }
+    .notification.info { border-color: #2196F3; }
+    .notification.warning { border-color: #ff9800; }
+
+    .notification .icon {
+        font-size: 1.5rem;
+    }
+    .notification.success .icon { color: #4CAF50; }
+    .notification.error .icon { color: #f44336; }
+    .notification.info .icon { color: #2196F3; }
+    .notification.warning .icon { color: #ff9800; }
+
+    .notification .message {
+        flex-grow: 1;
+        font-size: 0.95rem;
+        color: #333;
+    }
+    .notification .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #aaa;
+        transition: color 0.2s;
+    }
+    .notification .close-btn:hover {
+        color: #555;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilos para o campo de sugestão de cliente */
+    .autocomplete-container {
+        position: relative;
+        width: 100%;
+    }
+    .autocomplete-suggestions {
+        position: absolute;
+        top: 100%; /* Abaixo do input */
+        left: 0;
+        right: 0;
+        z-index: 100;
+        border: 1px solid #ccc;
+        background-color: white;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 0 0 10px 10px;
+    }
+    .autocomplete-suggestion-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.2s;
+    }
+    .autocomplete-suggestion-item:last-child {
+        border-bottom: none;
+    }
+    .autocomplete-suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+    .autocomplete-suggestion-item.active {
+        background-color: #fdf6f7;
+        font-weight: bold;
+    }
 
     /* Responsividade */
     @media (max-width: 768px) {
@@ -543,9 +645,14 @@
       li .item-actions { width: 100%; justify-content: flex-end; }
       .search-bar { padding: 10px; }
 
-
       .sidebar-toggle {
           display: block; /* Mostra o botão em mobile */
+      }
+      #notification-container {
+        top: 15px;
+        right: 15px;
+        left: 15px;
+        width: auto;
       }
     }
 
@@ -601,7 +708,12 @@
 
         <section id="pedidos">
           <h2>Registro de Pedidos</h2>
-          <input id="pedidoCliente" placeholder="Nome do Cliente para o Pedido" type="text" />
+          <div class="autocomplete-container">
+            <input id="pedidoCliente" placeholder="Nome do Cliente para o Pedido" type="text" autocomplete="off" />
+            <div id="clienteSuggestions" class="autocomplete-suggestions"></div>
+          </div>
+          <input type="hidden" id="pedidoClienteId" value="" />
+
           <input id="tipoProduto" placeholder="Tipo de Produto (ex: Bolo, Torta, Doce)" type="text" />
           <input id="valorPedido" type="number" step="0.01" min="0" placeholder="Valor Total (R$)" />
           <input id="dataEntrega" type="date" />
@@ -624,7 +736,7 @@
             <h2>Cadastro de Produtos Finais</h2>
             <input id="produtoFinalNome" placeholder="Nome do Produto (ex: Bolo de Cenoura)" type="text" />
             <input id="produtoFinalPrecoVenda" type="number" step="0.01" min="0" placeholder="Preço de Venda (R$)" />
-            <input id="produtoFinalCustoProducao" type="number" step="0.01" min="0" placeholder="Custo de Produção (R$) - Opcional" />
+            <input id="produtoFinalCustoProducao" type="number" step="0.01" min="0" placeholder="Custo de Produção (R$) - Preenchido Automaticamente" readonly />
 
             <div style="background:#fefefe; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
                 <h4>Ingredientes do Produto</h4>
@@ -660,6 +772,7 @@
           </select>
           <input id="produtoQtd" type="number" min="0" placeholder="Quantidade em Estoque" />
           <input id="produtoMin" type="number" min="0" placeholder="Quantidade Mínima Ideal" />
+          <input id="produtoCustoUnitario" type="number" step="0.01" min="0" placeholder="Custo Unitário (R$)" />
           <input id="produtoValidade" type="date" />
           <button class="save" onclick="Estoque.adicionarProduto()">Adicionar/Atualizar Item de Estoque</button>
 
@@ -764,6 +877,14 @@
             <h4>Gastos por Despesa</h4>
             <ul id="listaGastosDetalhes"></ul>
           </div>
+
+          <h3>Relatórios Rápidos</h3>
+          <div style="background:#fefefe; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                <h4>Top Clientes (por valor de pedido)</h4>
+                <ul id="topClientesList"></ul>
+                <h4>Top Produtos (por quantidade vendida)</h4>
+                <ul id="topProdutosList"></ul>
+            </div>
         </section>
 
         <section id="agenda">
@@ -797,6 +918,8 @@
     </main>
   </div>
 
+  <div id="notification-container"></div>
+
   <script>
     // --- UTILS: Funções genéricas para LocalStorage, validação, etc. ---
     const Utils = {
@@ -826,7 +949,7 @@
                 if (element) {
                     if (element.tagName === 'SELECT') {
                         element.value = ''; // Reseta selects
-                    } else if (element.type === 'number' || element.type === 'text' || element.type === 'tel' || element.type === 'date') {
+                    } else if (element.type === 'number' || element.type === 'text' || element.type === 'tel' || element.type === 'date' || element.type === 'hidden') {
                         element.value = ''; // Limpa inputs
                     }
                 }
@@ -861,44 +984,39 @@
         },
 
         // Função genérica para editar um item.
-        editItem: (key, originalId, formFields, listFunction, itemToDisplay, customPrepareEdit = null) => {
-            let items = Utils.getStorage(key);
-            const item = items[originalId]; // Usa o originalId
+        editItem: async (key, originalId, formFields, listFunction, itemToDisplay, customPrepareEdit = null) => {
+            const confirmation = await Notificacao.confirm(`Você está prestes a editar este item:\n\n${itemToDisplay(Utils.getStorage(key)[originalId])}\n\nOs campos de cadastro acima serão preenchidos com os dados atuais. Por favor, faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O item original será removido ao confirmar.`);
 
-            if (!item) {
-                console.error('Item não encontrado para edição:', key, originalId);
-                alert('Erro: Item não encontrado para edição.');
-                return;
-            }
+            if (confirmation) {
+                let items = Utils.getStorage(key);
+                const item = items[originalId];
 
-            // Preenche os campos do formulário com os dados do item selecionado
-            formFields.forEach(field => {
-                const inputElement = document.getElementById(field.id);
-                if (inputElement) {
-                    if (field.type === 'date') {
-                        inputElement.value = item[field.name] ? item[field.name].split('T')[0] : '';
-                    } else if (field.type === 'number') {
-                        inputElement.value = item[field.name] !== undefined ? parseFloat(item[field.name]) : '';
-                    } else {
-                        inputElement.value = item[field.name] || '';
+                // Preenche os campos do formulário com os dados do item selecionado
+                formFields.forEach(field => {
+                    const inputElement = document.getElementById(field.id);
+                    if (inputElement) {
+                        if (field.type === 'date') {
+                            inputElement.value = item[field.name] ? item[field.name].split('T')[0] : '';
+                        } else if (field.type === 'number') {
+                            inputElement.value = item[field.name] !== undefined ? parseFloat(item[field.name]) : '';
+                        } else {
+                            inputElement.value = item[field.name] || '';
+                        }
                     }
+                });
+
+                // Se houver uma função customizada de preparação para edição (ex: para ingredientes do produto)
+                if (customPrepareEdit && typeof customPrepareEdit === 'function') {
+                    customPrepareEdit(item);
                 }
-            });
 
-            // Se houver uma função customizada de preparação para edição (ex: para ingredientes do produto)
-            if (customPrepareEdit && typeof customPrepareEdit === 'function') {
-                customPrepareEdit(item);
-            }
-
-
-            if (confirm(`Você está prestes a editar este item:\n\n${itemToDisplay(item)}\n\nOs campos de cadastro acima foram preenchidos com os dados atuais. Por favor, faça suas alterações e CLIQUE EM "SALVAR" novamente para confirmar a edição. O item original será removido ao confirmar.`)) {
                 // Remove o item original da lista, ele será recadastrado com as alterações
                 items.splice(originalId, 1);
                 Utils.setStorage(key, items);
                 listFunction(); // Atualiza a lista para refletir a remoção (temporária) do item original
-                alert('Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
+                Notificacao.show('info', 'Item pronto para edição nos campos acima. Altere o que for necessário e clique em "Salvar" novamente para efetivar a mudança.');
             } else {
-                alert('Edição cancelada. O item original não foi alterado.');
+                Notificacao.show('info', 'Edição cancelada. O item original não foi alterado.');
                 Utils.clearForm(...formFields.map(f => f.id)); // Limpa os campos se cancelar a edição
                 if (customPrepareEdit) { // Limpa também estados temporários de edição
                     customPrepareEdit(null); // Passa null para indicar que deve limpar
@@ -908,25 +1026,101 @@
         },
 
         // Função genérica para excluir um item.
-        deleteItem: (key, originalId, listFunction, itemToDisplay, onCompleteCallback = null) => {
+        deleteItem: async (key, originalId, listFunction, itemToDisplay, onCompleteCallback = null) => {
             let items = Utils.getStorage(key);
-            const item = items[originalId]; // Usa o originalId
+            const item = items[originalId];
 
             if (!item) {
-                console.error('Item não encontrado para exclusão:', key, originalId);
-                alert('Erro: Item não encontrado para exclusão.');
+                Notificacao.show('error', 'Erro: Item não encontrado para exclusão.');
                 return;
             }
 
-            if (confirm(`Tem certeza que deseja excluir o seguinte item?\n\n${itemToDisplay(item)}`)) {
+            const confirmation = await Notificacao.confirm(`Tem certeza que deseja excluir o seguinte item?\n\n${itemToDisplay(item)}`);
+
+            if (confirmation) {
                 items.splice(originalId, 1);
                 Utils.setStorage(key, items);
                 listFunction(); // Atualiza a UI
                 if (onCompleteCallback && typeof onCompleteCallback === 'function') {
                     onCompleteCallback(); // Executa callback após exclusão (ex: atualizar financeiro)
                 }
-                alert('Item excluído com sucesso!');
+                Notificacao.show('success', 'Item excluído com sucesso!');
+            } else {
+                Notificacao.show('info', 'Exclusão cancelada.');
             }
+        },
+
+        // Gera um ID único simples
+        generateId: () => {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+    };
+
+    // --- NOTIFICAÇÃO: Exibe mensagens personalizadas ---
+    const Notificacao = {
+        container: document.getElementById('notification-container'),
+
+        show: (type, message, duration = 4000) => {
+            const notification = document.createElement('div');
+            notification.classList.add('notification', type);
+
+            let iconClass = '';
+            switch (type) {
+                case 'success': iconClass = 'fa-solid fa-check-circle'; break;
+                case 'error': iconClass = 'fa-solid fa-times-circle'; break;
+                case 'info': iconClass = 'fa-solid fa-info-circle'; break;
+                case 'warning': iconClass = 'fa-solid fa-exclamation-triangle'; break;
+            }
+
+            notification.innerHTML = `
+                <i class="icon ${iconClass}"></i>
+                <span class="message">${message}</span>
+                <button class="close-btn" onclick="this.parentNode.remove()"><i class="fa-solid fa-xmark"></i></button>
+            `;
+
+            Notificacao.container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                notification.addEventListener('transitionend', () => notification.remove());
+            }, duration);
+        },
+
+        // Exibe um modal de confirmação personalizado
+        confirm: (message) => {
+            return new Promise((resolve) => {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+                    z-index: 4000;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white; padding: 25px; border-radius: 12px;
+                    box-shadow: 0 5px 25px rgba(0,0,0,0.2); max-width: 400px; text-align: center;
+                    font-size: 1.1rem; color: #333;
+                `;
+                modalContent.innerHTML = `
+                    <p style="margin-bottom: 25px; white-space: pre-wrap;">${message}</p>
+                    <button id="confirmYes" style="background:#4CAF50; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; margin-right:15px;">Sim</button>
+                    <button id="confirmNo" style="background:#f44336; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">Não</button>
+                `;
+
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+
+                document.getElementById('confirmYes').onclick = () => {
+                    modalOverlay.remove();
+                    resolve(true);
+                };
+                document.getElementById('confirmNo').onclick = () => {
+                    modalOverlay.remove();
+                    resolve(false);
+                };
+            });
         }
     };
 
@@ -965,14 +1159,16 @@
                     Clientes.listarClientes();
                     break;
                 case 'pedidos':
+                    Pedidos.resetarCampos(); // Limpa e prepara os campos de pedido
                     Pedidos.listarPedidos();
                     break;
                 case 'produtos':
                     Produtos.carregarIngredientesParaSelect();
                     Produtos.listarProdutosFinais();
                     // Garante que a lista temporária esteja limpa ao mudar para Produtos
-                    Produtos.ingredientesTemporarios = []; 
+                    Produtos.ingredientesTemporarios = [];
                     Produtos.renderizarIngredientesTemporarios(); // Renderiza a lista temporária vazia
+                    Produtos.atualizarCustoProducaoProdutoFinal(); // Limpa ou atualiza o custo de produção
                     break;
                 case 'despesas':
                     Despesas.filtrarDespesas();
@@ -985,8 +1181,9 @@
                     Financeiro.atualizarFinanceiro();
                     document.getElementById('detalhesGanhos').classList.remove('active');
                     document.getElementById('detalhesGastos').classList.remove('active');
+                    Financeiro.gerarRelatoriosRapidos(); // Gera os relatórios
                     break;
-                case 'agenda': // NOVO
+                case 'agenda':
                     Agenda.listarClientesNaAgenda();
                     Agenda.voltarParaListaClientes(); // Garante que a lista de clientes esteja visível
                     break;
@@ -1018,19 +1215,34 @@
             const endereco = Clientes.enderecoInput.value.trim();
 
             if (!nome || !telefone || !endereco) {
-                return alert('Por favor, preencha todos os campos do cliente (Nome, Telefone, Endereço).');
+                return Notificacao.show('warning', 'Por favor, preencha todos os campos do cliente (Nome, Telefone, Endereço).');
             }
             if (!Utils.validatePhone(telefone)) {
-                return alert('Telefone inválido! Digite 11 dígitos, incluindo o DDD (ex: 51999998888).');
+                return Notificacao.show('warning', 'Telefone inválido! Digite 11 dígitos, incluindo o DDD (ex: 51999998888).');
             }
 
             const clientes = Utils.getStorage('clientes');
-            clientes.push({ nome, telefone, endereco });
+            // Verifica se o cliente já existe para evitar duplicatas exatas ao salvar
+            const clienteExistente = clientes.find(c => c.nome.toLowerCase() === nome.toLowerCase() && c.telefone === telefone);
+            if (clienteExistente) {
+                // Se estiver em modo de edição, o item original já foi removido, então pode adicionar.
+                // Se não estiver em modo de edição e já existir, notifica.
+                if (confirm('Este cliente parece já existir. Deseja realmente salvar um novo com os mesmos dados?')) {
+                     // Continua e adiciona
+                } else {
+                    Notificacao.show('info', 'Operação cancelada.');
+                    Utils.clearForm('clienteNome', 'clienteTelefone', 'clienteEndereco');
+                    return;
+                }
+            }
+
+
+            clientes.push({ id: Utils.generateId(), nome, telefone, endereco }); // Adiciona um ID único
             Utils.setStorage('clientes', clientes);
 
             Utils.clearForm('clienteNome', 'clienteTelefone', 'clienteEndereco');
             Clientes.listarClientes();
-            alert('Cliente salvo com sucesso!');
+            Notificacao.show('success', 'Cliente salvo com sucesso!');
         },
 
         listarClientes: () => {
@@ -1054,27 +1266,19 @@
                 Clientes.listElement.innerHTML = `<li class="empty-list-message">Nenhum cliente encontrado com "${termoBusca}".</li>`;
                 return;
             }
-            // Se não há termo de busca e nenhum cliente, ou se a busca retornou clientes
             if (clientesFiltrados.length === 0 && termoBusca === '') {
                  Clientes.listElement.innerHTML = '<li class="empty-list-message">Nenhum cliente cadastrado ainda.</li>';
                  return;
             }
 
 
-            clientesFiltrados.forEach((cliente) => {
-                // É CRÍTICO encontrar o índice original do item no array NÃO filtrado
-                const originalIndex = clientes.findIndex(c => 
-                    c.nome === cliente.nome && 
-                    c.telefone === cliente.telefone && 
-                    c.endereco === cliente.endereco
-                );
-
+            clientesFiltrados.forEach((cliente, index) => { // Use o index para o Utils.editItem/deleteItem
                 const itemText = `<strong>${cliente.nome}</strong><br>Tel: ${cliente.telefone}<br>End: ${cliente.endereco}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('clientes', ${originalIndex}, Clientes.formFields, Clientes.listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
+                    <button class="edit" onclick="Utils.editItem('clientes', ${index}, Clientes.formFields, Clientes.listarClientes, (item) => \`Nome: ${item.nome}, Tel: ${item.telefone}\`)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('clientes', ${originalIndex}, Clientes.listarClientes, (item) => \`Nome: ${item.nome}\`)">
+                    <button class="delete" onclick="Utils.deleteItem('clientes', ${index}, Clientes.listarClientes, (item) => \`Nome: ${item.nome}\`)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1086,7 +1290,8 @@
     // --- MÓDULO PEDIDOS ---
     const Pedidos = {
         formFields: [
-            {id:'pedidoCliente', name:'nome', type:'text'},
+            {id:'pedidoCliente', name:'nomeCliente', type:'text'}, // Usamos nomeCliente para o campo de input
+            {id:'pedidoClienteId', name:'clienteId', type:'hidden'}, // ID do cliente
             {id:'tipoProduto', name:'produto', type:'text'},
             {id:'valorPedido', name:'valor', type:'number'},
             {id:'dataEntrega', name:'data', type:'date'},
@@ -1094,31 +1299,121 @@
         ],
         listElement: document.getElementById('listaPedidos'),
         clienteInput: document.getElementById('pedidoCliente'),
+        clienteIdInput: document.getElementById('pedidoClienteId'),
         produtoInput: document.getElementById('tipoProduto'),
         valorInput: document.getElementById('valorPedido'),
         dataInput: document.getElementById('dataEntrega'),
         formaEntregaSelect: document.getElementById('formaEntrega'),
         buscaInput: document.getElementById('buscaPedido'),
+        suggestionsContainer: document.getElementById('clienteSuggestions'),
+
+        // Adiciona um evento de input para o campo de cliente
+        init: () => {
+            Pedidos.clienteInput.addEventListener('input', Pedidos.handleClienteInput);
+            Pedidos.clienteInput.addEventListener('blur', () => { // Esconde sugestões ao sair do foco
+                setTimeout(() => Pedidos.suggestionsContainer.style.display = 'none', 100);
+            });
+            Pedidos.clienteInput.addEventListener('focus', Pedidos.handleClienteInput); // Mostra ao focar
+            Pedidos.clienteInput.addEventListener('keydown', Pedidos.handleKeyDown); // Para navegação com teclado
+        },
+
+        handleClienteInput: () => {
+            const termo = Pedidos.clienteInput.value.toLowerCase();
+            Pedidos.suggestionsContainer.innerHTML = '';
+            Pedidos.suggestionsContainer.style.display = 'none'; // Esconde por padrão
+
+            // Limpa o ID do cliente se o texto for alterado
+            Pedidos.clienteIdInput.value = '';
+
+            if (termo.length < 2) return; // Começa a sugerir com 2 ou mais caracteres
+
+            const clientes = Utils.getStorage('clientes');
+            const sugestoes = clientes.filter(c =>
+                c.nome.toLowerCase().includes(termo) ||
+                c.telefone.includes(termo)
+            );
+
+            if (sugestoes.length > 0) {
+                Pedidos.suggestionsContainer.style.display = 'block';
+                sugestoes.forEach((cliente, index) => {
+                    const div = document.createElement('div');
+                    div.classList.add('autocomplete-suggestion-item');
+                    div.textContent = `${cliente.nome} (${cliente.telefone})`;
+                    div.dataset.clienteId = cliente.id;
+                    div.dataset.clienteNome = cliente.nome;
+                    div.addEventListener('click', () => Pedidos.selectCliente(cliente.nome, cliente.id));
+                    Pedidos.suggestionsContainer.appendChild(div);
+                });
+            }
+        },
+
+        handleKeyDown: (e) => {
+            const items = Array.from(Pedidos.suggestionsContainer.children);
+            if (items.length === 0) return;
+
+            let activeItem = Pedidos.suggestionsContainer.querySelector('.active');
+            let activeIndex = activeItem ? items.indexOf(activeItem) : -1;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (activeItem) activeItem.classList.remove('active');
+                activeIndex = (activeIndex + 1) % items.length;
+                items[activeIndex].classList.add('active');
+                items[activeIndex].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (activeItem) activeItem.classList.remove('active');
+                activeIndex = (activeIndex - 1 + items.length) % items.length;
+                items[activeIndex].classList.add('active');
+                items[activeIndex].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeItem) {
+                    activeItem.click();
+                } else if (items.length === 1) { // Se houver apenas 1 sugestão, seleciona ela
+                    items[0].click();
+                }
+            }
+        },
+
+        selectCliente: (nome, id) => {
+            Pedidos.clienteInput.value = nome;
+            Pedidos.clienteIdInput.value = id;
+            Pedidos.suggestionsContainer.innerHTML = '';
+            Pedidos.suggestionsContainer.style.display = 'none';
+        },
+
+        resetarCampos: () => {
+            Utils.clearForm('pedidoCliente', 'pedidoClienteId', 'tipoProduto', 'valorPedido', 'dataEntrega', 'formaEntrega');
+            Pedidos.suggestionsContainer.innerHTML = '';
+            Pedidos.suggestionsContainer.style.display = 'none';
+        },
 
         salvarPedido: () => {
             const nomeCliente = Pedidos.clienteInput.value.trim();
+            const clienteId = Pedidos.clienteIdInput.value; // Pega o ID do cliente selecionado
             const tipoProduto = Pedidos.produtoInput.value.trim();
             const valor = parseFloat(Pedidos.valorInput.value);
             const data = Pedidos.dataInput.value;
             const formaEntrega = Pedidos.formaEntregaSelect.value;
 
-            if (!nomeCliente || !tipoProduto || isNaN(valor) || valor <= 0 || !data || !formaEntrega) {
-                return alert('Por favor, preencha todos os campos do pedido corretamente (Valor deve ser positivo).');
+            // Validação do cliente selecionado
+            if (!clienteId || !nomeCliente) {
+                return Notificacao.show('warning', 'Por favor, selecione um cliente da lista de sugestões. Se o cliente não existe, cadastre-o primeiro.');
+            }
+
+            if (!tipoProduto || isNaN(valor) || valor <= 0 || !data || !formaEntrega) {
+                return Notificacao.show('warning', 'Por favor, preencha todos os campos do pedido corretamente (Valor deve ser positivo).');
             }
 
             const pedidos = Utils.getStorage('pedidos');
-            pedidos.push({ nome: nomeCliente, produto: tipoProduto, valor, data, entrega: formaEntrega });
+            pedidos.push({ id: Utils.generateId(), clienteId, nomeCliente, produto: tipoProduto, valor, data, entrega: formaEntrega });
             Utils.setStorage('pedidos', pedidos);
 
-            Utils.clearForm('pedidoCliente', 'tipoProduto', 'valorPedido', 'dataEntrega', 'formaEntrega');
+            Pedidos.resetarCampos();
             Pedidos.listarPedidos();
             Financeiro.atualizarFinanceiro();
-            alert('Pedido salvo com sucesso!');
+            Notificacao.show('success', 'Pedido salvo com sucesso!');
         },
 
         listarPedidos: () => {
@@ -1128,7 +1423,7 @@
 
             // Filtra os pedidos
             const pedidosFiltrados = pedidos.filter(p =>
-                p.nome.toLowerCase().includes(termoBusca) ||
+                p.nomeCliente.toLowerCase().includes(termoBusca) || // Agora busca por nomeCliente
                 p.produto.toLowerCase().includes(termoBusca)
             );
 
@@ -1148,28 +1443,31 @@
 
             pedidosFiltrados.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-            pedidosFiltrados.forEach((p) => {
-                // Encontrar o índice original para a edição/exclusão
-                const originalIndex = pedidos.findIndex(item =>
-                    item.nome === p.nome &&
-                    item.produto === p.produto &&
-                    item.valor === p.valor &&
-                    item.data === p.data &&
-                    item.entrega === p.entrega
-                );
-
+            pedidosFiltrados.forEach((p, index) => { // Use index para Utils.editItem/deleteItem
                 const dataFormatada = Utils.formatDate(p.data);
-                const itemText = `<strong>${p.nome}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
+                const itemText = `<strong>${p.nomeCliente}</strong> - ${p.produto}<br>Valor: R$ ${p.valor.toFixed(2)}<br>Entrega: ${p.entrega} em ${dataFormatada}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('pedidos', ${originalIndex}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`)">
+                    <button class="edit" onclick="Utils.editItem('pedidos', ${index}, Pedidos.formFields, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nomeCliente}, Produto: ${item.produto}, Valor: R$${item.valor.toFixed(2)}\`, Pedidos.prepareEdit)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('pedidos', ${originalIndex}, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nome}, Produto: ${item.produto}\`, Financeiro.atualizarFinanceiro)">
+                    <button class="delete" onclick="Utils.deleteItem('pedidos', ${index}, Pedidos.listarPedidos, (item) => \`Cliente: ${item.nomeCliente}, Produto: ${item.produto}\`, Financeiro.atualizarFinanceiro)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
                 Pedidos.listElement.appendChild(Utils.createListItem(itemText, actionsHtml));
             });
+        },
+
+        // Função para preparar os campos de edição de pedido
+        prepareEdit: (item) => {
+            if (item) {
+                // Preenche o campo de cliente e o ID oculto
+                Pedidos.clienteInput.value = item.nomeCliente;
+                Pedidos.clienteIdInput.value = item.clienteId;
+            } else {
+                // Limpa se a edição for cancelada
+                Pedidos.resetarCampos();
+            }
         }
     };
 
@@ -1178,7 +1476,7 @@
         formFields: [
             {id:'produtoFinalNome', name:'nome', type:'text'},
             {id:'produtoFinalPrecoVenda', name:'precoVenda', type:'number'},
-            {id:'produtoFinalCustoProducao', name:'custoProducao', type:'number'}
+            {id:'produtoFinalCustoProducao', name:'custoProducao', type:'number', readonly: true} // Custo será automático
             // Ingredientes serão tratados separadamente
         ],
         listElement: document.getElementById('listaProdutosFinais'),
@@ -1193,13 +1491,18 @@
         // Array temporário para armazenar ingredientes enquanto o produto está sendo cadastrado/editado
         ingredientesTemporarios: [],
 
+        init: () => {
+             Produtos.ingredienteSelect.addEventListener('change', Produtos.atualizarCustoProducaoProdutoFinal);
+             Produtos.ingredienteQuantidadeInput.addEventListener('input', Produtos.atualizarCustoProducaoProdutoFinal);
+        },
+
         carregarIngredientesParaSelect: () => {
             const estoque = Utils.getStorage('estoque');
             Produtos.ingredienteSelect.innerHTML = '<option value="">Selecione um Ingrediente/Item de Estoque</option>';
             estoque.filter(item => item.tipo === 'Ingrediente').forEach((item) => {
                 const option = document.createElement('option');
                 option.value = item.nome; // Usamos o nome como valor
-                option.textContent = `${item.nome} (Qtd: ${item.qtd})`;
+                option.textContent = `${item.nome} (Qtd: ${item.qtd} - R$ ${item.custoUnitario ? item.custoUnitario.toFixed(2) : '0.00'}/un.)`;
                 Produtos.ingredienteSelect.appendChild(option);
             });
         },
@@ -1209,26 +1512,40 @@
             const quantidade = parseInt(Produtos.ingredienteQuantidadeInput.value);
 
             if (!nomeIngrediente || isNaN(quantidade) || quantidade <= 0) {
-                return alert('Por favor, selecione um ingrediente e informe uma quantidade válida.');
+                return Notificacao.show('warning', 'Por favor, selecione um ingrediente e informe uma quantidade válida.');
+            }
+
+            const estoque = Utils.getStorage('estoque');
+            const itemEstoque = estoque.find(item => item.nome === nomeIngrediente && item.tipo === 'Ingrediente');
+
+            if (!itemEstoque) {
+                 return Notificacao.show('error', `Ingrediente "${nomeIngrediente}" não encontrado no estoque.`);
             }
 
             // Verifica se o ingrediente já foi adicionado
             const existe = Produtos.ingredientesTemporarios.find(i => i.nome === nomeIngrediente);
             if (existe) {
-                // Atualiza a quantidade se já existe
                 existe.quantidade += quantidade;
             } else {
-                Produtos.ingredientesTemporarios.push({ nome: nomeIngrediente, quantidade: quantidade });
+                Produtos.ingredientesTemporarios.push({
+                    nome: nomeIngrediente,
+                    quantidade: quantidade,
+                    custoUnitario: itemEstoque.custoUnitario || 0 // Pega o custo unitário do estoque
+                });
             }
 
             Produtos.renderizarIngredientesTemporarios();
+            Produtos.atualizarCustoProducaoProdutoFinal(); // Atualiza o custo
             Utils.clearForm('ingredienteQuantidade'); // Limpa apenas a quantidade
             Produtos.ingredienteSelect.value = ''; // Limpa o select
+            Notificacao.show('success', `Ingrediente ${nomeIngrediente} adicionado.`);
         },
 
         removerIngredienteTemp: (index) => {
             Produtos.ingredientesTemporarios.splice(index, 1);
             Produtos.renderizarIngredientesTemporarios();
+            Produtos.atualizarCustoProducaoProdutoFinal(); // Atualiza o custo
+            Notificacao.show('info', 'Ingrediente removido da lista temporária.');
         },
 
         renderizarIngredientesTemporarios: () => {
@@ -1242,32 +1559,47 @@
                 const li = document.createElement('li');
                 li.className = 'ingrediente-item';
                 li.innerHTML = `
-                    <span>${ingrediente.nome}: ${ingrediente.quantidade} un.</span>
+                    <span>${ingrediente.nome}: ${ingrediente.quantidade} un. (Custo estimado: R$ ${(ingrediente.custoUnitario * ingrediente.quantidade).toFixed(2)})</span>
                     <button onclick="Produtos.removerIngredienteTemp(${index})"><i class="fa-solid fa-xmark"></i></button>
                 `;
                 Produtos.listaIngredientesProdutoUl.appendChild(li);
             });
         },
 
+        // Calcula e exibe o custo de produção estimado
+        atualizarCustoProducaoProdutoFinal: () => {
+            let custoTotal = 0;
+            const estoque = Utils.getStorage('estoque');
+
+            Produtos.ingredientesTemporarios.forEach(ingredienteTemp => {
+                const itemEstoque = estoque.find(item => item.nome === ingredienteTemp.nome && item.tipo === 'Ingrediente');
+                if (itemEstoque && itemEstoque.custoUnitario !== undefined) {
+                    custoTotal += (ingredienteTemp.quantidade * itemEstoque.custoUnitario);
+                }
+            });
+            Produtos.custoProducaoInput.value = custoTotal.toFixed(2);
+        },
+
         salvarProdutoFinal: () => {
             const nome = Produtos.nomeInput.value.trim();
             const precoVenda = parseFloat(Produtos.precoVendaInput.value);
-            const custoProducao = parseFloat(Produtos.custoProducaoInput.value) || 0; // Opcional
+            const custoProducao = parseFloat(Produtos.custoProducaoInput.value) || 0; // Pega o valor calculado
 
             if (!nome || isNaN(precoVenda) || precoVenda <= 0) {
-                return alert('Por favor, preencha o nome do produto e o preço de venda corretamente.');
+                return Notificacao.show('warning', 'Por favor, preencha o nome do produto e o preço de venda corretamente.');
             }
             if (Produtos.ingredientesTemporarios.length === 0) {
-                if (!confirm('Você não adicionou nenhum ingrediente a este produto. Deseja continuar mesmo assim?')) {
+                if (!confirm('Você não adicionou nenhum ingrediente a este produto. Deseja continuar mesmo assim? O custo de produção ficará zerado.')) {
                     return;
                 }
             }
 
             const produtos = Utils.getStorage('produtosFinais');
-            produtos.push({ 
-                nome, 
-                precoVenda, 
-                custoProducao, 
+            produtos.push({
+                id: Utils.generateId(), // Adiciona um ID único
+                nome,
+                precoVenda,
+                custoProducao, // Já virá calculado ou zerado
                 ingredientes: [...Produtos.ingredientesTemporarios] // Copia o array
             });
             Utils.setStorage('produtosFinais', produtos);
@@ -1276,7 +1608,7 @@
             Produtos.ingredientesTemporarios = []; // Limpa os ingredientes temporários
             Produtos.renderizarIngredientesTemporarios(); // Atualiza a lista na UI
             Produtos.listarProdutosFinais();
-            alert('Produto final salvo com sucesso!');
+            Notificacao.show('success', 'Produto final salvo com sucesso!');
         },
 
         listarProdutosFinais: () => {
@@ -1304,14 +1636,7 @@
             }
 
 
-            produtosFiltrados.forEach((produto) => {
-                // Encontrar o índice original para a edição/exclusão
-                const originalIndex = produtos.findIndex(item =>
-                    item.nome === produto.nome &&
-                    item.precoVenda === produto.precoVenda &&
-                    JSON.stringify(item.ingredientes || []) === JSON.stringify(produto.ingredientes || []) // Comparar ingredientes para unicidade
-                );
-
+            produtosFiltrados.forEach((produto, index) => { // Use index para Utils.editItem/deleteItem
                 let ingredientesHtml = 'Nenhum ingrediente associado.';
                 if (produto.ingredientes && produto.ingredientes.length > 0) {
                     ingredientesHtml = produto.ingredientes.map(i => `${i.nome}: ${i.quantidade}un.`).join(', ');
@@ -1320,14 +1645,14 @@
                 const itemText = `
                     <strong>${produto.nome}</strong><br>
                     Preço Venda: R$ ${produto.precoVenda.toFixed(2)}<br>
-                    Custo Produção: R$ ${produto.custoProducao.toFixed(2)}<br>
+                    Custo Produção: R$ ${produto.custoProducao ? produto.custoProducao.toFixed(2) : '0.00'}<br>
                     Ingredientes: ${ingredientesHtml}
                 `;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('produtosFinais', ${originalIndex}, Produtos.formFields, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`, Produtos.prepararEdicaoProdutoFinal)">
+                    <button class="edit" onclick="Utils.editItem('produtosFinais', ${index}, Produtos.formFields, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`, Produtos.prepararEdicaoProdutoFinal)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${originalIndex}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
+                    <button class="delete" onclick="Utils.deleteItem('produtosFinais', ${index}, Produtos.listarProdutosFinais, (item) => \`Produto: ${item.nome}\`)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1340,10 +1665,12 @@
             if (produto) {
                 Produtos.ingredientesTemporarios = [...(produto.ingredientes || [])];
                 Produtos.renderizarIngredientesTemporarios();
+                Produtos.atualizarCustoProducaoProdutoFinal(); // Preenche o custo de produção ao editar
             } else {
                 // Se null, significa que a edição foi cancelada e deve limpar
                 Produtos.ingredientesTemporarios = [];
                 Produtos.renderizarIngredientesTemporarios();
+                Produtos.custoProducaoInput.value = ''; // Limpa o campo de custo
             }
         }
     };
@@ -1371,18 +1698,18 @@
             const valor = parseFloat(Despesas.valorInput.value);
 
             if (!categoria || !descricao || !data || isNaN(valor) || valor <= 0) {
-                alert('Por favor, selecione uma categoria e preencha todos os campos da despesa corretamente (Descrição, Data, Valor positivo).');
+                Notificacao.show('warning', 'Por favor, selecione uma categoria e preencha todos os campos da despesa corretamente (Descrição, Data, Valor positivo).');
                 return;
             }
 
             const despesas = Utils.getStorage('despesas');
-            despesas.push({ categoria, descricao, data, valor });
+            despesas.push({ id: Utils.generateId(), categoria, descricao, data, valor }); // Adiciona um ID único
             Utils.setStorage('despesas', despesas);
 
             Utils.clearForm('categoriaDespesa', 'descricaoDespesa', 'dataDespesa', 'valorDespesa');
             Financeiro.atualizarFinanceiro();
             Despesas.filtrarDespesas();
-            alert('Despesa salva com sucesso!');
+            Notificacao.show('success', 'Despesa salva com sucesso!');
         },
 
         filtrarDespesas: () => {
@@ -1411,22 +1738,14 @@
 
             despesasFiltradas.sort((a, b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00'));
 
-            despesasFiltradas.forEach((d) => {
-                // Encontrar o índice original para a edição/exclusão
-                const originalIndex = despesas.findIndex(item =>
-                    item.categoria === d.categoria &&
-                    item.descricao === d.descricao &&
-                    item.data === d.data &&
-                    item.valor === d.valor
-                );
-
+            despesasFiltradas.forEach((d, index) => { // Use index para Utils.editItem/deleteItem
                 const dataFormatada = Utils.formatDate(d.data);
                 const itemText = `<strong>${dataFormatada}</strong> | ${d.categoria} | ${d.descricao}<br>Valor: R$ ${d.valor.toFixed(2)}`;
                 const actionsHtml = `
-                    <button class="edit" onclick="Utils.editItem('despesas', ${originalIndex}, Despesas.formFields, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
+                    <button class="edit" onclick="Utils.editItem('despesas', ${index}, Despesas.formFields, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}, Valor: R$${item.valor.toFixed(2)}\`)">
                         <i class="fa-solid fa-pen"></i> Editar
                     </button>
-                    <button class="delete" onclick="Utils.deleteItem('despesas', ${originalIndex}, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`, Financeiro.atualizarFinanceiro)">
+                    <button class="delete" onclick="Utils.deleteItem('despesas', ${index}, Despesas.filtrarDespesas, (item) => \`Descrição: ${item.descricao}\`, Financeiro.atualizarFinanceiro)">
                         <i class="fa-solid fa-trash"></i> Excluir
                     </button>
                 `;
@@ -1442,6 +1761,7 @@
             {id:'produtoTipo', name:'tipo', type:'select'},
             {id:'produtoQtd', name:'qtd', type:'number'},
             {id:'produtoMin', name:'min', type:'number'},
+            {id:'produtoCustoUnitario', name:'custoUnitario', type:'number'},
             {id:'produtoValidade', name:'validade', type:'date'}
         ],
         listElement: document.getElementById('listaEstoque'),
@@ -1450,46 +1770,52 @@
         tipoSelect: document.getElementById('produtoTipo'),
         qtdInput: document.getElementById('produtoQtd'),
         minInput: document.getElementById('produtoMin'),
+        custoUnitarioInput: document.getElementById('produtoCustoUnitario'),
         validadeInput: document.getElementById('produtoValidade'),
         buscaInput: document.getElementById('buscaProdutoEstoque'), // Novo ID para a busca de estoque
         filtroTipoSelect: document.getElementById('filtroTipoEstoque'),
 
-        adicionarProduto: () => {
+        adicionarProduto: async () => {
             const nome = Estoque.nomeInput.value.trim();
             const tipo = Estoque.tipoSelect.value;
             const qtd = parseInt(Estoque.qtdInput.value);
             const min = parseInt(Estoque.minInput.value);
+            const custoUnitario = parseFloat(Estoque.custoUnitarioInput.value) || 0; // Custo unitário
             const validade = Estoque.validadeInput.value;
 
-            if (!nome || !tipo || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0) {
-                return alert('Por favor, preencha todos os campos do item de estoque corretamente (Quantidade e Mínimo devem ser números não negativos).');
+            if (!nome || !tipo || isNaN(qtd) || qtd < 0 || isNaN(min) || min < 0 || isNaN(custoUnitario) || custoUnitario < 0) {
+                return Notificacao.show('warning', 'Por favor, preencha todos os campos do item de estoque corretamente (Quantidade, Mínimo e Custo Unitário devem ser números não negativos).');
             }
 
             const estoque = Utils.getStorage('estoque');
             const itemExistenteIndex = estoque.findIndex(p => p.nome.toLowerCase() === nome.toLowerCase() && p.tipo === tipo);
 
             if (itemExistenteIndex > -1) {
-                if (confirm(`O item "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente ou ATUALIZAR (sobrescrever) o item? \n\nClique OK para ADICIONAR, ou CANCELAR para ATUALIZAR.`)) {
+                const confirmation = await Notificacao.confirm(`O item "${nome}" do tipo "${tipo}" já existe. Deseja ADICIONAR ${qtd} à quantidade existente e ATUALIZAR os demais dados ou SUBSTITUIR (sobrescrever) o item? \n\nClique SIM para ADICIONAR, ou NÃO para ATUALIZAR/SOBRESCEVER.`);
+
+                if (confirmation) { // ADICIONAR
                     estoque[itemExistenteIndex].qtd += qtd;
+                    estoque[itemExistenteIndex].custoUnitario = custoUnitario; // Atualiza o custo unitário também
                     if (validade) estoque[itemExistenteIndex].validade = validade;
                     if (min) estoque[itemExistenteIndex].min = min;
-                    Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, adição de estoque)`);
-                    alert(`Adicionadas ${qtd} unidades de "${nome}" ao estoque.`);
-                } else {
-                    estoque[itemExistenteIndex] = { nome, tipo, qtd, min, validade };
-                    Estoque.registrarHistorico(`Atualizado: ${nome} (${tipo}, nova quantidade: ${qtd})`);
-                    alert(`Item "${nome}" atualizado para ${qtd} unidades.`);
+                    Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, adição de estoque)`, 'entrada'); // Tipo de movimentação
+                    Notificacao.show('success', `Adicionadas ${qtd} unidades de "${nome}" ao estoque.`);
+                } else { // SOBRESCEVER
+                    estoque[itemExistenteIndex] = { id: estoque[itemExistenteIndex].id, nome, tipo, qtd, min, custoUnitario, validade };
+                    Estoque.registrarHistorico(`Atualizado: ${nome} (${tipo}, nova quantidade: ${qtd})`, 'atualizacao');
+                    Notificacao.show('success', `Item "${nome}" atualizado para ${qtd} unidades.`);
                 }
             } else {
-                estoque.push({ nome, tipo, qtd, min, validade });
-                Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, novo item no estoque)`);
-                alert('Novo item adicionado ao estoque!');
+                estoque.push({ id: Utils.generateId(), nome, tipo, qtd, min, custoUnitario, validade }); // Adiciona um ID único
+                Estoque.registrarHistorico(`+${qtd} ${nome} (${tipo}, novo item no estoque)`, 'entrada');
+                Notificacao.show('success', 'Novo item adicionado ao estoque!');
             }
 
             Utils.setStorage('estoque', estoque);
-            Utils.clearForm('produtoNome', 'produtoTipo', 'produtoQtd', 'produtoMin', 'produtoValidade');
+            Utils.clearForm('produtoNome', 'produtoTipo', 'produtoQtd', 'produtoMin', 'produtoCustoUnitario', 'produtoValidade');
             Estoque.listarProdutos();
             Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
+            Produtos.atualizarCustoProducaoProdutoFinal(); // Atualiza o custo estimado de produtos finais
         },
 
         listarProdutos: () => {
@@ -1500,8 +1826,7 @@
 
             const produtosFiltrados = estoque.filter(p => {
                 const nomeMatch = p.nome.toLowerCase().includes(termoBusca);
-                // Permite buscar tanto pelo nome quanto pelo tipo na barra de busca
-                const tipoMatchBusca = p.tipo.toLowerCase().includes(termoBusca); 
+                const tipoMatchBusca = p.tipo.toLowerCase().includes(termoBusca); // Permite buscar também pelo tipo
                 const filtroTipoMatch = tipoFiltro === '' || p.tipo === tipoFiltro;
                 return (nomeMatch || tipoMatchBusca) && filtroTipoMatch;
             });
@@ -1521,61 +1846,75 @@
             }
 
 
-            produtosFiltrados.forEach((produto) => {
-                // Encontrar o índice original para a edição/exclusão
-                const originalIndex = estoque.findIndex(item =>
-                    item.nome === produto.nome &&
-                    item.tipo === produto.tipo
-                );
-
-                const li = Utils.createListItem(
-                    `<strong>${produto.nome}</strong> (${produto.tipo}) - ${produto.qtd} un. (Mín: ${produto.min} un.)${produto.validade ? ` - Venc: ${Utils.formatDate(produto.validade)}` : ''}`,
-                    `
-                        <button class="use" onclick="Estoque.usarProduto(${originalIndex})">
-                            <i class="fa-solid fa-minus"></i> Usar 1
-                        </button>
-                        <button class="edit" onclick="Utils.editItem('estoque', ${originalIndex}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
-                            <i class="fa-solid fa-pen"></i> Editar
-                        </button>
-                        <button class="delete" onclick="Utils.deleteItem('estoque', ${originalIndex}, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un.)\`)">
-                            <i class="fa-solid fa-trash"></i> Excluir
-                        </button>
-                    `
-                );
+            produtosFiltrados.forEach((produto, index) => { // Use index para Utils.editItem/deleteItem
+                const itemText = `
+                    <strong>${produto.nome}</strong> (${produto.tipo})<br>
+                    Qtd: ${produto.qtd} un. (Mín: ${produto.min} un.)<br>
+                    Custo Unitário: R$ ${produto.custoUnitario ? produto.custoUnitario.toFixed(2) : '0.00'}<br>
+                    ${produto.validade ? `Venc: ${Utils.formatDate(produto.validade)}` : ''}
+                `;
+                const actionsHtml = `
+                    <button class="add-qty" onclick="Estoque.gerenciarQuantidade(${index}, 'adicionar')">
+                        <i class="fa-solid fa-plus"></i> Add Qtd
+                    </button>
+                    <button class="remove-qty" onclick="Estoque.gerenciarQuantidade(${index}, 'remover')">
+                        <i class="fa-solid fa-minus"></i> Remover Qtd
+                    </button>
+                    <button class="edit" onclick="Utils.editItem('estoque', ${index}, Estoque.formFields, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un., Tipo: ${item.tipo})\`)">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button class="delete" onclick="Utils.deleteItem('estoque', ${index}, Estoque.listarProdutos, (item) => \`Item: ${item.nome} (${item.qtd} un.)\`)">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                `;
+                const li = Utils.createListItem(itemText, actionsHtml);
                 if (produto.qtd === 0) li.classList.add('falta');
                 else if (produto.min > 0 && produto.qtd < produto.min) li.classList.add('baixo');
                 Estoque.listElement.appendChild(li);
             });
         },
 
-        usarProduto: (originalIndex) => { // Alterado para originalIndex
+        gerenciarQuantidade: async (originalIndex, tipoOperacao) => {
             const estoque = Utils.getStorage('estoque');
             const item = estoque[originalIndex];
 
             if (!item) {
-                alert('Item não encontrado no estoque.');
+                Notificacao.show('error', 'Item não encontrado no estoque.');
                 return;
             }
 
-            if (item.qtd > 0) {
-                if (confirm(`Deseja usar 1 unidade de "${item.nome}"?`)) {
-                    item.qtd--;
-                    Utils.setStorage('estoque', estoque); // Salva o array modificado
-                    Estoque.registrarHistorico(`-1 ${item.nome} (${item.tipo})`);
-                    Estoque.listarProdutos(); // Recarrega a lista
-                    Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
-                    alert(`1 unidade de "${item.nome}" usada.`);
-                }
-            } else {
-                alert(`Não há mais unidades de "${item.nome}" no estoque para usar.`);
+            const quantidadeString = prompt(`Quantas unidades de "${item.nome}" deseja ${tipoOperacao}?`);
+            const quantidade = parseInt(quantidadeString);
+
+            if (isNaN(quantidade) || quantidade <= 0) {
+                return Notificacao.show('warning', 'Quantidade inválida. Por favor, insira um número positivo.');
             }
+
+            if (tipoOperacao === 'adicionar') {
+                item.qtd += quantidade;
+                Estoque.registrarHistorico(`+${quantidade} ${item.nome} (${item.tipo}, adição)`, 'entrada');
+                Notificacao.show('success', `${quantidade} unidades de "${item.nome}" adicionadas.`);
+            } else if (tipoOperacao === 'remover') {
+                if (item.qtd >= quantidade) {
+                    item.qtd -= quantidade;
+                    Estoque.registrarHistorico(`-${quantidade} ${item.nome} (${item.tipo}, remoção)`, 'saida');
+                    Notificacao.show('success', `${quantidade} unidades de "${item.nome}" removidas.`);
+                } else {
+                    return Notificacao.show('warning', `Não há ${quantidade} unidades de "${item.nome}" no estoque. Quantidade atual: ${item.qtd}.`);
+                }
+            }
+
+            Utils.setStorage('estoque', estoque);
+            Estoque.listarProdutos(); // Recarrega a lista
+            Produtos.carregarIngredientesParaSelect(); // Atualiza a lista de ingredientes no módulo Produtos
+            Produtos.atualizarCustoProducaoProdutoFinal(); // Atualiza o custo estimado de produtos finais
         },
 
-        registrarHistorico: (texto) => {
+        registrarHistorico: (texto, tipoMovimentacao) => {
             const historico = Utils.getStorage('historicoEstoque');
             const dataHora = new Date().toLocaleString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-            historico.unshift(`${dataHora}: ${texto}`);
-            Utils.setStorage('historicoEstoque', historico.slice(0, 30));
+            historico.unshift({ dataHora, texto, tipo: tipoMovimentacao }); // Adiciona tipo de movimentação
+            Utils.setStorage('historicoEstoque', historico.slice(0, 50)); // Guarda mais histórico
             Estoque.listarHistorico();
         },
 
@@ -1590,7 +1929,13 @@
 
             hist.forEach((entry) => {
                 const li = document.createElement('li');
-                li.textContent = entry;
+                // Adiciona um ícone baseado no tipo de movimentação
+                let icon = '';
+                if (entry.tipo === 'entrada') icon = '<i class="fa-solid fa-arrow-circle-up" style="color:#4CAF50; margin-right: 5px;"></i>';
+                else if (entry.tipo === 'saida') icon = '<i class="fa-solid fa-arrow-circle-down" style="color:#f44336; margin-right: 5px;"></i>';
+                else if (entry.tipo === 'atualizacao') icon = '<i class="fa-solid fa-sync-alt" style="color:#2196F3; margin-right: 5px;"></i>';
+
+                li.innerHTML = `${icon}${entry.dataHora}: ${entry.texto}`;
                 Estoque.historicoListElement.appendChild(li);
             });
         }
@@ -1607,12 +1952,16 @@
         detalhesGastosDiv: document.getElementById('detalhesGastos'),
         listaGanhosDetalhesUl: document.getElementById('listaGanhosDetalhes'),
         listaGastosDetalhesUl: document.getElementById('listaGastosDetalhes'),
+        topClientesList: document.getElementById('topClientesList'),
+        topProdutosList: document.getElementById('topProdutosList'),
+
 
         preencherFiltrosAno: () => {
             Financeiro.filtroAnoSelect.innerHTML = '<option value="">Todos os Anos</option>';
 
-            const currentYear = new Date().getFullYear();
             let allYears = new Set();
+            const currentYear = new Date().getFullYear();
+            allYears.add(currentYear); // Garante o ano atual
 
             const pedidos = Utils.getStorage('pedidos');
             pedidos.forEach(p => {
@@ -1626,16 +1975,13 @@
 
             const sortedYears = Array.from(allYears).sort((a, b) => a - b);
 
-            if (!sortedYears.includes(currentYear)) sortedYears.push(currentYear);
-            sortedYears.sort((a, b) => a - b);
-
             sortedYears.forEach(year => {
                 const option = document.createElement('option');
                 option.value = year.toString();
                 option.textContent = year.toString();
                 Financeiro.filtroAnoSelect.appendChild(option);
             });
-            Financeiro.filtroAnoSelect.value = currentYear.toString();
+            Financeiro.filtroAnoSelect.value = currentYear.toString(); // Seleciona o ano atual por padrão
         },
 
         atualizarFinanceiro: () => {
@@ -1675,10 +2021,10 @@
             if (pedidosFiltrados.length === 0) {
                 Financeiro.listaGanhosDetalhesUl.innerHTML = '<li class="empty-list-message">Nenhum ganho registrado para o período selecionado.</li>';
             } else {
-                pedidosFiltrados.forEach(p => {
+                pedidosFiltrados.sort((a,b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00')).forEach(p => {
                     const dataFormatada = Utils.formatDate(p.data);
                     const li = document.createElement('li');
-                    li.textContent = `${dataFormatada} - ${p.nome} (${p.produto}): R$ ${p.valor.toFixed(2)}`;
+                    li.textContent = `${dataFormatada} - ${p.nomeCliente} (${p.produto}): R$ ${p.valor.toFixed(2)}`;
                     Financeiro.listaGanhosDetalhesUl.appendChild(li);
                 });
             }
@@ -1687,13 +2033,14 @@
             if (despesasFiltradas.length === 0) {
                 Financeiro.listaGastosDetalhesUl.innerHTML = '<li class="empty-list-message">Nenhum gasto registrado para o período selecionado.</li>';
             } else {
-                despesasFiltradas.forEach(d => {
+                despesasFiltradas.sort((a,b) => new Date(b.data + 'T00:00:00') - new Date(a.data + 'T00:00:00')).forEach(d => {
                     const dataFormatada = Utils.formatDate(d.data);
                     const li = document.createElement('li');
                     li.textContent = `${dataFormatada} - ${d.categoria} (${d.descricao}): R$ ${d.valor.toFixed(2)}`;
                     Financeiro.listaGastosDetalhesUl.appendChild(li);
                 });
             }
+            Financeiro.gerarRelatoriosRapidos(pedidosFiltrados); // Atualiza os relatórios com os dados filtrados
         },
 
         toggleDetalhesFinanceiros: (tipo) => {
@@ -1709,6 +2056,69 @@
                 Financeiro.detalhesGanhosDiv.classList.toggle('active');
             } else if (tipo === 'gastos') {
                 Financeiro.detalhesGastosDiv.classList.toggle('active');
+            }
+        },
+
+        gerarRelatoriosRapidos: (pedidosBase = null) => {
+            const pedidos = pedidosBase || Utils.getStorage('pedidos');
+            const filtroMes = Financeiro.filtroMesSelect.value;
+            const filtroAno = Financeiro.filtroAnoSelect.value;
+
+            const pedidosFiltrados = pedidos.filter(p => {
+                if (!p.data) return false;
+                const pedidoDate = new Date(p.data + 'T00:00:00');
+                const pedidoMonth = (pedidoDate.getMonth() + 1).toString().padStart(2, '0');
+                const pedidoYear = pedidoDate.getFullYear().toString();
+                return (filtroMes === '' || pedidoMonth === filtroMes) &&
+                       (filtroAno === '' || pedidoYear === filtroAno);
+            });
+
+            // Top Clientes
+            const clientesMap = {};
+            pedidosFiltrados.forEach(p => {
+                if (clientesMap[p.nomeCliente]) {
+                    clientesMap[p.nomeCliente] += p.valor;
+                } else {
+                    clientesMap[p.nomeCliente] = p.valor;
+                }
+            });
+            const topClientes = Object.entries(clientesMap)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5); // Top 5 clientes
+
+            Financeiro.topClientesList.innerHTML = '';
+            if (topClientes.length === 0) {
+                Financeiro.topClientesList.innerHTML = '<li class="empty-list-message">Nenhum cliente com pedidos no período.</li>';
+            } else {
+                topClientes.forEach(([cliente, valor]) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${cliente}: R$ ${valor.toFixed(2)}`;
+                    Financeiro.topClientesList.appendChild(li);
+                });
+            }
+
+            // Top Produtos
+            const produtosMap = {};
+            pedidosFiltrados.forEach(p => {
+                if (produtosMap[p.produto]) {
+                    produtosMap[p.produto]++; // Conta a quantidade de vezes que o produto foi vendido
+                } else {
+                    produtosMap[p.produto] = 1;
+                }
+            });
+            const topProdutos = Object.entries(produtosMap)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5); // Top 5 produtos mais vendidos
+
+            Financeiro.topProdutosList.innerHTML = '';
+            if (topProdutos.length === 0) {
+                Financeiro.topProdutosList.innerHTML = '<li class="empty-list-message">Nenhum produto vendido no período.</li>';
+            } else {
+                topProdutos.forEach(([produto, qtd]) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${produto}: ${qtd} vendas`;
+                    Financeiro.topProdutosList.appendChild(li);
+                });
             }
         }
     };
@@ -1755,7 +2165,7 @@
                     Tel: ${cliente.telefone}
                 `;
                 const actionsHtml = `
-                    <button class="view-details" onclick="Agenda.verDetalhesCliente('${cliente.nome}', '${cliente.telefone}', '${cliente.endereco}')">
+                    <button class="view-details" onclick="Agenda.verDetalhesCliente('${cliente.id}')">
                         <i class="fa-solid fa-eye"></i> Ver Histórico
                     </button>
                 `;
@@ -1763,19 +2173,28 @@
             });
         },
 
-        verDetalhesCliente: (nomeCliente, telefoneCliente, enderecoCliente) => {
+        verDetalhesCliente: (clienteId) => {
+            const clientes = Utils.getStorage('clientes');
+            const cliente = clientes.find(c => c.id === clienteId);
+
+            if (!cliente) {
+                Notificacao.show('error', 'Cliente não encontrado.');
+                Agenda.voltarParaListaClientes();
+                return;
+            }
+
             Agenda.clientListView.style.display = 'none';
             Agenda.clientDetailsView.style.display = 'block';
 
-            Agenda.detalheClienteNome.textContent = nomeCliente;
-            Agenda.detalheClienteTelefone.textContent = telefoneCliente;
-            Agenda.detalheClienteEndereco.textContent = enderecoCliente;
+            Agenda.detalheClienteNome.textContent = cliente.nome;
+            Agenda.detalheClienteTelefone.textContent = cliente.telefone;
+            Agenda.detalheClienteEndereco.textContent = cliente.endereco;
 
             Agenda.listaPedidosCliente.innerHTML = '';
             const pedidos = Utils.getStorage('pedidos');
 
-            // Filtra os pedidos feitos por este cliente
-            const pedidosDoCliente = pedidos.filter(p => p.nome.toLowerCase() === nomeCliente.toLowerCase());
+            // Filtra os pedidos feitos por este cliente, agora usando o ID
+            const pedidosDoCliente = pedidos.filter(p => p.clienteId === cliente.id);
 
             if (pedidosDoCliente.length === 0) {
                 Agenda.listaPedidosCliente.innerHTML = '<li class="empty-list-message">Este cliente ainda não possui pedidos registrados.</li>';
@@ -1806,8 +2225,10 @@
 
     // Inicializa o app ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
-        // Nada aqui, o App.entrar() é chamado pelo clique do botão na splash screen
-        // Isso permite a transição da splash
+        // Inicializa os módulos que precisam de event listeners
+        Pedidos.init();
+        Produtos.init();
+        // Não chame App.entrar() aqui, ele é chamado pelo clique do botão na splash screen
     });
   </script>
 </body>
