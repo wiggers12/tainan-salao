@@ -1161,6 +1161,64 @@
     atualizarDashboard();
   };
 </script>
+  <!-- Seu conteúdo HTML e seções aqui -->
+
+  <!-- Script de login Firebase (etapa 3) -->
+  <script>
+    // Função que esconde splash e mostra login
+    function irParaLogin() {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('login').style.display = 'flex';
+    }
+
+    // Função para fazer login com Firebase
+    async function login() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+      } catch (err) {
+        alert('Erro ao entrar: ' + err.message);
+      }
+    }
+
+    // Função para criar conta com Firebase
+    async function criarConta() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, senha);
+        alert('Conta criada com sucesso! Faça login.');
+      } catch (err) {
+        alert('Erro ao criar conta: ' + err.message);
+      }
+    }
+
+    // Função para logout
+    function logout() {
+      signOut(auth);
+    }
+
+    // Observa mudança no estado de autenticação do usuário
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        // Usuário logado: esconde login, mostra app
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+      } else {
+        // Usuário deslogado: mostra login, esconde app
+        document.getElementById('login').style.display = 'flex';
+        document.getElementById('main').style.display = 'none';
+      }
+    });
+
+    // Mostrar splash inicialmente ao carregar a página
+    window.onload = () => {
+      document.getElementById('splash').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
 
 </body>
 </html>
