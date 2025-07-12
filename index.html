@@ -378,6 +378,54 @@ input.error, select.error, textarea.error {
     background-color: #ccc;
     color: #4a2c4d;
 }
+
+/* Dashboard Specific Styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-card.card-clientes { background: linear-gradient(45deg, #e0f2f7, #bbdefb); color: #1565c0; }
+.dashboard-card.card-profissionais { background: linear-gradient(45deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+.dashboard-card.card-produtos { background: linear-gradient(45deg, #fff3e0, #ffe0b2); color: #ef6c00; }
+.dashboard-card.card-agendamentos { background: linear-gradient(45deg, #fbe9e7, #ffccbc); color: #d84315; }
+.dashboard-card.card-caixa { background: linear-gradient(45deg, #f3e5f5, #e1bee7); color: #6a1b9a; }
+.dashboard-card.card-lucro { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); color: #00838f; }
+
+.dashboard-card .card-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.dashboard-card .card-title {
+    font-size: 1.1rem;
+    color: rgba(0,0,0,0.7);
+    margin-bottom: 0;
+}
+
+.dashboard-chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
+    margin-top: 30px;
+}
 </style>
 </head>
 <body>
@@ -409,14 +457,57 @@ input.error, select.error, textarea.error {
   </div>
 
   <section id="dashboardSection" style="display:none;">
-    <h3>Dashboard</h3>
-    <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
-    <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
-    <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
-    <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
-    <p><strong>Caixa Atual:</strong> <span id="dashCaixaAtual">R$ 0,00</span></p>
+    <h3>Dashboard Principal</h3>
 
-    <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
+    <div class="dashboard-grid">
+        <div class="dashboard-card card-clientes">
+            <p class="card-title">Total de Clientes</p>
+            <p class="card-value" id="dashTotalClientes">0</p>
+        </div>
+        <div class="dashboard-card card-profissionais">
+            <p class="card-title">Total de Profissionais</p>
+            <p class="card-value" id="dashTotalProfissionais">0</p>
+        </div>
+        <div class="dashboard-card card-produtos">
+            <p class="card-title">Produtos em Estoque</p>
+            <p class="card-value" id="dashTotalProdutos">0</p>
+        </div>
+        <div class="dashboard-card card-agendamentos">
+            <p class="card-title">Agendamentos Pendentes</p>
+            <p class="card-value" id="dashTotalAgendamentos">0</p>
+        </div>
+        <div class="dashboard-card card-caixa">
+            <p class="card-title">Caixa Atual</p>
+            <p class="card-value" id="dashCaixaAtual">R$ 0,00</p>
+        </div>
+        <div class="dashboard-card card-lucro">
+            <p class="card-title">Lucro Mensal (Mês Atual)</p>
+            <p class="card-value" id="dashLucroMensal">R$ 0,00</p>
+        </div>
+        <div class="dashboard-card card-caixa">
+            <p class="card-title">Ganhos Mensais (Mês Atual)</p>
+            <p class="card-value" id="dashGanhosMensal">R$ 0,00</p>
+        </div>
+        <div class="dashboard-card card-agendamentos">
+            <p class="card-title">Gastos Mensais (Mês Atual)</p>
+            <p class="card-value" id="dashGastosMensal">R$ 0,00</p>
+        </div>
+    </div>
+
+    <div class="dashboard-chart-container">
+        <h4>Ganhos x Gastos x Lucro Mensal</h4>
+        <canvas id="graficoFinanceiro"></canvas>
+    </div>
+
+    <div class="dashboard-chart-container">
+        <h4>Agendamentos por Profissional</h4>
+        <canvas id="graficoAgendamentosProfissional"></canvas>
+    </div>
+
+    <div class="dashboard-chart-container">
+        <h4>Top 5 Serviços Mais Realizados (por valor)</h4>
+        <canvas id="graficoServicosPopulares"></canvas>
+    </div>
   </section>
 
   <section id="clientesSection" style="display:none;">
@@ -663,6 +754,18 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 });
 
+// Cores para os gráficos
+const chartColors = {
+    primary: '#7b1fa2', // Roxo principal
+    secondary: '#ce93d8', // Roxo claro
+    success: '#4caf50', // Verde
+    warning: '#ffc107', // Amarelo
+    danger: '#e53935', // Vermelho
+    info: '#03a9f4', // Azul claro
+    dark: '#4a2c4d', // Roxo escuro
+    light: '#f3e5f5' // Roxo muito claro
+};
+
 // ============ UTILITÁRIOS GERAIS ============
 
 // Função para exibir notificações Toast
@@ -736,6 +839,7 @@ function validateSelect(fieldId, errorId, message) {
     const errorSpan = document.getElementById(errorId);
     if (field.value === '' || field.value === 'null') { // Checa se a opção padrão está selecionada
         field.classList.add('error');
+        errorSpan.textContent = ''; // Limpa antes de verificar se precisa mostrar
         errorSpan.textContent = message;
         return false;
     }
@@ -853,6 +957,8 @@ function abrirSecao(id) {
   if (id === "dashboardSection") {
     atualizarDashboard();
     desenharGraficoFinanceiro();
+    desenharGraficoAgendamentosProfissional();
+    desenharGraficoServicosPopulares();
   }
   if (id === "backupSection") { }
 }
@@ -1174,7 +1280,7 @@ function usarProduto() {
     return showToast("Informe uma quantidade válida para uso.");
   }
 
-  const produto = produtos.find(p => p.id === produtoId);
+  const produto = products.find(p => p.id === produtoId);
   if (!produto) return showToast("Produto não encontrado.");
 
   if (produto.quantidade < qtdUso) {
@@ -1501,12 +1607,46 @@ function atualizarDashboard() {
     return acc;
   }, 0);
   const gastosCalculados = gastos.reduce((acc,g) => acc + g.valor, 0);
-  const lucroAtual = caixaInicial + ganhosCalculados - gastosCalculados;
-  document.getElementById("dashCaixaAtual").textContent = currencyFormatter.format(lucroAtual);
+  const lucroTotal = caixaInicial + ganhosCalculados - gastosCalculados;
+  document.getElementById("dashCaixaAtual").textContent = currencyFormatter.format(lucroTotal);
+
+  // Calcular ganhos, gastos e lucro do mês atual
+  const hoje = new Date();
+  const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0'); // Mês atual com 2 dígitos
+  const anoAtual = hoje.getFullYear().toString();
+  const mesAnoAtual = `${anoAtual}-${mesAtual}`;
+
+  let ganhosMesAtual = 0;
+  agendamentos.forEach(a => {
+      if (a.status === "Concluído" && a.data.startsWith(mesAnoAtual)) {
+          const prof = profissionais.find(p => p.id === a.profId);
+          const serv = prof?.servicos[a.servIndex];
+          if (serv) {
+              ganhosMesAtual += serv.valor;
+          }
+      }
+  });
+
+  let gastosMesAtual = 0;
+  gastos.forEach(g => {
+      if (g.data.startsWith(mesAnoAtual)) {
+          gastosMesAtual += g.valor;
+      }
+  });
+
+  const lucroMesAtual = ganhosMesAtual - gastosMesAtual;
+
+  document.getElementById("dashGanhosMensal").textContent = currencyFormatter.format(ganhosMesAtual);
+  document.getElementById("dashGastosMensal").textContent = currencyFormatter.format(gastosMesAtual);
+  document.getElementById("dashLucroMensal").textContent = currencyFormatter.format(lucroMesAtual);
 }
 
-// ======= GRÁFICO FINANCEIRO ========
+
+// ======= GRÁFICOS DO DASHBOARD ========
 let chartFinanceiro = null;
+let chartAgendamentosProfissional = null;
+let chartServicosPopulares = null;
+
 function desenharGraficoFinanceiro() {
   const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
 
@@ -1546,27 +1686,37 @@ function desenharGraficoFinanceiro() {
         {
           label: 'Ganhos',
           data: ganhosData,
-          backgroundColor: 'rgba(123, 31, 162, 0.7)',
+          backgroundColor: chartColors.success,
+          borderColor: chartColors.success,
+          borderWidth: 1,
         },
         {
           label: 'Gastos',
           data: gastosData,
-          backgroundColor: 'rgba(229, 57, 53, 0.7)',
+          backgroundColor: chartColors.danger,
+          borderColor: chartColors.danger,
+          borderWidth: 1,
         },
         {
           label: 'Lucro',
           data: lucroData,
           type: 'line',
-          borderColor: 'rgba(76,175,80,1)',
+          borderColor: chartColors.primary,
+          backgroundColor: chartColors.primary,
           borderWidth: 3,
           fill: false,
-          tension: 0.2,
+          tension: 0.3, // Curva mais suave
           yAxisID: 'y1',
+          pointBackgroundColor: chartColors.primary,
+          pointBorderColor: '#fff',
+          pointRadius: 5,
+          pointHoverRadius: 7
         }
       ]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false, // Permite ajustar a altura do gráfico
       interaction: {
         mode: 'index',
         intersect: false,
@@ -1577,12 +1727,17 @@ function desenharGraficoFinanceiro() {
           position: 'left',
           title: {
             display: true,
-            text: 'R$',
+            text: 'Valor (R$)',
+            color: chartColors.dark
           },
           ticks: {
+              color: chartColors.dark,
               callback: function(value) {
                   return currencyFormatter.format(value);
               }
+          },
+          grid: {
+            color: 'rgba(0,0,0,0.05)'
           }
         },
         y1: {
@@ -1590,16 +1745,27 @@ function desenharGraficoFinanceiro() {
           position: 'right',
           grid: {
             drawOnChartArea: false,
+            color: 'rgba(0,0,0,0.05)'
           },
           title: {
             display: true,
-            text: 'Lucro R$',
+            text: 'Lucro (R$)',
+            color: chartColors.dark
           },
           ticks: {
+              color: chartColors.dark,
               callback: function(value) {
                   return currencyFormatter.format(value);
               }
           }
+        },
+        x: {
+            ticks: {
+                color: chartColors.dark
+            },
+            grid: {
+                color: 'rgba(0,0,0,0.05)'
+            }
         }
       },
       plugins: {
@@ -1616,17 +1782,205 @@ function desenharGraficoFinanceiro() {
                   }
                   return label;
               }
-          }
+          },
+          backgroundColor: chartColors.dark,
+          titleColor: '#fff',
+          bodyColor: '#fff'
         },
         legend: {
           labels: {
             boxWidth: 20,
+            color: chartColors.dark
           }
         }
       }
     }
   });
 }
+
+function desenharGraficoAgendamentosProfissional() {
+    const ctx = document.getElementById('graficoAgendamentosProfissional').getContext('2d');
+
+    const agendamentosPorProfissional = {};
+    profissionais.forEach(p => agendamentosPorProfissional[p.nome] = 0); // Garante que todos os profissionais apareçam
+
+    agendamentos.forEach(a => {
+        if (a.status === "Concluído") {
+            const profissional = profissionais.find(p => p.id === a.profId);
+            if (profissional) {
+                agendamentosPorProfissional[profissional.nome]++;
+            }
+        }
+    });
+
+    const labels = Object.keys(agendamentosPorProfissional);
+    const data = Object.values(agendamentosPorProfissional);
+
+    // Cores aleatórias para o gráfico de pizza/doughnut
+    const backgroundColors = labels.map((_, i) => {
+        const colors = [
+            '#9c27b0', '#ba68c8', '#ce93d8', '#e1bee7', '#f3e5f5',
+            '#673ab7', '#9575cd', '#b39ddb', '#d1c4e9', '#ede7f6'
+        ];
+        return colors[i % colors.length];
+    });
+
+    if(chartAgendamentosProfissional) chartAgendamentosProfissional.destroy();
+
+    chartAgendamentosProfissional = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: chartColors.dark,
+                        boxWidth: 20
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed) {
+                                label += context.parsed + ' agendamento(s)';
+                            }
+                            return label;
+                        }
+                    },
+                    backgroundColor: chartColors.dark,
+                    titleColor: '#fff',
+                    bodyColor: '#fff'
+                }
+            }
+        }
+    });
+}
+
+function desenharGraficoServicosPopulares() {
+    const ctx = document.getElementById('graficoServicosPopulares').getContext('2d');
+
+    const servicosTotalizados = {}; // { 'Nome do Serviço': valorTotalGanho, ... }
+
+    agendamentos.forEach(a => {
+        if (a.status === "Concluído") {
+            const profissional = profissionais.find(p => p.id === a.profId);
+            const servico = profissional?.servicos[a.servIndex];
+            if (servico) {
+                if (servicosTotalizados[servico.nome]) {
+                    servicosTotalizados[servico.nome] += servico.valor;
+                } else {
+                    servicosTotalizados[servico.nome] = servico.valor;
+                }
+            }
+        }
+    });
+
+    // Converter para array e ordenar para pegar os Top 5
+    const sortedServicos = Object.entries(servicosTotalizados)
+        .sort(([, valueA], [, valueB]) => valueB - valueA)
+        .slice(0, 5); // Pegar os Top 5
+
+    const labels = sortedServicos.map(item => item[0]);
+    const data = sortedServicos.map(item => item[1]);
+
+    const backgroundColors = labels.map((_, i) => {
+        const colors = [
+            chartColors.primary,
+            chartColors.secondary,
+            chartColors.info,
+            chartColors.success,
+            chartColors.warning
+        ];
+        return colors[i % colors.length];
+    });
+
+
+    if(chartServicosPopulares) chartServicosPopulares.destroy();
+
+    chartServicosPopulares = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valor Total',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map(color => color.replace('0.7', '1')), // Versão mais opaca
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y', // Gráfico de barras horizontal
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Valor (R$)',
+                        color: chartColors.dark
+                    },
+                    ticks: {
+                        color: chartColors.dark,
+                        callback: function(value) {
+                            return currencyFormatter.format(value);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: chartColors.dark
+                    },
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Não precisamos de legenda para um único dataset
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.x !== null) { // Para gráfico horizontal, é x
+                                label += currencyFormatter.format(context.parsed.x);
+                            }
+                            return label;
+                        }
+                    },
+                    backgroundColor: chartColors.dark,
+                    titleColor: '#fff',
+                    bodyColor: '#fff'
+                }
+            }
+        }
+    });
+}
+
 
 // ======= BACKUP E RESTAURAÇÃO =======
 function exportarDados() {
@@ -1683,7 +2037,7 @@ function confirmImport(event) {
             const dados = JSON.parse(e.target.result);
             clientes = dados.clientes || [];
             profissionais = dados.profissionais || [];
-            produtos = dados.produtos || [];
+            products = dados.produtos || [];
             agendamentos = dados.agendamentos || [];
             gastos = dados.gastos || [];
             caixaInicial = dados.caixaInicial || 0;
