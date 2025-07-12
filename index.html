@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
 
-<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNpemVzIjoiNTEyeNTEyIiwic3JjIjoiaWNvbnMvaWNvbi01MTJ4NTEyLnBuYyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRhaSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRhaSBCb3RlbGhvIiwic3RhcnRfdXJsIjoiLi9pbmRleC5odG1sIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y4YmJkMCIsInRoZW1lX2NvbG9yIjoiIzdiMWZhMiIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQifQ==">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNpemVzIjoiNTEyeNTEyIiwic3JjIjoiaWNvbnMvaWNvbi01MTJ4NTEyLnBuYyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiSBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic3RhcnRfdXJsIjoiLi9pbmRleC5odG1sIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y4YmJkMCIsInRoZW1lX2NvbG9yIjoiIzdiMWZhMiIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQifQ==">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -19,7 +19,7 @@ body {
   margin: 0;
   background: linear-gradient(135deg, #fce4ec, #f8bbd0);
   color: #4a2c4d;
-  min-height: 100vh; /* Garante que o body ocupa 100% da altura da viewport */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* Permite rolagem no body se o conteúdo total exceder 100vh */
@@ -27,7 +27,7 @@ body {
 
 /* Splash Screen / Login Screen */
 #splash, #loginScreen {
-  flex: 1; /* Faz com que ocupem o espaço disponível */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -113,6 +113,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  /* No main, apenas queremos que ele ocupe o espaço disponível e se alinhe */
 }
 
 /* Menu */
@@ -159,7 +160,10 @@ section {
   box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
   max-width: 100%;
   margin-bottom: 30px;
+  /* Não adiciona overflow-y aqui para que o body controle a rolagem principal */
+  /* Remove as propriedades max-height e overflow-y daqui */
 }
+
 section h3 {
   margin-top: 0;
   color: #4a2c4d;
@@ -250,7 +254,7 @@ input.error, select.error, textarea.error {
   color: #7b1fa2cc;
 }
 .item button {
-  margin-left: 0; /* Remove margin-left para melhor layout */
+  margin-left: 0;
   margin-top: 8px;
   border-radius: 20px;
   padding: 5px 12px;
@@ -294,10 +298,9 @@ input.error, select.error, textarea.error {
     font-size: 2rem;
   }
   button {
-    width: auto; /* Permite que o width seja auto nos botões */
-    display: inline-block; /* Para que os botões fiquem lado a lado se houver espaço */
+    width: auto;
+    display: inline-block;
   }
-  /* Força botões de item a irem para nova linha em telas pequenas */
   .item button {
       width: 100%;
       margin-right: 0;
@@ -411,7 +414,7 @@ input.error, select.error, textarea.error {
 .dashboard-card.card-agendamentos { background: linear-gradient(45deg, #fbe9e7, #ffccbc); color: #d84315; }
 .dashboard-card.card-caixa { background: linear-gradient(45deg, #f3e5f5, #e1bee7); color: #6a1b9a; }
 .dashboard-card.card-lucro { background: linear-gradient(45deg, #e0f7fa, #b2ebf2); color: #00838f; }
-.dashboard-card.card-alert { background: linear-gradient(45deg, #ffecb3, #ffe082); color: #ffa000; } /* Cor para alerta */
+.dashboard-card.card-alert { background: linear-gradient(45deg, #ffecb3, #ffe082); color: #ffa000; }
 
 .dashboard-card .card-value {
     font-size: 2.5rem;
@@ -426,7 +429,7 @@ input.error, select.error, textarea.error {
     margin-bottom: 0;
 }
 .dashboard-card a {
-    color: inherit; /* Mantém a cor do card */
+    color: inherit;
     text-decoration: none;
     font-weight: bold;
     margin-top: 10px;
@@ -441,7 +444,15 @@ input.error, select.error, textarea.error {
     padding: 20px;
     box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
     margin-top: 30px;
-    position: relative; /* Para posicionar o filtro */
+    height: 400px; /* Altura fixa para o contêiner do gráfico */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Garante que o canvas do gráfico se ajuste ao seu contêiner */
+.dashboard-chart-container canvas {
+    flex: 1; /* Permite que o canvas cresça para preencher o espaço disponível no contêiner flex */
+    max-height: 100%; /* Garante que o canvas não transborde */
 }
 
 .chart-filter-controls {
@@ -449,16 +460,16 @@ input.error, select.error, textarea.error {
     gap: 10px;
     margin-bottom: 15px;
     align-items: center;
-    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    flex-wrap: wrap;
 }
 .chart-filter-controls label {
     margin-bottom: 0;
     font-weight: normal;
 }
-.chart-filter-controls select, .chart-filter-controls input[type="date"] {
+.chart-filter-controls select, .chart-filter-controls input[type="date"], .chart-filter-controls input[type="month"] {
     width: auto;
     flex-grow: 1;
-    max-width: 180px; /* Limita a largura dos selects/inputs */
+    max-width: 180px;
     padding: 8px 12px;
     border-radius: 8px;
 }
@@ -479,8 +490,8 @@ input.error, select.error, textarea.error {
 .dashboard-agendamentos-proximos ul {
     list-style: none;
     padding: 0;
-    max-height: 250px; /* Limita a altura da lista de agendamentos */
-    overflow-y: auto; /* Adiciona rolagem se a lista for muito longa */
+    max-height: 200px; /* Altura máxima com rolagem para a lista de agendamentos */
+    overflow-y: auto;
 }
 .dashboard-agendamentos-proximos li {
     background-color: #f3e5f5;
@@ -491,6 +502,7 @@ input.error, select.error, textarea.error {
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
+    flex-wrap: wrap; /* Para quebra de linha em telas menores */
 }
 .dashboard-agendamentos-proximos li strong {
     color: #6a1b9a;
@@ -499,6 +511,20 @@ input.error, select.error, textarea.error {
     font-size: 0.85rem;
     color: #7b1fa2;
 }
+
+/* Estilos para rolagem interna de listas longas nas seções */
+#listaClientes, #listaProfissionais, #listaProdutos, #produtosEmFalta,
+#listaGanhos, #listaGastos, #historicoMovimentacoes {
+    max-height: 300px; /* Altura máxima para listas de itens genéricas */
+    overflow-y: auto;
+    padding-right: 10px; /* Adiciona padding para evitar que o conteúdo encoste na barra de rolagem */
+}
+#listaAgendamentos {
+    max-height: 400px; /* Um pouco mais alta para a lista de agendamentos */
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 
 </style>
 </head>
@@ -566,7 +592,7 @@ input.error, select.error, textarea.error {
             <p class="card-title">Gastos Mensais (Mês Atual)</p>
             <p class="card-value" id="dashGastosMensal">R$ 0,00</p>
         </div>
-        <div class="dashboard-card card-alert" id="dashAlertProdutosEmFalta">
+        <div class="dashboard-card card-alert" id="dashAlertProdutosEmFalta" style="display:none;">
             <p class="card-title">Produtos em Falta</p>
             <p class="card-value" id="dashQtdProdutosEmFalta">0</p>
             <a href="#" onclick="abrirSecao('produtosSection'); return false;">Ver Estoque</a>
@@ -942,7 +968,6 @@ function validateSelect(fieldId, errorId, message) {
     const errorSpan = document.getElementById(errorId);
     if (field.value === '' || field.value === 'null') { // Checa se a opção padrão está selecionada
         field.classList.add('error');
-        errorSpan.textContent = ''; // Limpa antes de verificar se precisa mostrar
         errorSpan.textContent = message;
         return false;
     }
@@ -950,7 +975,6 @@ function validateSelect(fieldId, errorId, message) {
     errorSpan.textContent = '';
     return true;
 }
-
 
 // Função para aplicar máscara de telefone
 function applyPhoneMask(inputElement) {
@@ -1037,7 +1061,7 @@ function abrirSecao(id) {
   if (id === "clientesSection") {
     listarClientes();
     limparCamposCliente();
-    applyPhoneMask(document.getElementById("telefoneCliente")); // Aplica a máscara
+    applyPhoneMask(document.getElementById("telefoneCliente"));
   }
   if (id === "profissionaisSection") {
     listarProfissionais();
@@ -1054,7 +1078,7 @@ function abrirSecao(id) {
     preencherSelectClienteAgendamento();
     preencherSelectProfissionalAgendamento();
     listarAgendamentos();
-    limparCamposAgendamento(); // Certifica-se que os campos estão limpos
+    limparCamposAgendamento();
   }
   if (id === "financeiroSection") carregarFinanceiro();
   if (id === "dashboardSection") {
@@ -1074,7 +1098,6 @@ function validarFormCliente() {
     let isValid = true;
     isValid = validateField('nomeCliente', 'errorNomeCliente', 'Nome do cliente é obrigatório.') && isValid;
     isValid = validateEmail('emailCliente', 'errorEmailCliente', 'Email inválido.') && isValid;
-    // Telefone e data de cadastro não são obrigatórios
     return isValid;
 }
 
@@ -1086,7 +1109,7 @@ function salvarCliente() {
   const nomeInput = document.getElementById("nomeCliente");
   const telefone = document.getElementById("telefoneCliente").value.trim();
   const email = document.getElementById("emailCliente").value.trim();
-  const dataCadastro = document.getElementById("dataCadastroCliente").value || new Date().toISOString().slice(0, 10); // Data atual se não informada
+  const dataCadastro = document.getElementById("dataCadastroCliente").value || new Date().toISOString().slice(0, 10);
   const obs = document.getElementById("obsCliente").value.trim();
 
   let dados = { nome: nomeInput.value.trim(), telefone, email, dataCadastro, obs };
@@ -1094,12 +1117,12 @@ function salvarCliente() {
   if (clienteEditandoId !== null) {
     const index = clientes.findIndex(c => c.id === clienteEditandoId);
     if (index !== -1) {
-      clientes[index] = { ...clientes[index], ...dados }; // Mantém o ID original
+      clientes[index] = { ...clientes[index], ...dados };
       showToast("Cliente atualizado com sucesso!");
     }
     clienteEditandoId = null;
   } else {
-    dados.id = generateUUID(); // Atribui um ID único ao novo cliente
+    dados.id = generateUUID();
     clientes.push(dados);
     showToast("Cliente salvo com sucesso!");
   }
@@ -1107,7 +1130,7 @@ function salvarCliente() {
   listarClientes();
   limparCamposCliente();
   atualizarDashboard();
-  desenharGraficoNovosClientes(); // Atualiza o gráfico de novos clientes
+  desenharGraficoNovosClientes();
 }
 function limparCamposCliente() {
   document.getElementById("nomeCliente").value = "";
@@ -1119,7 +1142,7 @@ function limparCamposCliente() {
   document.getElementById("errorNomeCliente").textContent = '';
   document.getElementById("emailCliente").classList.remove('error');
   document.getElementById("errorEmailCliente").textContent = '';
-  clienteEditandoId = null; // Garante que não estamos em modo de edição
+  clienteEditandoId = null;
 }
 function listarClientes() {
   const busca = document.getElementById("buscaCliente").value.toLowerCase();
@@ -1147,16 +1170,18 @@ function editarCliente(id) {
     document.getElementById("emailCliente").value = c.email;
     document.getElementById("dataCadastroCliente").value = c.dataCadastro || "";
     document.getElementById("obsCliente").value = c.obs;
-    clienteEditandoId = c.id; // Define o ID do cliente que está sendo editado
-    document.getElementById("nomeCliente").focus(); // Foca no campo para edição
+    clienteEditandoId = c.id;
+    document.getElementById("nomeCliente").focus();
   }
 }
 function excluirCliente(id) {
+    agendamentos = agendamentos.filter(a => a.clienteId !== id); // Remove agendamentos do cliente
     clientes = clientes.filter(c => c.id !== id);
+    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
     localStorage.setItem("clientes", JSON.stringify(clientes));
     listarClientes();
     atualizarDashboard();
-    desenharGraficoNovosClientes(); // Atualiza o gráfico de novos clientes
+    desenharGraficoNovosClientes();
     showToast("Cliente excluído!");
 }
 
@@ -1186,7 +1211,17 @@ function salvarProfissional() {
   if (profissionalEditandoId !== null) {
     const index = profissionais.findIndex(p => p.id === profissionalEditandoId);
     if (index !== -1) {
-      profissionais[index] = { ...profissionais[index], ...dados };
+      // Para edição, podemos permitir adicionar mais serviços ou apenas editar o primeiro
+      // Por simplicidade, vamos editar apenas o primeiro serviço aqui.
+      // Se houvesse múltiplos, a lógica seria mais complexa.
+      if (profissionais[index].servicos && profissionais[index].servicos.length > 0) {
+          profissionais[index].servicos[0] = servicos[0];
+      } else {
+          profissionais[index].servicos = servicos;
+      }
+      profissionais[index].nome = dados.nome;
+      profissionais[index].especialidade = dados.especialidade;
+
       showToast("Profissional atualizado com sucesso!");
     }
     profissionalEditandoId = null;
@@ -1199,7 +1234,8 @@ function salvarProfissional() {
   listarProfissionais();
   limparCamposProfissional();
   atualizarDashboard();
-  desenharGraficoAgendamentosProfissional(); // Atualiza gráfico
+  desenharGraficoAgendamentosProfissional();
+  preencherSelectProfissionalAgendamento(); // Atualiza select de agendamentos
 }
 function limparCamposProfissional() {
   document.getElementById("nomeProf").value = "";
@@ -1239,6 +1275,7 @@ function editarProfissional(id) {
   if (p) {
     document.getElementById("nomeProf").value = p.nome;
     document.getElementById("espProf").value = p.especialidade;
+    // Assume que só estamos editando o primeiro serviço por enquanto
     document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
     document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
     profissionalEditandoId = p.id;
@@ -1246,11 +1283,14 @@ function editarProfissional(id) {
   }
 }
 function excluirProfissional(id) {
+    agendamentos = agendamentos.filter(a => a.profId !== id); // Remove agendamentos do profissional
     profissionais = profissionais.filter(p => p.id !== id);
+    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
     localStorage.setItem("profissionais", JSON.stringify(profissionais));
     listarProfissionais();
     atualizarDashboard();
-    desenharGraficoAgendamentosProfissional(); // Atualiza gráfico
+    desenharGraficoAgendamentosProfissional();
+    preencherSelectProfissionalAgendamento(); // Atualiza select de agendamentos
     showToast("Profissional excluído!");
 }
 
@@ -1286,14 +1326,15 @@ function salvarProduto() {
   if (produtoEditandoId !== null) {
     const index = produtos.findIndex(p => p.id === produtoEditandoId);
     if (index !== -1) {
-      dados.movimentacoes = produtos[index].movimentacoes || []; // Mantém movimentações existentes
+      // Ao editar, queremos manter o histórico de movimentações, mas atualizar as outras propriedades
+      dados.movimentacoes = produtos[index].movimentacoes || [];
       produtos[index] = { ...produtos[index], ...dados };
       showToast("Produto atualizado com sucesso!");
     }
     produtoEditandoId = null;
   } else {
-    dados.id = generateUUID(); // Atribui um ID único ao novo produto
-    dados.movimentacoes = []; // Inicia com array vazio de movimentações
+    dados.id = generateUUID();
+    dados.movimentacoes = [];
     produtos.push(dados);
     showToast("Produto salvo com sucesso!");
   }
@@ -1326,7 +1367,7 @@ function listarProdutos() {
   const busca = document.getElementById("buscaProduto").value.toLowerCase();
   const lista = document.getElementById("listaProdutos");
   lista.innerHTML = "";
-  produtos.forEach(p => {
+  productos.forEach(p => {
     if (!p.nome.toLowerCase().includes(busca)) return;
     const validadeText = p.validade ? ` | Validade: ${p.validade}` : "";
     lista.innerHTML += `
@@ -1394,7 +1435,7 @@ function usarProduto() {
     return showToast("Informe uma quantidade válida para uso.");
   }
 
-  const produto = produtos.find(p => p.id === produtoId); // Corrigido para 'produtos'
+  const produto = produtos.find(p => p.id === produtoId);
   if (!produto) return showToast("Produto não encontrado.");
 
   if (produto.quantidade < qtdUso) {
@@ -1417,18 +1458,27 @@ function usarProduto() {
   preencherSelectProdutosUso();
   listarMovimentacoes();
   qtdUsoInput.value = "";
-  select.value = ""; // Limpa o select
+  select.value = "";
   atualizarDashboard();
   showToast(`Usado ${qtdUso} de ${produto.nome}.`);
 }
 function listarMovimentacoes() {
   const div = document.getElementById("historicoMovimentacoes");
   div.innerHTML = "";
-  productos.forEach((p) => { // Corrigido para 'produtos'
-    if (!p.movimentacoes || p.movimentacoes.length === 0) return;
+  // Filtra produtos que realmente possuem movimentações
+  const produtosComMovimentacao = produtos.filter(p => p.movimentacoes && p.movimentacoes.length > 0);
+
+  if (produtosComMovimentacao.length === 0) {
+      div.innerHTML = "<div class='item'>Nenhuma movimentação de produto registrada.</div>";
+      return;
+  }
+
+  productosComMovimentacao.forEach((p) => {
     div.innerHTML += `<h5>${p.nome}</h5>`;
+    // Ordena as movimentações por data decrescente
+    p.movimentacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
     p.movimentacoes.forEach(m => {
-      div.innerHTML += `<div class="item">${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
+      div.innerHTML += `<div class="item"><strong>${m.data}</strong> - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
     });
   });
 }
@@ -1441,6 +1491,20 @@ function validarFormAgendamento() {
     isValid = validateSelect('selectServicoAgendamento', 'errorSelectServicoAgendamento', 'Selecione um serviço.') && isValid;
     isValid = validateField('dataAgendamento', 'errorDataAgendamento', 'Data é obrigatória.') && isValid;
     isValid = validateField('horaAgendamento', 'errorHoraAgendamento', 'Hora é obrigatória.') && isValid;
+
+    // Validação adicional: data do agendamento não pode ser no passado (apenas para novos agendamentos)
+    if (document.getElementById("agendamentoEditandoId").value === "") { // Só valida para novos
+        const dataAgendamento = new Date(document.getElementById("dataAgendamento").value + 'T' + document.getElementById("horaAgendamento").value);
+        const hoje = new Date();
+        if (dataAgendamento < hoje) {
+            document.getElementById('dataAgendamento').classList.add('error');
+            document.getElementById('errorDataAgendamento').textContent = 'Agendamento não pode ser no passado.';
+            isValid = false;
+        } else {
+            document.getElementById('dataAgendamento').classList.remove('error');
+            document.getElementById('errorDataAgendamento').textContent = '';
+        }
+    }
     return isValid;
 }
 
@@ -1467,7 +1531,6 @@ function atualizarServicosProfissional() {
   if (!profissional) return;
   
   profissional.servicos.forEach((s, i) => {
-    // O valor do option será o índice do serviço no array, pois é um array simples
     selectServico.innerHTML += `<option value="${i}">${s.nome} - ${currencyFormatter.format(s.valor)}</option>`;
   });
 }
@@ -1478,30 +1541,30 @@ function salvarAgendamento() {
   }
   const clienteId = document.getElementById("selectClienteAgendamento").value;
   const profId = document.getElementById("selectProfissionalAgendamento").value;
-  const servIndex = document.getElementById("selectServicoAgendamento").value; // Este é o INDEX do serviço
+  const servIndex = parseInt(document.getElementById("selectServicoAgendamento").value);
   const data = document.getElementById("dataAgendamento").value;
   const hora = document.getElementById("horaAgendamento").value;
 
   let agendamento = {
-    id: generateUUID(), // ID único para o agendamento
+    id: generateUUID(),
     clienteId,
     profId,
-    servIndex: parseInt(servIndex), // Garante que seja um número
+    servIndex: servIndex,
     data,
     hora,
     status: "Pendente",
-    dataCriacao: new Date().toISOString().slice(0, 10) // Adiciona a data de criação do agendamento
+    dataCriacao: new Date().toISOString().slice(0, 10)
   };
 
-  // Verificar se é uma edição
-  if (document.getElementById("agendamentoEditandoId") && document.getElementById("agendamentoEditandoId").value !== "") {
+  if (document.getElementById("agendamentoEditandoId").value !== "") {
       const agendamentoIdToEdit = document.getElementById("agendamentoEditandoId").value;
       const index = agendamentos.findIndex(a => a.id === agendamentoIdToEdit);
       if (index !== -1) {
-          agendamentos[index] = { ...agendamentos[index], ...agendamento };
+          // Mantém o status e dataCriação originais na edição, se não forem alterados
+          agendamentos[index] = { ...agendamentos[index], ...agendamento, id: agendamentoIdToEdit };
           showToast("Agendamento atualizado com sucesso!");
       }
-      document.getElementById("agendamentoEditandoId").value = ""; // Limpa o ID de edição
+      document.getElementById("agendamentoEditandoId").value = "";
   } else {
       agendamentos.push(agendamento);
       showToast("Agendamento salvo com sucesso!");
@@ -1512,9 +1575,9 @@ function salvarAgendamento() {
   atualizarDashboard();
   carregarFinanceiro();
   limparCamposAgendamento();
-  desenharGraficoServicosPopulares(); // Atualiza gráfico
-  desenharGraficoAgendamentosProfissional(); // Atualiza gráfico
-  listarAgendamentosProximos(); // Atualiza lista de agendamentos próximos
+  desenharGraficoServicosPopulares();
+  desenharGraficoAgendamentosProfissional();
+  listarAgendamentosProximos();
 }
 
 function limparCamposAgendamento() {
@@ -1523,8 +1586,8 @@ function limparCamposAgendamento() {
     document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
     document.getElementById("dataAgendamento").value = "";
     document.getElementById("horaAgendamento").value = "";
+    document.getElementById("agendamentoEditandoId").value = ""; // Limpa ID de edição
 
-    // Remove classes de erro e mensagens
     document.getElementById("selectClienteAgendamento").classList.remove('error');
     document.getElementById("errorSelectClienteAgendamento").textContent = '';
     document.getElementById("selectProfissionalAgendamento").classList.remove('error');
@@ -1556,7 +1619,7 @@ function listarAgendamentos() {
       const dateTimeA = new Date(`${a.data}T${a.hora}`);
       const dateTimeB = new Date(`${b.data}T${b.hora}`);
       return dateTimeA - dateTimeB;
-  }); // Ordena por data e hora
+  });
 
   if (agendamentosExibidos.length === 0) {
       lista.innerHTML = "<div class='item'>Nenhum agendamento encontrado para os filtros aplicados.</div>";
@@ -1564,16 +1627,24 @@ function listarAgendamentos() {
   }
 
   agendamentosExibidos.forEach(a => {
-    const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
+    const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "Cliente Removido";
     const profissional = profissionais.find(p => p.id === a.profId);
-    const servico = profissional?.servicos[a.servIndex]; // Usa servIndex para encontrar o serviço
+    const servico = profissional?.servicos[a.servIndex];
+
+    const statusText = a.status;
+    let statusClass = '';
+    if (a.status === 'Concluído') {
+        statusClass = 'status-concluido'; // Adicionar classe para estilizar
+    } else if (a.status === 'Pendente') {
+        statusClass = 'status-pendente'; // Adicionar classe para estilizar
+    }
 
     lista.innerHTML += `
     <div class="item">
       <strong>${clienteNome}</strong> - ${a.data} ${a.hora} <br>
       Profissional: ${profissional?.nome || "N/A"}<br>
       Serviço: ${servico?.nome || "N/A"} - ${currencyFormatter.format(servico?.valor || 0)}<br>
-      Status: ${a.status}
+      Status: <span class="${statusClass}">${statusText}</span>
       <div>
           <button class="editar" onclick="editarAgendamento('${a.id}')">Editar</button>
           <button class="excluir" onclick="confirmarExclusao('agendamento', '${a.id}', 'de ${clienteNome} em ${a.data} ${a.hora}')">Excluir</button>
@@ -1588,20 +1659,11 @@ function editarAgendamento(id) {
   if (a) {
     document.getElementById("selectClienteAgendamento").value = a.clienteId;
     document.getElementById("selectProfissionalAgendamento").value = a.profId;
-    atualizarServicosProfissional(); // Preenche os serviços com base no profissional selecionado
+    atualizarServicosProfissional();
     document.getElementById("selectServicoAgendamento").value = a.servIndex;
     document.getElementById("dataAgendamento").value = a.data;
     document.getElementById("horaAgendamento").value = a.hora;
-
-    // Adiciona um campo oculto para armazenar o ID do agendamento em edição
-    let hiddenInput = document.getElementById("agendamentoEditandoId");
-    if (!hiddenInput) {
-        hiddenInput = document.createElement("input");
-        hiddenInput.type = "hidden";
-        hiddenInput.id = "agendamentoEditandoId";
-        document.getElementById("agendamentosSection").appendChild(hiddenInput);
-    }
-    hiddenInput.value = a.id;
+    document.getElementById("agendamentoEditandoId").value = a.id;
     showToast("Editando agendamento. Salve para confirmar.");
   }
 }
@@ -1612,9 +1674,9 @@ function excluirAgendamento(id) {
     listarAgendamentos();
     atualizarDashboard();
     carregarFinanceiro();
-    desenharGraficoServicosPopulares(); // Atualiza gráfico
-    desenharGraficoAgendamentosProfissional(); // Atualiza gráfico
-    listarAgendamentosProximos(); // Atualiza lista de agendamentos próximos
+    desenharGraficoServicosPopulares();
+    desenharGraficoAgendamentosProfissional();
+    listarAgendamentosProximos();
     showToast("Agendamento excluído!");
 }
 function alterarStatusAgendamento(id) {
@@ -1631,9 +1693,9 @@ function alterarStatusAgendamento(id) {
       listarAgendamentos();
       carregarFinanceiro();
       atualizarDashboard();
-      desenharGraficoServicosPopulares(); // Atualiza gráfico
-      desenharGraficoAgendamentosProfissional(); // Atualiza gráfico
-      listarAgendamentosProximos(); // Atualiza lista de agendamentos próximos
+      desenharGraficoServicosPopulares();
+      desenharGraficoAgendamentosProfissional();
+      listarAgendamentosProximos();
   }
 }
 function limparFiltrosAgendamento() {
@@ -1655,7 +1717,7 @@ function salvarCaixaInicial() {
   showToast("Caixa inicial salvo.");
   atualizarDashboard();
   carregarFinanceiro();
-  desenharGraficoFinanceiro(); // Atualiza gráfico financeiro
+  desenharGraficoFinanceiro();
 }
 
 function carregarFinanceiro() {
@@ -1713,8 +1775,8 @@ function salvarGasto() {
   gastos.push({ id: generateUUID(), descricao: descricaoInput.value.trim(), valor: parseFloat(valorGastoInput.value), data: dataGastoInput.value });
   localStorage.setItem("gastos", JSON.stringify(gastos));
   carregarFinanceiro();
-  atualizarDashboard(); // Atualiza os cards do dashboard
-  desenharGraficoFinanceiro(); // Atualiza o gráfico financeiro
+  atualizarDashboard();
+  desenharGraficoFinanceiro();
 
   descricaoInput.value = "";
   valorGastoInput.value = "";
@@ -1744,7 +1806,7 @@ function atualizarDashboard() {
 
   // Calcular ganhos, gastos e lucro do mês atual
   const hoje = new Date();
-  const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0'); // Mês atual com 2 dígitos
+  const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0');
   const anoAtual = hoje.getFullYear().toString();
   const mesAnoAtual = `${anoAtual}-${mesAtual}`;
 
@@ -1779,11 +1841,11 @@ function atualizarDashboard() {
 
   dashQtdProdutosEmFalta.textContent = produtosEmFalta.length;
   if (produtosEmFalta.length > 0) {
-      dashAlertCard.style.display = 'flex'; // Mostra o card de alerta
-      dashAlertCard.classList.add('card-alert'); // Adiciona classe de cor de alerta
+      dashAlertCard.style.display = 'flex';
+      dashAlertCard.classList.add('card-alert');
       showToast(`Atenção: ${produtosEmFalta.length} produto(s) em falta!`, 5000);
   } else {
-      dashAlertCard.style.display = 'none'; // Esconde se não há produtos em falta
+      dashAlertCard.style.display = 'none';
       dashAlertCard.classList.remove('card-alert');
   }
 }
@@ -1803,10 +1865,8 @@ function preencherFiltrosFinanceiro() {
     const anoAtual = hoje.getFullYear();
     const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0');
 
-    // Preenche o input type="month" com o mês atual
     filtroMes.value = `${anoAtual}-${mesAtual}`;
 
-    // Preenche o select de anos
     filtroAno.innerHTML = '<option value="">Todos os Anos</option>';
     const anosUnicos = new Set();
     agendamentos.forEach(a => anosUnicos.add(a.data.substring(0, 4)));
@@ -1815,7 +1875,7 @@ function preencherFiltrosFinanceiro() {
     Array.from(anosUnicos).sort().reverse().forEach(ano => {
         filtroAno.innerHTML += `<option value="${ano}">${ano}</option>`;
     });
-    filtroAno.value = ""; // Começa sem ano selecionado por padrão
+    filtroAno.value = "";
 }
 
 function resetFiltroFinanceiro() {
@@ -1829,10 +1889,9 @@ function resetFiltroFinanceiro() {
 
 function desenharGraficoFinanceiro() {
   const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
-  const filtroMes = document.getElementById('filtroMesFinanceiro').value; // yyyy-mm
-  const filtroAno = document.getElementById('filtroAnoFinanceiro').value; // yyyy
+  const filtroMes = document.getElementById('filtroMesFinanceiro').value;
+  const filtroAno = document.getElementById('filtroAnoFinanceiro').value;
 
-  // Agrupar ganhos e gastos por mês
   const ganhosMes = {};
   const gastosMes = {};
 
@@ -1848,7 +1907,7 @@ function desenharGraficoFinanceiro() {
     const serv = prof?.servicos[a.servIndex];
     if (!serv) return;
 
-    const mes = a.data.slice(0,7); // yyyy-mm
+    const mes = a.data.slice(0,7);
     ganhosMes[mes] = (ganhosMes[mes] || 0) + serv.valor;
   });
 
@@ -1863,7 +1922,6 @@ function desenharGraficoFinanceiro() {
     gastosMes[mes] = (gastosMes[mes] || 0) + g.valor;
   });
 
-  // Criar lista de meses únicos (ordenados)
   const meses = Array.from(new Set([...Object.keys(ganhosMes), ...Object.keys(gastosMes)])).sort();
 
   const ganhosData = meses.map(m => ganhosMes[m] || 0);
@@ -1899,7 +1957,7 @@ function desenharGraficoFinanceiro() {
           backgroundColor: chartColors.primary,
           borderWidth: 3,
           fill: false,
-          tension: 0.3, // Curva mais suave
+          tension: 0.3,
           yAxisID: 'y1',
           pointBackgroundColor: chartColors.primary,
           pointBorderColor: '#fff',
@@ -1910,7 +1968,7 @@ function desenharGraficoFinanceiro() {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false, // Permite ajustar a altura do gráfico
+      maintainAspectRatio: false,
       interaction: {
         mode: 'index',
         intersect: false,
@@ -1996,7 +2054,7 @@ function desenharGraficoAgendamentosProfissional() {
     const ctx = document.getElementById('graficoAgendamentosProfissional').getContext('2d');
 
     const agendamentosPorProfissional = {};
-    profissionais.forEach(p => agendamentosPorProfissional[p.nome] = 0); // Garante que todos os profissionais apareçam
+    profissionais.forEach(p => agendamentosPorProfissional[p.nome] = 0);
 
     agendamentos.forEach(a => {
         if (a.status === "Concluído") {
@@ -2010,7 +2068,6 @@ function desenharGraficoAgendamentosProfissional() {
     const labels = Object.keys(agendamentosPorProfissional);
     const data = Object.values(agendamentosPorProfissional);
 
-    // Cores aleatórias para o gráfico de pizza/doughnut
     const backgroundColors = labels.map((_, i) => {
         const colors = [
             '#9c27b0', '#ba68c8', '#ce93d8', '#e1bee7', '#f3e5f5',
@@ -2068,7 +2125,7 @@ function desenharGraficoAgendamentosProfissional() {
 function desenharGraficoServicosPopulares() {
     const ctx = document.getElementById('graficoServicosPopulares').getContext('2d');
 
-    const servicosTotalizados = {}; // { 'Nome do Serviço': valorTotalGanho, ... }
+    const servicosTotalizados = {};
 
     agendamentos.forEach(a => {
         if (a.status === "Concluído") {
@@ -2084,10 +2141,9 @@ function desenharGraficoServicosPopulares() {
         }
     });
 
-    // Converter para array e ordenar para pegar os Top 5
     const sortedServicos = Object.entries(servicosTotalizados)
         .sort(([, valueA], [, valueB]) => valueB - valueA)
-        .slice(0, 5); // Pegar os Top 5
+        .slice(0, 5);
 
     const labels = sortedServicos.map(item => item[0]);
     const data = sortedServicos.map(item => item[1]);
@@ -2103,7 +2159,6 @@ function desenharGraficoServicosPopulares() {
         return colors[i % colors.length];
     });
 
-
     if(chartServicosPopulares) chartServicosPopulares.destroy();
 
     chartServicosPopulares = new Chart(ctx, {
@@ -2114,14 +2169,14 @@ function desenharGraficoServicosPopulares() {
                 label: 'Valor Total',
                 data: data,
                 backgroundColor: backgroundColors,
-                borderColor: backgroundColors.map(color => color.replace('0.7', '1')), // Versão mais opaca
+                borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y', // Gráfico de barras horizontal
+            indexAxis: 'y',
             scales: {
                 x: {
                     beginAtZero: true,
@@ -2151,7 +2206,7 @@ function desenharGraficoServicosPopulares() {
             },
             plugins: {
                 legend: {
-                    display: false // Não precisamos de legenda para um único dataset
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -2160,7 +2215,7 @@ function desenharGraficoServicosPopulares() {
                             if (label) {
                                 label += ': ';
                             }
-                            if (context.parsed.x !== null) { // Para gráfico horizontal, é x
+                            if (context.parsed.x !== null) {
                                 label += currencyFormatter.format(context.parsed.x);
                             }
                             return label;
@@ -2181,7 +2236,7 @@ function desenharGraficoNovosClientes() {
     const clientesPorMes = {};
     clientes.forEach(c => {
         if (c.dataCadastro) {
-            const mesAno = c.dataCadastro.slice(0, 7); // YYYY-MM
+            const mesAno = c.dataCadastro.slice(0, 7);
             clientesPorMes[mesAno] = (clientesPorMes[mesAno] || 0) + 1;
         }
     });
@@ -2235,7 +2290,7 @@ function desenharGraficoNovosClientes() {
                     },
                     ticks: {
                         color: chartColors.dark,
-                        precision: 0 // Apenas números inteiros
+                        precision: 0
                     },
                     grid: {
                         color: 'rgba(0,0,0,0.05)'
@@ -2261,14 +2316,12 @@ function listarAgendamentosProximos() {
     listaDiv.innerHTML = '';
 
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0); // Zera hora para comparação de data
+    hoje.setHours(0, 0, 0, 0);
 
-    // Pega agendamentos dos próximos 7 dias (incluindo hoje)
     const agendamentosFiltrados = agendamentos.filter(a => {
         const agendamentoData = new Date(a.data + 'T' + a.hora);
-        agendamentoData.setSeconds(0, 0); // Zera segundos para comparação precisa
+        agendamentoData.setSeconds(0, 0);
         
-        // Verifica se o agendamento ainda não passou
         if (agendamentoData < hoje) return false;
         
         const diffTime = Math.abs(agendamentoData - hoje);
@@ -2319,9 +2372,9 @@ function exportarDados() {
       const a = document.createElement("a");
       a.href = url;
       a.download = "backup_espaco_tai_botelho.json";
-      document.body.appendChild(a); // Necessário para Firefox
+      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a); // Limpa o elemento
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
       showToast("Dados exportados com sucesso!");
   } catch (error) {
@@ -2336,7 +2389,7 @@ function triggerImport() {
         "Importar dados substituirá *todos* os dados atuais. Tem certeza que deseja continuar?"
     ).then((result) => {
         if (result) {
-            document.getElementById('inputImport').click(); // Abre o seletor de arquivos
+            document.getElementById('inputImport').click();
         } else {
             showToast("Importação cancelada.");
         }
@@ -2346,7 +2399,7 @@ function triggerImport() {
 function confirmImport(event) {
     const file = event.target.files[0];
     if (!file) {
-        event.target.value = ""; // Limpa o campo do arquivo
+        event.target.value = "";
         return;
     }
 
@@ -2356,7 +2409,7 @@ function confirmImport(event) {
             const dados = JSON.parse(e.target.result);
             clientes = dados.clientes || [];
             profissionais = dados.profissionais || [];
-            produtos = dados.produtos || []; // Corrigido de 'products' para 'produtos'
+            produtos = dados.produtos || [];
             agendamentos = dados.agendamentos || [];
             gastos = dados.gastos || [];
             caixaInicial = dados.caixaInicial || 0;
@@ -2369,12 +2422,12 @@ function confirmImport(event) {
             localStorage.setItem("caixaInicial", caixaInicial);
 
             showToast("Dados importados com sucesso!");
-            abrirSecao("dashboardSection"); // Volta para o dashboard e recarrega tudo
+            abrirSecao("dashboardSection");
         } catch (error) {
             showToast("Arquivo de backup inválido! Verifique o formato.");
             console.error("Erro ao importar dados:", error);
         } finally {
-            event.target.value = ""; // Limpa o campo do arquivo
+            event.target.value = "";
         }
     };
     reader.readAsText(file);
@@ -2382,7 +2435,7 @@ function confirmImport(event) {
 
 // Função genérica para confirmar exclusão com modal
 async function confirmarExclusao(tipo, id, nomeItem) {
-    const confirmMessage = `Tem certeza que deseja excluir este ${tipo} (${nomeItem})? Esta ação não pode ser desfeita.`;
+    const confirmMessage = `Tem certeza que deseja excluir este ${tipo} (${nomeItem})? Esta ação não pode ser desfeita e pode afetar registros relacionados (agendamentos).`;
     const result = await showConfirmationModal("Confirmar Exclusão", confirmMessage);
     if (result) {
         if (tipo === 'cliente') {
@@ -2401,8 +2454,6 @@ async function confirmarExclusao(tipo, id, nomeItem) {
 
 
 // Service Worker (incorporado para teste, mas recomendado em arquivo separado)
-// NOTA: Para um PWA completo, o service worker deve estar em um arquivo separado.
-// Este código pode não funcionar para instalação PWA em todos os navegadores.
 const serviceWorkerCode = `
 const CACHE_NAME = 'espaco-tai-botelho-cache-v1';
 const urlsToCache = [
@@ -2452,7 +2503,6 @@ self.addEventListener('activate', event => {
 // Registro do Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Cria um Blob do código do Service Worker
     const serviceWorkerBlob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
     const serviceWorkerUrl = URL.createObjectURL(serviceWorkerBlob);
 
@@ -2469,10 +2519,9 @@ if ('serviceWorker' in navigator) {
 
 // Inicializar dashboard ao carregar
 window.onload = () => {
-  // Esconder a tela principal até o login ou entrada
   document.getElementById("main").style.display = "none";
-  document.getElementById("splash").style.display = "flex"; // Garante que a splash screen está visível
-  atualizarDashboard(); // Atualiza os números no dashboard mesmo que não esteja visível
+  document.getElementById("splash").style.display = "flex";
+  atualizarDashboard(); // Garante que os números do dashboard são carregados
 };
 </script>
 
