@@ -1,7 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8" /> 
+  <!-- Firebase SDK (auth e app) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
+    authDomain: "tainan-salao.firebaseapp.com",
+    projectId: "tainan-salao",
+    storageBucket: "tainan-salao.appspot.com",
+    messagingSenderId: "965996001179",
+    appId: "1:965996001179:web:29a4b4911622c97606533e",
+    measurementId: "G-Y3G5ZBZ5FP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.auth = auth;
+  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  window.signOut = signOut;
+  window.onAuthStateChanged = onAuthStateChanged;
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
 
