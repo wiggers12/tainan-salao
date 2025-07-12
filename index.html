@@ -2,33 +2,251 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8" /> 
-  <!-- Firebase SDK (auth e app) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
-    authDomain: "tainan-salao.firebaseapp.com",
-    projectId: "tainan-salao",
-    storageBucket: "tainan-salao.appspot.com",
-    messagingSenderId: "965996001179",
-    appId: "1:965996001179:web:29a4b4911622c97606533e",
-    measurementId: "G-Y3G5ZBZ5FP"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  window.auth = auth;
-  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-  window.signOut = signOut;
-  window.onAuthStateChanged = onAuthStateChanged;
-</script>
-
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Espaço Tai Botelho - Sistema Completo</title>
+
+  <!-- Firebase SDK (import via module) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKlVI23YoxRb1fntQKy-ZfkzaDM-MWsSQ",
+      authDomain: "doce-sabor-caseiro.firebaseapp.com",
+      projectId: "doce-sabor-caseiro",
+      storageBucket: "doce-sabor-caseiro.appspot.com",
+      messagingSenderId: "414062499771",
+      appId: "1:414062499771:web:1a811377bc6bbf145f969e",
+      measurementId: "G-KMC0FC7Z4H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Expondo para window para usar nas funções fora do module
+    window.auth = auth;
+    window.onAuthStateChanged = onAuthStateChanged;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      color: #4a2c4d;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Splash */
+    #splash {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ce93d8, #ba68c8);
+      color: white;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 1000;
+    }
+    #splash h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 4px #6d3c77;
+    }
+    #btnEntrar {
+      background: #7b1fa2;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.25rem;
+      border-radius: 30px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 15px #4a0072;
+      transition: background-color 0.3s ease;
+    }
+    #btnEntrar:hover {
+      background: #9c27b0;
+    }
+
+    /* Login */
+    #login {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff0f5;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 999;
+    }
+    #login .form {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    #login input {
+      padding: 12px 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1.8px solid #ce93d8;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    #login input:focus {
+      border-color: #7b1fa2;
+    }
+    #login button {
+      background: #7b1fa2;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #login button:hover {
+      background: #9c27b0;
+    }
+    #login .actions {
+      text-align: center;
+    }
+    #login .actions button {
+      background: none;
+      border: none;
+      color: #7b1fa2;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      text-decoration: underline;
+    }
+    #login .actions button:hover {
+      color: #9c27b0;
+    }
+
+    /* App container */
+    #app {
+      display: none;
+      padding: 20px;
+      max-width: 1000px;
+      width: 100%;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="splash">
+    <h1>Espaço Tai Botelho</h1>
+    <button id="btnEntrar" onclick="abrirLogin()">Entrar</button>
+  </div>
+
+  <div id="login">
+    <div class="form">
+      <input type="email" id="email" placeholder="E-mail" autocomplete="username" />
+      <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" />
+      <button onclick="login()">Entrar</button>
+      <div class="actions">
+        <button onclick="criarConta()">Criar Conta</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app">
+    <h2>Bem-vindo ao sistema Espaço Tai Botelho!</h2>
+    <button onclick="logout()">Sair</button>
+    <!-- Aqui você pode adicionar seu painel com menus e seções -->
+  </div>
+
+  <script>
+    // Função para ocultar splash e mostrar login
+    function abrirLogin() {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('login').style.display = 'flex';
+    }
+
+    // Login com Firebase
+    async function login() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+      } catch (error) {
+        alert('Erro ao entrar: ' + error.message);
+      }
+    }
+
+    // Criar conta com Firebase
+    async function criarConta() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, senha);
+        alert('Conta criada com sucesso! Faça login.');
+      } catch (error) {
+        alert('Erro ao criar conta: ' + error.message);
+      }
+    }
+
+    // Logout
+    function logout() {
+      signOut(auth);
+    }
+
+    // Monitorar estado de autenticação
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        // Usuário logado: esconde login, splash, mostra app
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+      } else {
+        // Usuário não logado: mostra splash e login, esconde app
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('login').style.display = 'flex';
+        document.getElementById('splash').style.display = 'none';
+      }
+    });
+
+    // Mostrar splash na carga inicial da página
+    window.onload = () => {
+      document.getElementById('splash').style.display = 'flex';
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('app').style.display = 'none';
+    };
+  </script>
+
+</body>
+</html>
 
 <!-- Chart.js para gráficos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -79,7 +297,7 @@
   #btnEntrar:hover {
     background: #9c27b0;
   }
-  
+
   /* Main container */
   #main {
     display: none;
@@ -125,17 +343,7 @@
     font-size: 1.1rem;
     margin: 0;
   }
-<!-- Tela de Login -->
-<div class="login" id="login" style="display: none; align-items: center; justify-content: center; height: 100vh;">
-  <div style="background:white; padding:30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center;">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="E-mail" style="padding:10px; margin:5px; border-radius:8px;" />
-    <input type="password" id="senha" placeholder="Senha" style="padding:10px; margin:5px; border-radius:8px;" />
-    <button onclick="login()">Entrar</button>
-    <p style="margin:10px 0;">ou</p>
-    <button onclick="criarConta()">Criar Conta</button>
-  </div>
-</div
+
   /* Sections */
   section {
     background: rgba(255 255 255 / 0.95);
@@ -1161,64 +1369,6 @@
     atualizarDashboard();
   };
 </script>
-  <!-- Seu conteúdo HTML e seções aqui -->
-
-  <!-- Script de login Firebase (etapa 3) -->
-  <script>
-    // Função que esconde splash e mostra login
-    function irParaLogin() {
-      document.getElementById('splash').style.display = 'none';
-      document.getElementById('login').style.display = 'flex';
-    }
-
-    // Função para fazer login com Firebase
-    async function login() {
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, senha);
-      } catch (err) {
-        alert('Erro ao entrar: ' + err.message);
-      }
-    }
-
-    // Função para criar conta com Firebase
-    async function criarConta() {
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, senha);
-        alert('Conta criada com sucesso! Faça login.');
-      } catch (err) {
-        alert('Erro ao criar conta: ' + err.message);
-      }
-    }
-
-    // Função para logout
-    function logout() {
-      signOut(auth);
-    }
-
-    // Observa mudança no estado de autenticação do usuário
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        // Usuário logado: esconde login, mostra app
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('main').style.display = 'block';
-      } else {
-        // Usuário deslogado: mostra login, esconde app
-        document.getElementById('login').style.display = 'flex';
-        document.getElementById('main').style.display = 'none';
-      }
-    });
-
-    // Mostrar splash inicialmente ao carregar a página
-    window.onload = () => {
-      document.getElementById('splash').style.display = 'flex';
-    }
-  </script>
-</body>
-</html>
 
 </body>
 </html>
