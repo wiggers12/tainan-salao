@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
 
-<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNpemVzIjoiNTEyeNTEyIiwic3JjIjoiaWNvbnMvaWNvbi01MTJ4NTEyLnBuYyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiSBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic3RhcnRfdXJsIjoiLi9pbmRleC5odG1sIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y4YmJkMCIsInRoZW1lX2NvbG9yIjoiIzdiMWZhMiIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQifQ==">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNpemVzIjoiNTEyeNTEyIiwic3JjIjoiaWNvbnMvaWNvbi01MTJ4NTEyLnBuYyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiSBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRaiSBCb3RlbGhvIiIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGJiZDAiLCJ0aGVtZV9jb2xvciI6IiM3YjFmYTIiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0In0=">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -269,6 +269,24 @@ input.error, select.error, textarea.error {
   background: #e53935;
   color: white;
 }
+.item button.info {
+  background: #03a9f4;
+  color: white;
+}
+.item .status-concluido {
+    color: #2e7d32; /* Verde escuro */
+    font-weight: bold;
+}
+.item .status-pendente {
+    color: #ef6c00; /* Laranja */
+    font-weight: bold;
+}
+.item .status-nao-pagou {
+    color: #e53935; /* Vermelho */
+    font-weight: bold;
+}
+
+
 .flex-row {
   display: flex;
   gap: 10px;
@@ -387,6 +405,18 @@ input.error, select.error, textarea.error {
     background-color: #ccc;
     color: #4a2c4d;
 }
+
+/* Specific Modal for Payment */
+#paymentModal .modal-content {
+    max-width: 500px;
+}
+#paymentModal .form-group {
+    text-align: left;
+}
+#paymentModal button {
+    margin-top: 15px;
+}
+
 
 /* Dashboard Specific Styles */
 .dashboard-grid {
@@ -859,6 +889,31 @@ input.error, select.error, textarea.error {
     </div>
 </div>
 
+<div id="paymentModal" class="modal-overlay">
+    <div class="modal-content">
+        <h4>Registrar Pagamento</h4>
+        <p>Informe os detalhes do pagamento para o agendamento:</p>
+        <div class="form-group">
+            <label for="paymentMethod">Forma de Pagamento:</label>
+            <select id="paymentMethod">
+                <option value="">-- Selecione --</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Pix">Pix</option>
+                <option value="Debito">Débito</option>
+                <option value="Credito">Crédito</option>
+            </select>
+            <span class="error-message" id="errorPaymentMethod"></span>
+        </div>
+        <label>
+            <input type="checkbox" id="clientDidNotPay"> Cliente não pagou
+        </label>
+        <div class="modal-buttons">
+            <button class="confirm-btn" id="confirmPaymentBtn">Confirmar</button>
+            <button class="cancel-btn" id="cancelPaymentBtn">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 
 <script>
 // Variáveis globais para os dados (simulando um banco de dados local)
@@ -873,6 +928,9 @@ let caixaInicial = parseFloat(localStorage.getItem("caixaInicial")) || 0;
 let clienteEditandoId = null;
 let profissionalEditandoId = null;
 let produtoEditandoId = null;
+
+// Variáveis para o modal de pagamento
+let currentAgendamentoIdForPayment = null;
 
 // Constante para a senha de acesso (pode ser alterada)
 const MASTER_PASSWORD = "admin"; // Senha simples para controle de acesso básico
@@ -1017,6 +1075,43 @@ document.getElementById('modalConfirmBtn').onclick = () => {
 document.getElementById('modalCancelBtn').onclick = () => {
     document.getElementById('confirmationModal').style.display = 'none';
     resolveModalPromise(false);
+};
+
+// ============== MODAL DE PAGAMENTO =============
+let resolvePaymentModalPromise;
+
+function showPaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    document.getElementById('paymentMethod').value = ''; // Limpa a seleção anterior
+    document.getElementById('clientDidNotPay').checked = false; // Desmarca "não pagou"
+    document.getElementById('paymentMethod').classList.remove('error'); // Remove erros
+    document.getElementById('errorPaymentMethod').textContent = ''; // Limpa mensagem de erro
+    modal.style.display = 'flex';
+
+    return new Promise((resolve) => {
+        resolvePaymentModalPromise = resolve;
+    });
+}
+
+document.getElementById('confirmPaymentBtn').onclick = () => {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const clientDidNotPay = document.getElementById('clientDidNotPay').checked;
+
+    if (!clientDidNotPay && paymentMethod === '') {
+        document.getElementById('paymentMethod').classList.add('error');
+        document.getElementById('errorPaymentMethod').textContent = 'Selecione uma forma de pagamento ou marque "Cliente não pagou".';
+        return;
+    }
+    document.getElementById('paymentMethod').classList.remove('error');
+    document.getElementById('errorPaymentMethod').textContent = '';
+
+    document.getElementById('paymentModal').style.display = 'none';
+    resolvePaymentModalPromise({ paymentMethod, clientDidNotPay });
+};
+
+document.getElementById('cancelPaymentBtn').onclick = () => {
+    document.getElementById('paymentModal').style.display = 'none';
+    resolvePaymentModalPromise(null); // Retorna null se cancelar
 };
 
 
@@ -1367,7 +1462,7 @@ function listarProdutos() {
   const busca = document.getElementById("buscaProduto").value.toLowerCase();
   const lista = document.getElementById("listaProdutos");
   lista.innerHTML = "";
-  productos.forEach(p => {
+  produtos.forEach(p => {
     if (!p.nome.toLowerCase().includes(busca)) return;
     const validadeText = p.validade ? ` | Validade: ${p.validade}` : "";
     lista.innerHTML += `
@@ -1473,7 +1568,7 @@ function listarMovimentacoes() {
       return;
   }
 
-  productosComMovimentacao.forEach((p) => {
+  produtosComMovimentacao.forEach((p) => {
     div.innerHTML += `<h5>${p.nome}</h5>`;
     // Ordena as movimentações por data decrescente
     p.movimentacoes.sort((a,b) => new Date(b.data) - new Date(a.data));
@@ -1496,6 +1591,7 @@ function validarFormAgendamento() {
     if (document.getElementById("agendamentoEditandoId").value === "") { // Só valida para novos
         const dataAgendamento = new Date(document.getElementById("dataAgendamento").value + 'T' + document.getElementById("horaAgendamento").value);
         const hoje = new Date();
+        hoje.setSeconds(0,0); // Ignora segundos e milissegundos para comparação
         if (dataAgendamento < hoje) {
             document.getElementById('dataAgendamento').classList.add('error');
             document.getElementById('errorDataAgendamento').textContent = 'Agendamento não pode ser no passado.';
@@ -1553,6 +1649,9 @@ function salvarAgendamento() {
     data,
     hora,
     status: "Pendente",
+    formaPagamento: "", // Novo campo
+    naoPagou: false, // Novo campo
+    dataConclusao: "", // Novo campo para data da conclusão/pagamento
     dataCriacao: new Date().toISOString().slice(0, 10)
   };
 
@@ -1560,7 +1659,7 @@ function salvarAgendamento() {
       const agendamentoIdToEdit = document.getElementById("agendamentoEditandoId").value;
       const index = agendamentos.findIndex(a => a.id === agendamentoIdToEdit);
       if (index !== -1) {
-          // Mantém o status e dataCriação originais na edição, se não forem alterados
+          // Mantém o status, formaPagamento, naoPagou e dataConclusao originais na edição, se não forem alterados
           agendamentos[index] = { ...agendamentos[index], ...agendamento, id: agendamentoIdToEdit };
           showToast("Agendamento atualizado com sucesso!");
       }
@@ -1600,6 +1699,56 @@ function limparCamposAgendamento() {
     document.getElementById("errorHoraAgendamento").textContent = '';
 }
 
+async function alterarStatusAgendamento(id) {
+  const agendamento = agendamentos.find(a => a.id === id);
+  if (!agendamento) return;
+
+  if (agendamento.status === "Pendente") {
+      // Se está pendente, vamos concluir
+      currentAgendamentoIdForPayment = id; // Armazena o ID do agendamento
+      const paymentDetails = await showPaymentModal();
+
+      if (paymentDetails === null) { // Usuário cancelou o modal de pagamento
+          showToast("Conclusão do agendamento cancelada.");
+          currentAgendamentoIdForPayment = null;
+          return;
+      }
+
+      agendamento.status = "Concluído";
+      agendamento.dataConclusao = new Date().toISOString().slice(0, 10);
+      agendamento.formaPagamento = paymentDetails.clientDidNotPay ? "Não Pagou" : paymentDetails.paymentMethod;
+      agendamento.naoPagou = paymentDetails.clientDidNotPay;
+
+      showToast("Agendamento concluído!");
+
+  } else if (agendamento.status === "Concluído") {
+      // Se já está concluído, vamos reabrir
+      const confirmReopen = await showConfirmationModal(
+          "Reabrir Agendamento",
+          "Tem certeza que deseja reabrir este agendamento? Ele será marcado como Pendente e removido dos ganhos."
+      );
+      if (!confirmReopen) {
+          showToast("Reabertura do agendamento cancelada.");
+          return;
+      }
+
+      agendamento.status = "Pendente";
+      agendamento.formaPagamento = ""; // Limpa forma de pagamento
+      agendamento.naoPagou = false; // Define como não pagou
+      agendamento.dataConclusao = ""; // Limpa data de conclusão
+      showToast("Agendamento reaberto!");
+  }
+  
+  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+  listarAgendamentos();
+  carregarFinanceiro();
+  atualizarDashboard();
+  desenharGraficoServicosPopulares();
+  desenharGraficoAgendamentosProfissional();
+  listarAgendamentosProximos();
+  currentAgendamentoIdForPayment = null; // Limpa o ID após o processamento
+}
+
 function listarAgendamentos() {
   const busca = document.getElementById("buscaAgendamento").value.toLowerCase();
   const filtroPendentes = document.getElementById("filtroPendentes").checked;
@@ -1631,12 +1780,20 @@ function listarAgendamentos() {
     const profissional = profissionais.find(p => p.id === a.profId);
     const servico = profissional?.servicos[a.servIndex];
 
-    const statusText = a.status;
+    let statusText = a.status;
     let statusClass = '';
+    let pagamentoInfo = '';
+
     if (a.status === 'Concluído') {
-        statusClass = 'status-concluido'; // Adicionar classe para estilizar
+        statusClass = 'status-concluido';
+        if (a.naoPagou) {
+            statusText = 'Não Pagou';
+            statusClass = 'status-nao-pagou';
+        } else if (a.formaPagamento) {
+            pagamentoInfo = `<br>Pagamento: ${a.formaPagamento}`;
+        }
     } else if (a.status === 'Pendente') {
-        statusClass = 'status-pendente'; // Adicionar classe para estilizar
+        statusClass = 'status-pendente';
     }
 
     lista.innerHTML += `
@@ -1644,11 +1801,11 @@ function listarAgendamentos() {
       <strong>${clienteNome}</strong> - ${a.data} ${a.hora} <br>
       Profissional: ${profissional?.nome || "N/A"}<br>
       Serviço: ${servico?.nome || "N/A"} - ${currencyFormatter.format(servico?.valor || 0)}<br>
-      Status: <span class="${statusClass}">${statusText}</span>
+      Status: <span class="${statusClass}">${statusText}</span> ${pagamentoInfo}
       <div>
           <button class="editar" onclick="editarAgendamento('${a.id}')">Editar</button>
           <button class="excluir" onclick="confirmarExclusao('agendamento', '${a.id}', 'de ${clienteNome} em ${a.data} ${a.hora}')">Excluir</button>
-          <button onclick="alterarStatusAgendamento('${a.id}')">${a.status === 'Pendente' ? 'Concluir' : 'Reabrir'}</button>
+          ${a.status === 'Pendente' ? `<button onclick="alterarStatusAgendamento('${a.id}')">Concluir</button>` : `<button class="info" onclick="alterarStatusAgendamento('${a.id}')">Reabrir</button>`}
       </div>
     </div>`;
   });
@@ -1679,25 +1836,7 @@ function excluirAgendamento(id) {
     listarAgendamentosProximos();
     showToast("Agendamento excluído!");
 }
-function alterarStatusAgendamento(id) {
-  const agendamento = agendamentos.find(a => a.id === id);
-  if (agendamento) {
-      if (agendamento.status === "Pendente") {
-          agendamento.status = "Concluído";
-          showToast("Agendamento concluído!");
-      } else {
-          agendamento.status = "Pendente";
-          showToast("Agendamento reaberto!");
-      }
-      localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-      listarAgendamentos();
-      carregarFinanceiro();
-      atualizarDashboard();
-      desenharGraficoServicosPopulares();
-      desenharGraficoAgendamentosProfissional();
-      listarAgendamentosProximos();
-  }
-}
+
 function limparFiltrosAgendamento() {
   document.getElementById("buscaAgendamento").value = "";
   document.getElementById("filtroPendentes").checked = true;
@@ -1723,17 +1862,18 @@ function salvarCaixaInicial() {
 function carregarFinanceiro() {
   document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
 
-  // Ganhos = soma dos agendamentos concluídos
+  // Ganhos = soma dos agendamentos concluídos E PAGOS
   let ganhos = 0;
   let ganhosHTML = "";
   agendamentos.forEach(a => {
-    if (a.status === "Concluído") {
+    if (a.status === "Concluído" && !a.naoPagou) { // Só considera ganho se concluído E pago
       const prof = profissionais.find(p => p.id === a.profId);
       const serv = prof?.servicos[a.servIndex];
       if (serv) {
         ganhos += serv.valor;
         const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
-        ganhosHTML += `<div class="item"><strong>${clienteNome}</strong> - ${a.data} - ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
+        const formaPagamento = a.formaPagamento || "N/A";
+        ganhosHTML += `<div class="item"><strong>${clienteNome}</strong> - ${a.data} - ${serv.nome} - ${currencyFormatter.format(serv.valor)} (${formaPagamento})</div>`;
       }
     }
   });
@@ -1792,7 +1932,7 @@ function atualizarDashboard() {
   document.getElementById("dashTotalAgendamentos").textContent = agendamentos.filter(a => a.status === "Pendente").length;
   
   const ganhosCalculados = agendamentos.reduce((acc,a) => {
-    if(a.status === "Concluído"){
+    if(a.status === "Concluído" && !a.naoPagou){ // Apenas agendamentos concluídos E pagos
       const prof = profissionais.find(p => p.id === a.profId);
       if(prof && prof.servicos[a.servIndex]){
         return acc + prof.servicos[a.servIndex].valor;
@@ -1812,7 +1952,7 @@ function atualizarDashboard() {
 
   let ganhosMesAtual = 0;
   agendamentos.forEach(a => {
-      if (a.status === "Concluído" && a.data.startsWith(mesAnoAtual)) {
+      if (a.status === "Concluído" && !a.naoPagou && a.dataConclusao.startsWith(mesAnoAtual)) { // Usa dataConclusao
           const prof = profissionais.find(p => p.id === a.profId);
           const serv = prof?.servicos[a.servIndex];
           if (serv) {
@@ -1869,7 +2009,7 @@ function preencherFiltrosFinanceiro() {
 
     filtroAno.innerHTML = '<option value="">Todos os Anos</option>';
     const anosUnicos = new Set();
-    agendamentos.forEach(a => anosUnicos.add(a.data.substring(0, 4)));
+    agendamentos.forEach(a => { if (a.dataConclusao) anosUnicos.add(a.dataConclusao.substring(0, 4)); }); // Usa dataConclusao
     gastos.forEach(g => anosUnicos.add(g.data.substring(0, 4)));
 
     Array.from(anosUnicos).sort().reverse().forEach(ano => {
@@ -1896,9 +2036,9 @@ function desenharGraficoFinanceiro() {
   const gastosMes = {};
 
   const dadosGanhosFiltrados = agendamentos.filter(a => {
-      if (a.status !== "Concluído") return false;
-      if (filtroMes && !a.data.startsWith(filtroMes)) return false;
-      if (filtroAno && !a.data.startsWith(filtroAno)) return false;
+      if (a.status !== "Concluído" || a.naoPagou || !a.dataConclusao) return false; // Apenas concluídos E pagos
+      if (filtroMes && !a.dataConclusao.startsWith(filtroMes)) return false;
+      if (filtroAno && !a.dataConclusao.startsWith(filtroAno)) return false;
       return true;
   });
 
@@ -1907,7 +2047,7 @@ function desenharGraficoFinanceiro() {
     const serv = prof?.servicos[a.servIndex];
     if (!serv) return;
 
-    const mes = a.data.slice(0,7);
+    const mes = a.dataConclusao.slice(0,7);
     ganhosMes[mes] = (ganhosMes[mes] || 0) + serv.valor;
   });
 
@@ -2057,7 +2197,7 @@ function desenharGraficoAgendamentosProfissional() {
     profissionais.forEach(p => agendamentosPorProfissional[p.nome] = 0);
 
     agendamentos.forEach(a => {
-        if (a.status === "Concluído") {
+        if (a.status === "Concluído" && !a.naoPagou) { // Apenas agendamentos concluídos E pagos
             const profissional = profissionais.find(p => p.id === a.profId);
             if (profissional) {
                 agendamentosPorProfissional[profissional.nome]++;
@@ -2128,7 +2268,7 @@ function desenharGraficoServicosPopulares() {
     const servicosTotalizados = {};
 
     agendamentos.forEach(a => {
-        if (a.status === "Concluído") {
+        if (a.status === "Concluído" && !a.naoPagou) { // Apenas serviços concluídos E pagos
             const profissional = profissionais.find(p => p.id === a.profId);
             const servico = profissional?.servicos[a.servIndex];
             if (servico) {
