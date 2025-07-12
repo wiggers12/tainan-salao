@@ -1,390 +1,1746 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Espaço Tai Botelho - Sistema Completo</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Espaço Tai Botelho - Sistema Completo</title>
 
-  <!-- Firebase SDK (import via module) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKlVI23YoxRb1fntQKy-ZfkzaDM-MWsSQ",
-      authDomain: "doce-sabor-caseiro.firebaseapp.com",
-      projectId: "doce-sabor-caseiro",
-      storageBucket: "doce-sabor-caseiro.appspot.com",
-      messagingSenderId: "414062499771",
-      appId: "1:414062499771:web:1a811377bc6bbf145f969e",
-      measurementId: "G-KMC0FC7Z4H"
-    };
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    margin: 0;
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    color: #4a2c4d;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.auth = auth;
-    window.onAuthStateChanged = onAuthStateChanged;
-    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-    window.signOut = signOut;
-  </script>
-
-  <!-- Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-      color: #4a2c4d;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    #splash {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #ce93d8, #ba68c8);
-      color: white;
-      height: 100vh;
-      width: 100vw;
-      position: fixed;
-      top: 0; left: 0;
-      z-index: 1000;
-      transition: opacity 0.6s ease;
-    }
-    #splash h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 4px #6d3c77;
-    }
-    #btnEntrar {
-      background: #7b1fa2;
-      border: none;
-      padding: 15px 40px;
-      font-size: 1.25rem;
-      border-radius: 30px;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 6px 15px #4a0072;
-      transition: background-color 0.3s ease;
-    }
-    #btnEntrar:hover {
-      background: #9c27b0;
-    }
-
-    #login {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff0f5;
-      height: 100vh;
-      width: 100vw;
-      position: fixed;
-      top: 0; left: 0;
-      z-index: 999;
-    }
-    #login .form {
-      background: white;
-      padding: 30px 40px;
+  /* Splash Screen / Login Screen */
+  #splash, #loginScreen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ce93d8, #ba68c8);
+    color: white;
+    transition: opacity 0.6s ease;
+    padding: 20px;
+  }
+  #splash h1, #loginScreen h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 4px #6d3c77;
+  }
+  #loginScreen {
+      display: none; /* Inicia oculto, será mostrado após splash */
+  }
+  #loginForm {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
       border-radius: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      width: 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    #login input {
-      padding: 12px 14px;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: 1.8px solid #ce93d8;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-    #login input:focus {
-      border-color: #7b1fa2;
-    }
-    #login button {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      color: #4a2c4d;
+      max-width: 400px;
+      width: 90%;
+  }
+  #loginForm label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-align: left;
+  }
+  #loginForm input[type="email"],
+  #loginForm input[type="password"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ce93d8;
+      border-radius: 8px;
+      font-size: 1.1rem;
+  }
+  #loginForm button {
       background: #7b1fa2;
       border: none;
-      padding: 14px 20px;
-      border-radius: 30px;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 25px;
       color: white;
-      font-weight: 700;
-      font-size: 1.1rem;
       cursor: pointer;
+      box-shadow: 0 4px 10px #4a0072;
       transition: background-color 0.3s ease;
-    }
-    #login button:hover {
+      margin-top: 10px; /* Adicionado para espaçar botões de login/registro */
+  }
+  #loginForm button:hover {
       background: #9c27b0;
-    }
-    #login .actions {
-      text-align: center;
-    }
-    #login .actions button {
-      background: none;
-      border: none;
-      color: #7b1fa2;
-      cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 8px;
-      text-decoration: underline;
-    }
-    #login .actions button:hover {
-      color: #9c27b0;
-    }
-
-    #app {
+  }
+  #loginError {
+      color: #e53935;
+      margin-top: 10px;
+      font-weight: bold;
       display: none;
-      padding: 20px;
-      max-width: 1200px;
-      width: 100%;
-      margin-top: 50px;
-    }
+  }
 
+  #btnEntrar {
+    background: #7b1fa2;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.25rem;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 15px #4a0072;
+    transition: background-color 0.3s ease;
+  }
+  #btnEntrar:hover {
+    background: #9c27b0;
+  }
+
+  /* Main container */
+  #main {
+    display: none;
+    flex: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Menu */
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .menu-item {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 5px 15px rgb(160 75 149 / 0.3);
+    cursor: pointer;
+    flex: 1 1 130px;
+    max-width: 150px;
+    padding: 20px 10px;
+    text-align: center;
+    color: #7b1fa2;
+    user-select: none;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .menu-item:hover {
+    box-shadow: 0 8px 20px rgb(160 75 149 / 0.6);
+    transform: translateY(-5px);
+  }
+  .menu-item span {
+    font-size: 2.7rem;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .menu-item p {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .menu-item.logout {
+    background: #e53935; /* Cor para o botão de logout */
+    color: white;
+  }
+  .menu-item.logout:hover {
+      background: #c62828;
+  }
+
+  /* Sections */
+  section {
+    background: rgba(255 255 255 / 0.95);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
+    max-width: 100%;
+    margin-bottom: 30px;
+  }
+  section h3 {
+    margin-top: 0;
+    color: #4a2c4d;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ce93d8;
+    padding-bottom: 6px;
+  }
+
+  /* Forms */
+  .form-group {
+    margin-bottom: 12px;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.8px solid #ce93d8;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #7b1fa2;
+    outline: none;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  button {
+    background: #7b1fa2;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    margin-right: 8px; /* Espaçamento entre botões */
+  }
+  button:hover {
+    background: #9c27b0;
+  }
+
+  /* Validação de formulário */
+  input.error, select.error, textarea.error {
+    border-color: #e53935;
+  }
+  .error-message {
+    color: #e53935;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Busca */
+  .busca input {
+    padding: 10px 12px;
+    border-radius: 20px;
+    border: 1.8px solid #ce93d8;
+    width: 100%;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  /* Listas */
+  .item {
+    background: #f3e5f5;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 6px rgb(160 75 149 / 0.15);
+  }
+  .item strong {
+    font-size: 1.1rem;
+    color: #6a1b9a;
+  }
+  .item small {
+    display: block;
+    margin-top: 4px;
+    color: #7b1fa2cc;
+  }
+  .item button {
+    margin-left: 0; /* Remove margin-left para melhor layout */
+    margin-top: 8px;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    box-shadow: none;
+  }
+  .item button.editar {
+    background: #9c27b0;
+    color: white;
+  }
+  .item button.excluir {
+    background: #e53935;
+    color: white;
+  }
+  .flex-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .flex-row > * {
+    flex: 1 1 150px;
+  }
+
+  /* Responsive */
+  @media(max-width: 768px){
     .menu {
-      display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 30px;
     }
     .menu-item {
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 5px 15px rgb(160 75 149 / 0.3);
-      cursor: pointer;
-      flex: 1 1 130px;
-      max-width: 150px;
-      padding: 20px 10px;
-      text-align: center;
-      color: #7b1fa2;
-      user-select: none;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-    .menu-item:hover {
-      box-shadow: 0 8px 20px rgb(160 75 149 / 0.6);
-      transform: translateY(-5px);
+      max-width: 120px;
+      font-size: 0.9rem;
+      padding: 18px 8px;
     }
     .menu-item span {
-      font-size: 2.7rem;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .menu-item p {
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin: 0;
-    }
-
-    section {
-      background: rgba(255 255 255 / 0.95);
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
-      max-width: 100%;
-      margin-bottom: 30px;
-    }
-    section h3 {
-      margin-top: 0;
-      color: #4a2c4d;
-      margin-bottom: 15px;
-      border-bottom: 2px solid #ce93d8;
-      padding-bottom: 6px;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1.8px solid #ce93d8;
-      font-size: 1rem;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: #7b1fa2;
-      outline: none;
+      font-size: 2rem;
     }
     button {
-      background: #7b1fa2;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 30px;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 10px;
+      width: auto; /* Permite que o width seja auto nos botões */
+      display: inline-block; /* Para que os botões fiquem lado a lado se houver espaço */
     }
-    button:hover {
-      background: #9c27b0;
+    /* Força botões de item a irem para nova linha em telas pequenas */
+    .item button {
+        width: 100%;
+        margin-right: 0;
     }
-  </style>
+  }
+
+  /* Export/Import Buttons (Backup local não será mais necessário, mas os botões permanecem para exportar/importar dados para o Firebase) */
+  #backupSection {
+    margin-top: 15px;
+    text-align: center;
+  }
+  #backupSection button {
+    margin: 5px;
+    min-width: 120px;
+  }
+
+  /* Toast Notification */
+  .toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 17px;
+      opacity: 0;
+      transition: opacity 0.5s, visibility 0.5s;
+  }
+  .toast.show {
+      visibility: visible;
+      opacity: 1;
+  }
+</style>
 </head>
 <body>
 
-  <div id="splash">
-    <h1>Espaço Tai Botelho</h1>
-    <button id="btnEntrar" onclick="abrirLogin()">Entrar</button>
+<div id="splash">
+  <h1>Espaço Tai Botelho</h1>
+  <button id="btnEntrar">Entrar</button>
+</div>
+
+<div id="loginScreen">
+  <h1>Acesso Restrito</h1>
+  <div id="loginForm">
+    <label for="emailLogin">Email:</label>
+    <input type="email" id="emailLogin" placeholder="Digite seu email" required />
+    <label for="password">Senha:</label>
+    <input type="password" id="password" placeholder="Digite a senha" required />
+    <span id="loginError" class="error-message"></span>
+    <button id="btnLogin">Acessar Sistema</button>
+    <button style="background: #28a745; margin-top: 15px;" onclick="criarPrimeiroUsuarioManual()">Registrar Primeiro Acesso</button>
+  </div>
+</div>
+
+<div id="main">
+  <div class="menu">
+    <div class="menu-item" onclick="abrirSecao('dashboardSection')"><span>📊</span><p>Dashboard</p></div>
+    <div class="menu-item" onclick="abrirSecao('clientesSection')"><span>👥</span><p>Clientes</p></div>
+    <div class="menu-item" onclick="abrirSecao('profissionaisSection')"><span>💇‍♀️</span><p>Profissionais</p></div>
+    <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
+    <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
+    <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
+    <div class="menu-item" onclick="abrirSecao('backupSection')"><span>💾</span><p>Backup</p></div>
+    <div class="menu-item logout" onclick="logout()"><span>🚪</span><p>Sair</p></div>
   </div>
 
-  <div id="login">
-    <div class="form">
-      <input type="email" id="email" placeholder="E-mail" autocomplete="username" />
-      <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" />
-      <button onclick="login()">Entrar</button>
-      <div class="actions">
-        <button onclick="criarConta()">Criar Conta</button>
-      </div>
+  <section id="dashboardSection" style="display:none;">
+    <h3>Dashboard</h3>
+    <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
+    <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
+    <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
+    <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
+    <p><strong>Caixa Atual:</strong> <span id="dashCaixaAtual">R$ 0,00</span></p>
+
+    <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
+  </section>
+
+  <section id="clientesSection" style="display:none;">
+    <h3>Cadastro de Clientes</h3>
+    <div class="form-group">
+      <label for="nomeCliente">Nome:</label>
+      <input type="text" id="nomeCliente" required />
+      <span class="error-message" id="errorNomeCliente"></span>
     </div>
-  </div>
+    <div class="form-group">
+      <label for="telefoneCliente">Telefone:</label>
+      <input type="text" id="telefoneCliente" />
+    </div>
+    <div class="form-group">
+      <label for="emailCliente">Email:</label>
+      <input type="email" id="emailCliente" />
+    </div>
+    <div class="form-group">
+      <label for="obsCliente">Observações:</label>
+      <textarea id="obsCliente"></textarea>
+    </div>
+    <button onclick="salvarCliente()">Salvar Cliente</button>
+    <button onclick="limparCamposCliente()">Novo/Limpar</button>
 
-  <div id="app">
-    <h2>Bem-vindo ao sistema Espaço Tai Botelho!</h2>
-    <button onclick="logout()">Sair</button>
+    <div class="busca">
+      <input type="text" id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" />
+    </div>
+    <div id="listaClientes"></div>
+  </section>
 
-    <div class="menu">
-      <div class="menu-item" onclick="abrirSecao('dashboardSection')"><span>📊</span><p>Dashboard</p></div>
-      <div class="menu-item" onclick="abrirSecao('clientesSection')"><span>👥</span><p>Clientes</p></div>
-      <div class="menu-item" onclick="abrirSecao('profissionaisSection')"><span>💇‍♀️</span><p>Profissionais</p></div>
-      <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
-      <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
-      <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
+  <section id="profissionaisSection" style="display:none;">
+    <h3>Cadastro de Profissionais</h3>
+    <div class="form-group">
+      <label for="nomeProf">Nome:</label>
+      <input type="text" id="nomeProf" required />
+      <span class="error-message" id="errorNomeProf"></span>
+    </div>
+    <div class="form-group">
+      <label for="espProf">Especialidade:</label>
+      <input type="text" id="espProf" required />
+      <span class="error-message" id="errorEspProf"></span>
+    </div>
+    <div class="form-group">
+      <label for="servicoProf">Serviço Principal:</label>
+      <input type="text" id="servicoProf" required />
+      <span class="error-message" id="errorServicoProf"></span>
+    </div>
+    <div class="form-group">
+      <label for="valorProf">Valor (R$):</label>
+      <input type="number" id="valorProf" min="0" step="0.01" required />
+      <span class="error-message" id="errorValorProf"></span>
+    </div>
+    <button onclick="salvarProfissional()">Salvar Profissional</button>
+    <button onclick="limparCamposProfissional()">Novo/Limpar</button>
+
+    <div class="busca">
+      <input type="text" id="buscaProfissional" placeholder="Buscar profissional..." oninput="listarProfissionais()" />
+    </div>
+    <div id="listaProfissionais"></div>
+  </section>
+
+  <section id="produtosSection" style="display:none;">
+    <h3>Cadastro de Produtos</h3>
+    <div class="form-group">
+      <label for="nomeProduto">Nome do Produto:</label>
+      <input type="text" id="nomeProduto" required />
+      <span class="error-message" id="errorNomeProduto"></span>
+    </div>
+    <div class="form-group">
+      <label for="tipoProduto">Tipo do Produto:</label>
+      <input type="text" id="tipoProduto" required />
+      <span class="error-message" id="errorTipoProduto"></span>
+    </div>
+    <div class="form-group">
+      <label for="quantidadeProduto">Quantidade em Estoque:</label>
+      <input type="number" id="quantidadeProduto" min="0" required />
+      <span class="error-message" id="errorQuantidadeProduto"></span>
+    </div>
+    <div class="form-group">
+      <label for="minQuantidadeProduto">Quantidade Mínima para Alerta:</label>
+      <input type="number" id="minQuantidadeProduto" min="0" required />
+      <span class="error-message" id="errorMinQuantidadeProduto"></span>
+    </div>
+    <div class="form-group">
+      <label for="validadeProduto">Data de Validade (opcional):</label>
+      <input type="date" id="validadeProduto" />
+    </div>
+    <button onclick="salvarProduto()">Salvar Produto</button>
+    <button onclick="limparCamposProduto()">Novo/Limpar</button>
+
+    <div class="busca">
+      <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()" />
+    </div>
+    <div id="listaProdutos"></div>
+
+    <h4>Produtos em falta</h4>
+    <div id="produtosEmFalta"></div>
+
+    <h4>Usar Produto</h4>
+    <div class="flex-row" style="gap: 10px; flex-wrap: nowrap; margin-bottom: 10px;">
+      <select id="selectProdutoUso" style="flex-grow:1;"></select>
+      <input type="number" id="quantidadeUso" min="1" placeholder="Quantidade" style="max-width: 100px;" />
+      <button onclick="usarProduto()">Usar Produto</button>
     </div>
 
-    <section id="dashboardSection" style="display:none;">
-      <h3>Dashboard</h3>
-      <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
-      <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
-      <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
-      <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
-      <p><strong>Caixa Atual:</strong> R$ <span id="dashCaixaAtual">0,00</span></p>
-      <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
-    </section>
-  </div>
+    <h4>Histórico de Movimentações</h4>
+    <div id="historicoMovimentacoes"></div>
+  </section>
 
-  <script>
-    function abrirLogin() {
-      document.getElementById('splash').style.display = 'none';
-      document.getElementById('login').style.display = 'flex';
-    }
+  <section id="agendamentosSection" style="display:none;">
+    <h3>Agendamento de Clientes</h3>
+    <div class="form-group">
+      <label for="selectClienteAgendamento">Cliente:</label>
+      <select id="selectClienteAgendamento" required></select>
+      <span class="error-message" id="errorSelectClienteAgendamento"></span>
+    </div>
+    <div class="form-group">
+      <label for="selectProfissionalAgendamento">Profissional:</label>
+      <select id="selectProfissionalAgendamento" onchange="atualizarServicosProfissional()" required></select>
+      <span class="error-message" id="errorSelectProfissionalAgendamento"></span>
+    </div>
+    <div class="form-group">
+      <label for="selectServicoAgendamento">Serviço:</label>
+      <select id="selectServicoAgendamento" required></select>
+      <span class="error-message" id="errorSelectServicoAgendamento"></span>
+    </div>
+    <div class="form-group">
+      <label for="dataAgendamento">Data:</label>
+      <input type="date" id="dataAgendamento" required />
+      <span class="error-message" id="errorDataAgendamento"></span>
+    </div>
+    <div class="form-group">
+      <label for="horaAgendamento">Hora:</label>
+      <input type="time" id="horaAgendamento" required />
+      <span class="error-message" id="errorHoraAgendamento"></span>
+    </div>
+    <button onclick="salvarAgendamento()">Salvar Agendamento</button>
 
-    async function login() {
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, senha);
-      } catch (error) {
-        alert('Erro ao entrar: ' + error.message);
+    <div class="busca" style="margin-top:20px;">
+      <input type="text" id="buscaAgendamento" placeholder="Buscar por nome do cliente..." oninput="listarAgendamentos()" />
+    </div>
+    <div class="flex-row" style="gap:10px; margin: 10px 0;">
+      <label>
+        <input type="checkbox" id="filtroPendentes" checked onchange="listarAgendamentos()" />
+        Mostrar apenas pendentes
+      </label>
+      <label style="flex-grow:1;">
+        Filtrar por data:
+        <input type="date" id="filtroData" onchange="listarAgendamentos()" />
+      </label>
+      <button onclick="limparFiltrosAgendamento()">Limpar filtros</button>
+    </div>
+
+    <div id="listaAgendamentos"></div>
+  </section>
+
+  <section id="financeiroSection" style="display:none;">
+    <h3>Financeiro</h3>
+
+    <div class="form-group">
+      <label for="caixaInicial">Caixa Inicial (R$):</label>
+      <input type="number" id="caixaInicial" min="0" step="0.01" />
+      <button onclick="salvarCaixaInicial()">Salvar Caixa Inicial</button>
+    </div>
+
+    <h4>Ganhos (Agendamentos realizados)</h4>
+    <div id="listaGanhos" style="max-height: 150px; overflow-y: auto; background: #fce4ec; padding: 10px; border-radius: 12px;"></div>
+
+    <h4>Gastos</h4>
+    <div class="form-group">
+      <label for="descricaoGasto">Descrição:</label>
+      <input type="text" id="descricaoGasto" required />
+      <span class="error-message" id="errorDescricaoGasto"></span>
+    </div>
+    <div class="form-group">
+      <label for="valorGasto">Valor (R$):</label>
+      <input type="number" id="valorGasto" min="0" step="0.01" required />
+      <span class="error-message" id="errorValorGasto"></span>
+    </div>
+    <div class="form-group">
+      <label for="dataGasto">Data:</label>
+      <input type="date" id="dataGasto" required />
+      <span class="error-message" id="errorDataGasto"></span>
+    </div>
+    <button onclick="salvarGasto()">Salvar Gasto</button>
+
+    <h4>Lista de Gastos</h4>
+    <div id="listaGastos" style="max-height: 150px; overflow-y: auto; background: #fce4ec; padding: 10px; border-radius: 12px;"></div>
+
+    <h4>Resumo Financeiro Mensal</h4>
+    <p><strong>Caixa Atual:</strong> <span id="caixaAtual">R$ 0,00</span></p>
+    <p><strong>Ganhos Totais:</strong> <span id="ganhosTotais">R$ 0,00</span></p>
+    <p><strong>Gastos Totais:</strong> <span id="gastosTotais">R$ 0,00</span></p>
+    <p><strong>Lucro Total:</strong> <span id="lucroTotal">R$ 0,00</span></p>
+  </section>
+
+  <section id="backupSection" style="display:none;">
+    <h3>Backup e Restauração de Dados</h3>
+    <button onclick="exportarDadosFirestore()">Exportar Dados (Firestore JSON)</button>
+    <button onclick="document.getElementById('inputImportFirestore').click()">Importar Dados (Firestore JSON)</button>
+    <input type="file" id="inputImportFirestore" accept="application/json" style="display:none" onchange="importarDadosFirestore(event)" />
+    <p style="margin-top:20px;">*Esta função de backup exporta/importa os dados do seu Firestore. Não é mais necessário o backup local do navegador.</p>
+  </section>
+</div>
+
+<div id="toastNotification" class="toast"></div>
+
+<script type="module">
+  // Importar as funções necessárias do Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Se você estiver usando Analytics
+
+  // Suas configurações do Firebase (as que você me enviou)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
+    authDomain: "tainan-salao.firebaseapp.com",
+    projectId: "tainan-salao",
+    storageBucket: "tainan-salao.firebasestorage.app",
+    messagingSenderId: "965996001179",
+    appId: "1:965996001179:web:e805a9e1087aaa9306533e",
+    measurementId: "G-E6EN58PXVB"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app); // Inicializa o serviço de autenticação
+  const db = getFirestore(app); // Inicializa o serviço Firestore
+  const analytics = getAnalytics(app); // Se você estiver usando Analytics
+
+  // =============================================================================================================
+  // VARIÁVEIS GLOBAIS (Serão preenchidas pelo Firestore)
+  // =============================================================================================================
+
+  let clientes = [];
+  let profissionais = [];
+  let produtos = [];
+  let agendamentos = [];
+  let gastos = [];
+  let caixaInicial = 0;
+
+  // Variáveis de controle de edição
+  let clienteEditandoId = null;
+  let profissionalEditandoId = null;
+  let produtoEditandoId = null;
+  let agendamentoEditandoId = null; // Para edição de agendamentos
+
+  // Objeto para formatar moeda
+  const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
+  // Função para exibir notificações Toast
+  function showToast(message, duration = 3000) {
+      const toast = document.getElementById("toastNotification");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+          toast.classList.remove("show");
+      }, duration);
+  }
+
+  // Função de validação de formulário genérica
+  function validateField(fieldId, errorId, message) {
+      const field = document.getElementById(fieldId);
+      const errorSpan = document.getElementById(errorId);
+      if (field.value.trim() === '') {
+          field.classList.add('error');
+          errorSpan.textContent = message;
+          return false;
       }
+      field.classList.remove('error');
+      errorSpan.textContent = '';
+      return true;
+  }
+
+  // =============================================================================================================
+  // AUTENTICAÇÃO COM FIREBASE
+  // =============================================================================================================
+
+  document.getElementById("btnEntrar").onclick = () => {
+    document.getElementById("splash").style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("loginScreen").style.display = "flex";
+    }, 600);
+  };
+
+  document.getElementById("btnLogin").onclick = async () => {
+    const emailInput = document.getElementById("emailLogin");
+    const passwordInput = document.getElementById("password");
+    const loginError = document.getElementById("loginError");
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      loginError.textContent = "Email e senha são obrigatórios.";
+      loginError.style.display = "block";
+      emailInput.classList.toggle('error', !email);
+      passwordInput.classList.toggle('error', !password);
+      return;
     }
 
-    async function criarConta() {
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, senha);
-        alert('Conta criada com sucesso! Faça login.');
-      } catch (error) {
-        alert('Erro ao criar conta: ' + error.message);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      showToast("Login bem-sucedido!");
+      loginError.style.display = "none";
+      emailInput.classList.remove('error');
+      passwordInput.classList.remove('error');
+    } catch (error) {
+      console.error("Erro de login:", error.code, error.message);
+      let errorMessage = "Erro ao fazer login. Verifique suas credenciais.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMessage = "Email ou senha incorretos.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Formato de email inválido.";
       }
+      loginError.textContent = errorMessage;
+      loginError.style.display = "block";
+      emailInput.classList.add('error');
+      passwordInput.classList.add('error');
     }
+  };
 
-    function logout() {
-      signOut(auth);
-    }
-
-    function abrirSecao(idSecao) {
-      const sections = document.querySelectorAll('#app section');
-      sections.forEach(sec => {
-        sec.style.display = (sec.id === idSecao) ? 'block' : 'none';
-      });
-      if (idSecao === 'dashboardSection') {
-        atualizarDashboard();
+  // Função para criar um novo usuário (usada para o primeiro acesso/admin)
+  async function criarPrimeiroUsuario(email, password) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("Usuário registrado:", userCredential.user);
+      showToast("Primeiro usuário registrado com sucesso! Faça login.");
+      document.getElementById("emailLogin").value = email;
+      document.getElementById("password").value = password;
+    } catch (error) {
+      console.error("Erro ao registrar usuário:", error.code, error.message);
+      let errorMessage = "Erro ao registrar usuário. Tente novamente.";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Este email já está em uso.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Senha muito fraca (mínimo 6 caracteres).";
       }
+      showToast(errorMessage);
     }
+  }
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('splash').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        abrirSecao('dashboardSection');
+  function criarPrimeiroUsuarioManual() {
+      const email = prompt("Digite o email para o primeiro acesso/admin:");
+      const password = prompt("Digite a senha para o primeiro acesso/admin (mínimo 6 caracteres):");
+      if (email && password) {
+          criarPrimeiroUsuario(email, password);
       } else {
-        document.getElementById('app').style.display = 'none';
-        document.getElementById('login').style.display = 'flex';
-        document.getElementById('splash').style.display = 'none';
+          showToast("Email e senha não podem ser vazios.");
       }
-    });
+  }
 
-    window.onload = () => {
-      document.getElementById('splash').style.display = 'flex';
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('app').style.display = 'none';
+  // Observar o estado de autenticação para redirecionar o usuário
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Usuário logado
+      document.getElementById("loginScreen").style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("main").style.display = "block";
+        abrirSecao("dashboardSection"); // Abre o dashboard após o login
+        carregarTodosOsDadosDoFirestore(); // Carrega todos os dados do Firestore
+      }, 600);
+    } else {
+      // Usuário deslogado ou não logado
+      if (document.getElementById("splash").style.display === "none") {
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("main").style.display = "none";
+      }
+    }
+  });
+
+  async function logout() {
+    try {
+      await signOut(auth);
+      showToast("Você foi desconectado.");
+      document.getElementById("loginScreen").style.opacity = 1;
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("main").style.display = "none";
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      showToast("Erro ao desconectar.");
+    }
+  }
+
+  // =============================================================================================================
+  // FUNÇÕES DE MANIPULAÇÃO DO FIRESTORE
+  // =============================================================================================================
+
+  // Carregar todos os dados do Firestore e configurar listeners em tempo real
+  async function carregarTodosOsDadosDoFirestore() {
+      showToast("Carregando dados...");
+      carregarClientesFirestore();
+      carregarProfissionaisFirestore();
+      carregarProdutosFirestore();
+      carregarAgendamentosFirestore();
+      carregarGastosFirestore();
+      carregarCaixaInicialFirestore();
+  }
+
+  // Funções de CARREGAMENTO (onSnapshot para tempo real)
+  function carregarClientesFirestore() {
+      onSnapshot(query(collection(db, "clientes"), orderBy("nome", "asc")), (snapshot) => {
+          clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          listarClientes();
+          atualizarDashboard();
+          preencherSelectClienteAgendamento();
+      }, (error) => { console.error("Erro ao carregar clientes:", error); showToast("Erro ao carregar clientes."); });
+  }
+
+  function carregarProfissionaisFirestore() {
+      onSnapshot(query(collection(db, "profissionais"), orderBy("nome", "asc")), (snapshot) => {
+          profissionais = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          listarProfissionais();
+          atualizarDashboard();
+          preencherSelectProfissionalAgendamento();
+      }, (error) => { console.error("Erro ao carregar profissionais:", error); showToast("Erro ao carregar profissionais."); });
+  }
+
+  function carregarProdutosFirestore() {
+      onSnapshot(query(collection(db, "produtos"), orderBy("nome", "asc")), (snapshot) => {
+          produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          listarProdutos();
+          listarProdutosEmFalta();
+          preencherSelectProdutosUso();
+          listarMovimentacoes();
+          atualizarDashboard();
+      }, (error) => { console.error("Erro ao carregar produtos:", error); showToast("Erro ao carregar produtos."); });
+  }
+
+  function carregarAgendamentosFirestore() {
+      onSnapshot(query(collection(db, "agendamentos"), orderBy("data", "desc"), orderBy("hora", "desc")), (snapshot) => {
+          agendamentos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          listarAgendamentos();
+          atualizarDashboard();
+          carregarFinanceiro(); // Financeiro depende dos agendamentos concluídos
+          desenharGraficoFinanceiro();
+      }, (error) => { console.error("Erro ao carregar agendamentos:", error); showToast("Erro ao carregar agendamentos."); });
+  }
+
+  function carregarGastosFirestore() {
+      onSnapshot(query(collection(db, "gastos"), orderBy("data", "desc")), (snapshot) => {
+          gastos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          carregarFinanceiro(); // Financeiro depende dos gastos
+          desenharGraficoFinanceiro();
+      }, (error) => { console.error("Erro ao carregar gastos:", error); showToast("Erro ao carregar gastos."); });
+  }
+
+  async function carregarCaixaInicialFirestore() {
+      const configRef = doc(db, "configuracoes", "caixaInicial");
+      try {
+          const docSnap = await getDoc(configRef);
+          if (docSnap.exists()) {
+              caixaInicial = parseFloat(docSnap.data().valor) || 0;
+          } else {
+              // Se não existir, crie com valor padrão
+              await updateDoc(configRef, { valor: 0 }, { merge: true });
+              caixaInicial = 0;
+          }
+          document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
+          carregarFinanceiro();
+          atualizarDashboard();
+      } catch (error) {
+          console.error("Erro ao carregar/criar caixa inicial:", error);
+          showToast("Erro ao carregar caixa inicial.");
+      }
+  }
+
+  // ================== CLIENTES ======================
+  async function salvarCliente() {
+    const nomeInput = document.getElementById("nomeCliente");
+    const telefone = document.getElementById("telefoneCliente").value.trim();
+    const email = document.getElementById("emailCliente").value.trim();
+    const obs = document.getElementById("obsCliente").value.trim();
+
+    if (!validateField('nomeCliente', 'errorNomeCliente', 'Nome é obrigatório.')) return;
+
+    let dados = { nome: nomeInput.value.trim(), telefone, email, obs };
+
+    try {
+      if (clienteEditandoId !== null) {
+        const clienteRef = doc(db, "clientes", clienteEditandoId);
+        await updateDoc(clienteRef, dados);
+        showToast("Cliente atualizado com sucesso!");
+      } else {
+        await addDoc(collection(db, "clientes"), dados);
+        showToast("Cliente salvo com sucesso!");
+      }
+      limparCamposCliente();
+      clienteEditandoId = null;
+    } catch (e) {
+      console.error("Erro ao salvar cliente: ", e);
+      showToast("Erro ao salvar cliente.");
+    }
+  }
+  function limparCamposCliente() {
+    document.getElementById("nomeCliente").value = "";
+    document.getElementById("telefoneCliente").value = "";
+    document.getElementById("emailCliente").value = "";
+    document.getElementById("obsCliente").value = "";
+    document.getElementById("nomeCliente").classList.remove('error');
+    document.getElementById("errorNomeCliente").textContent = '';
+    clienteEditandoId = null;
+  }
+  function listarClientes() {
+    const busca = document.getElementById("buscaCliente").value.toLowerCase();
+    const lista = document.getElementById("listaClientes");
+    lista.innerHTML = "";
+    clientes.forEach(c => {
+      if (!c.nome.toLowerCase().includes(busca)) return;
+      lista.innerHTML += `
+      <div class="item">
+        <strong>${c.nome}</strong> <small>${c.telefone || ""} | ${c.email || ""}</small><br>
+        <small>${c.obs || ""}</small>
+        <div>
+            <button class="editar" onclick="editarCliente('${c.id}')">Editar</button>
+            <button class="excluir" onclick="excluirCliente('${c.id}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+  }
+  function editarCliente(id) {
+    const c = clientes.find(cliente => cliente.id === id);
+    if (c) {
+      document.getElementById("nomeCliente").value = c.nome;
+      document.getElementById("telefoneCliente").value = c.telefone;
+      document.getElementById("emailCliente").value = c.email;
+      document.getElementById("obsCliente").value = c.obs;
+      clienteEditandoId = c.id;
+      showToast("Modo de edição de cliente.");
+    }
+  }
+  async function excluirCliente(id) {
+    if (confirm("Deseja realmente excluir este cliente?")) {
+      try {
+        await deleteDoc(doc(db, "clientes", id));
+        showToast("Cliente excluído!");
+      } catch (e) {
+        console.error("Erro ao excluir cliente: ", e);
+        showToast("Erro ao excluir cliente.");
+      }
+    }
+  }
+
+  // ================== PROFISSIONAIS ======================
+  async function salvarProfissional() {
+    const nomeInput = document.getElementById("nomeProf");
+    const espInput = document.getElementById("espProf");
+    const servicoNomeInput = document.getElementById("servicoProf");
+    const valorProfInput = document.getElementById("valorProf");
+
+    let isValid = true;
+    isValid = validateField('nomeProf', 'errorNomeProf', 'Nome é obrigatório.') && isValid;
+    isValid = validateField('espProf', 'errorEspProf', 'Especialidade é obrigatória.') && isValid;
+    isValid = validateField('servicoProf', 'errorServicoProf', 'Serviço é obrigatório.') && isValid;
+    
+    const servValor = parseFloat(valorProfInput.value);
+    if (isNaN(servValor) || servValor < 0) {
+        valorProfInput.classList.add('error');
+        document.getElementById("errorValorProf").textContent = 'Valor inválido.';
+        isValid = false;
+    } else {
+        valorProfInput.classList.remove('error');
+        document.getElementById("errorValorProf").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    let servicos = [{ nome: servicoNomeInput.value.trim(), valor: servValor }];
+    let dados = { nome: nomeInput.value.trim(), especialidade: espInput.value.trim(), servicos };
+
+    try {
+      if (profissionalEditandoId !== null) {
+        const profRef = doc(db, "profissionais", profissionalEditandoId);
+        await updateDoc(profRef, dados);
+        showToast("Profissional atualizado com sucesso!");
+      } else {
+        await addDoc(collection(db, "profissionais"), dados);
+        showToast("Profissional salvo com sucesso!");
+      }
+      limparCamposProfissional();
+      profissionalEditandoId = null;
+    } catch (e) {
+      console.error("Erro ao salvar profissional: ", e);
+      showToast("Erro ao salvar profissional.");
+    }
+  }
+  function limparCamposProfissional() {
+    document.getElementById("nomeProf").value = "";
+    document.getElementById("espProf").value = "";
+    document.getElementById("servicoProf").value = "";
+    document.getElementById("valorProf").value = "";
+    document.getElementById("nomeProf").classList.remove('error');
+    document.getElementById("errorNomeProf").textContent = '';
+    document.getElementById("espProf").classList.remove('error');
+    document.getElementById("errorEspProf").textContent = '';
+    document.getElementById("servicoProf").classList.remove('error');
+    document.getElementById("errorServicoProf").textContent = '';
+    document.getElementById("valorProf").classList.remove('error');
+    document.getElementById("errorValorProf").textContent = '';
+    profissionalEditandoId = null;
+  }
+  function listarProfissionais() {
+    const busca = document.getElementById("buscaProfissional").value.toLowerCase();
+    const lista = document.getElementById("listaProfissionais");
+    lista.innerHTML = "";
+    profissionais.forEach(p => {
+      if (!p.nome.toLowerCase().includes(busca)) return;
+      let servicosHTML = p.servicos.map(s => `<li>${s.nome} - ${currencyFormatter.format(s.valor)}</li>`).join("");
+      lista.innerHTML += `
+      <div class="item">
+        <strong>${p.nome}</strong> <small>(${p.especialidade})</small>
+        <ul>${servicosHTML}</ul>
+        <div>
+            <button class="editar" onclick="editarProfissional('${p.id}')">Editar</button>
+            <button class="excluir" onclick="excluirProfissional('${p.id}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+  }
+  function editarProfissional(id) {
+    const p = profissionais.find(prof => prof.id === id);
+    if (p) {
+      document.getElementById("nomeProf").value = p.nome;
+      document.getElementById("espProf").value = p.especialidade;
+      document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
+      document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
+      profissionalEditandoId = p.id;
+      showToast("Modo de edição de profissional.");
+    }
+  }
+  async function excluirProfissional(id) {
+    if (confirm("Deseja realmente excluir este profissional?")) {
+      try {
+        await deleteDoc(doc(db, "profissionais", id));
+        showToast("Profissional excluído!");
+      } catch (e) {
+        console.error("Erro ao excluir profissional: ", e);
+        showToast("Erro ao excluir profissional.");
+      }
+    }
+  }
+
+  // ================== PRODUTOS (Estoque avançado) ======================
+  async function salvarProduto() {
+    const nomeInput = document.getElementById("nomeProduto");
+    const tipoInput = document.getElementById("tipoProduto");
+    const quantidadeInput = document.getElementById("quantidadeProduto");
+    const minQtdInput = document.getElementById("minQuantidadeProduto");
+    const validade = document.getElementById("validadeProduto").value;
+
+    let isValid = true;
+    isValid = validateField('nomeProduto', 'errorNomeProduto', 'Nome é obrigatório.') && isValid;
+    isValid = validateField('tipoProduto', 'errorTipoProduto', 'Tipo é obrigatório.') && isValid;
+
+    const quantidade = parseInt(quantidadeInput.value);
+    if (isNaN(quantidade) || quantidade < 0) {
+        quantidadeInput.classList.add('error');
+        document.getElementById("errorQuantidadeProduto").textContent = 'Quantidade inválida.';
+        isValid = false;
+    } else {
+        quantidadeInput.classList.remove('error');
+        document.getElementById("errorQuantidadeProduto").textContent = '';
+    }
+
+    const minQtd = parseInt(minQtdInput.value);
+    if (isNaN(minQtd) || minQtd < 0) {
+        minQtdInput.classList.add('error');
+        document.getElementById("errorMinQuantidadeProduto").textContent = 'Quantidade mínima inválida.';
+        isValid = false;
+    } else {
+        minQtdInput.classList.remove('error');
+        document.getElementById("errorMinQuantidadeProduto").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    let dados = { nome: nomeInput.value.trim(), tipo: tipoInput.value.trim(), quantidade, minQtd, validade };
+
+    try {
+      if (produtoEditandoId !== null) {
+        const produtoRef = doc(db, "produtos", produtoEditandoId);
+        await updateDoc(produtoRef, dados);
+        showToast("Produto atualizado com sucesso!");
+      } else {
+        dados.movimentacoes = []; // Inicia com array vazio de movimentações
+        await addDoc(collection(db, "produtos"), dados);
+        showToast("Produto salvo com sucesso!");
+      }
+      limparCamposProduto();
+      produtoEditandoId = null;
+    } catch (e) {
+      console.error("Erro ao salvar produto: ", e);
+      showToast("Erro ao salvar produto.");
+    }
+  }
+  function limparCamposProduto() {
+    document.getElementById("nomeProduto").value = "";
+    document.getElementById("tipoProduto").value = "";
+    document.getElementById("quantidadeProduto").value = "";
+    document.getElementById("minQuantidadeProduto").value = "";
+    document.getElementById("validadeProduto").value = "";
+    document.getElementById("nomeProduto").classList.remove('error');
+    document.getElementById("errorNomeProduto").textContent = '';
+    document.getElementById("tipoProduto").classList.remove('error');
+    document.getElementById("errorTipoProduto").textContent = '';
+    document.getElementById("quantidadeProduto").classList.remove('error');
+    document.getElementById("errorQuantidadeProduto").textContent = '';
+    document.getElementById("minQuantidadeProduto").classList.remove('error');
+    document.getElementById("errorMinQuantidadeProduto").textContent = '';
+    produtoEditandoId = null;
+  }
+  function listarProdutos() {
+    const busca = document.getElementById("buscaProduto").value.toLowerCase();
+    const lista = document.getElementById("listaProdutos");
+    lista.innerHTML = "";
+    produtos.forEach(p => {
+      if (!p.nome.toLowerCase().includes(busca)) return;
+      const validadeText = p.validade ? ` | Validade: ${p.validade}` : "";
+      lista.innerHTML += `
+      <div class="item">
+        <strong>${p.nome}</strong> <small>(${p.tipo})</small><br>
+        <small>Quantidade: ${p.quantidade} | Mínimo: ${p.minQtd}${validadeText}</small><br>
+        <div>
+            <button class="editar" onclick="editarProduto('${p.id}')">Editar</button>
+            <button class="excluir" onclick="excluirProduto('${p.id}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+  }
+  function listarProdutosEmFalta() {
+    const div = document.getElementById("produtosEmFalta");
+    div.innerHTML = "";
+    const emFalta = produtos.filter(p => p.quantidade < p.minQtd);
+    if (emFalta.length === 0) {
+      div.textContent = "Nenhum produto em falta.";
+      return;
+    }
+    emFalta.forEach(p => {
+      div.innerHTML += `<div class="item"><strong>${p.nome}</strong> - Quantidade: ${p.quantidade} (mínimo: ${p.minQtd})</div>`;
+    });
+  }
+  function editarProduto(id) {
+    const p = produtos.find(produto => produto.id === id);
+    if (p) {
+      document.getElementById("nomeProduto").value = p.nome;
+      document.getElementById("tipoProduto").value = p.tipo;
+      document.getElementById("quantidadeProduto").value = p.quantidade;
+      document.getElementById("minQuantidadeProduto").value = p.minQtd;
+      document.getElementById("validadeProduto").value = p.validade || "";
+      produtoEditandoId = p.id;
+      showToast("Modo de edição de produto.");
+    }
+  }
+  async function excluirProduto(id) {
+    if (confirm("Deseja realmente excluir este produto?")) {
+      try {
+        await deleteDoc(doc(db, "produtos", id));
+        showToast("Produto excluído!");
+      } catch (e) {
+        console.error("Erro ao excluir produto: ", e);
+        showToast("Erro ao excluir produto.");
+      }
+    }
+  }
+  function preencherSelectProdutosUso() {
+    const select = document.getElementById("selectProdutoUso");
+    select.innerHTML = "<option value=''>-- Selecione um produto --</option>";
+    produtos.forEach(p => {
+      select.innerHTML += `<option value="${p.id}">${p.nome} (Qtd: ${p.quantidade})</option>`;
+    });
+  }
+  async function usarProduto() {
+    const select = document.getElementById("selectProdutoUso");
+    const produtoId = select.value;
+    const qtdUsoInput = document.getElementById("quantidadeUso");
+    const qtdUso = parseInt(qtdUsoInput.value);
+
+    if (!produtoId) {
+      return showToast("Selecione um produto válido.");
+    }
+    if (isNaN(qtdUso) || qtdUso <= 0) {
+      return showToast("Informe uma quantidade válida para uso.");
+    }
+
+    const produto = produtos.find(p => p.id === produtoId);
+    if (!produto) return showToast("Produto não encontrado.");
+
+    if (produto.quantidade < qtdUso) {
+      return showToast("Quantidade insuficiente em estoque.");
+    }
+
+    try {
+      const hoje = new Date().toISOString().slice(0,10);
+      const updatedMovimentacoes = [...(produto.movimentacoes || []), {
+        tipo: "Saída",
+        quantidade: qtdUso,
+        data: hoje,
+        descricao: "Uso no salão"
+      }];
+
+      const produtoRef = doc(db, "produtos", produtoId);
+      await updateDoc(produtoRef, {
+        quantidade: produto.quantidade - qtdUso,
+        movimentacoes: updatedMovimentacoes
+      });
+
+      qtdUsoInput.value = "";
+      select.value = "";
+      showToast(`Usado ${qtdUso} de ${produto.nome}.`);
+    } catch (e) {
+      console.error("Erro ao usar produto: ", e);
+      showToast("Erro ao usar produto.");
+    }
+  }
+  function listarMovimentacoes() {
+    const div = document.getElementById("historicoMovimentacoes");
+    div.innerHTML = "";
+    produtos.forEach((p) => {
+      if (!p.movimentacoes || p.movimentacoes.length === 0) return;
+      div.innerHTML += `<h5>${p.nome}</h5>`;
+      p.movimentacoes.forEach(m => {
+        div.innerHTML += `<div class="item">${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
+      });
+    });
+  }
+
+  // ================== AGENDAMENTOS ======================
+  function preencherSelectClienteAgendamento() {
+    const select = document.getElementById("selectClienteAgendamento");
+    select.innerHTML = "<option value=''>-- Selecione um cliente --</option>";
+    clientes.forEach(c => {
+      select.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+    });
+  }
+  function preencherSelectProfissionalAgendamento() {
+    const select = document.getElementById("selectProfissionalAgendamento");
+    select.innerHTML = "<option value=''>-- Selecione um profissional --</option>";
+    profissionais.forEach(p => {
+      select.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+    });
+    document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
+  }
+  function atualizarServicosProfissional() {
+    const profId = document.getElementById("selectProfissionalAgendamento").value;
+    const selectServico = document.getElementById("selectServicoAgendamento");
+    selectServico.innerHTML = "<option value=''>-- Selecione o serviço --</option>";
+    const profissional = profissionais.find(p => p.id === profId);
+    if (!profissional) return;
+    
+    profissional.servicos.forEach((s, i) => {
+      selectServico.innerHTML += `<option value="${i}">${s.nome} - ${currencyFormatter.format(s.valor)}</option>`;
+    });
+  }
+  async function salvarAgendamento() {
+    const clienteId = document.getElementById("selectClienteAgendamento").value;
+    const profId = document.getElementById("selectProfissionalAgendamento").value;
+    const servIndex = document.getElementById("selectServicoAgendamento").value;
+    const data = document.getElementById("dataAgendamento").value;
+    const hora = document.getElementById("horaAgendamento").value;
+
+    let isValid = true;
+    isValid = validateField('selectClienteAgendamento', 'errorSelectClienteAgendamento', 'Cliente é obrigatório.') && isValid;
+    isValid = validateField('selectProfissionalAgendamento', 'errorSelectProfissionalAgendamento', 'Profissional é obrigatório.') && isValid;
+    isValid = validateField('selectServicoAgendamento', 'errorSelectServicoAgendamento', 'Serviço é obrigatório.') && isValid;
+    isValid = validateField('dataAgendamento', 'errorDataAgendamento', 'Data é obrigatória.') && isValid;
+    isValid = validateField('horaAgendamento', 'errorHoraAgendamento', 'Hora é obrigatória.') && isValid;
+
+    if (!isValid) return;
+
+    let agendamentoData = {
+      clienteId,
+      profId,
+      servIndex: parseInt(servIndex),
+      data,
+      hora,
+      status: "Pendente" // Sempre inicia como Pendente
     };
 
-    let grafico;
-    function atualizarDashboard() {
-      const totalClientes = 10;
-      const totalProfissionais = 5;
-      const totalProdutos = 25;
-      const agendamentosPendentes = 7;
-      const caixaAtual = 1234.56;
+    try {
+        if (agendamentoEditandoId !== null) {
+            const agendamentoRef = doc(db, "agendamentos", agendamentoEditandoId);
+            await updateDoc(agendamentoRef, agendamentoData);
+            showToast("Agendamento atualizado com sucesso!");
+        } else {
+            await addDoc(collection(db, "agendamentos"), agendamentoData);
+            showToast("Agendamento salvo com sucesso!");
+        }
+        limparCamposAgendamento();
+        agendamentoEditandoId = null; // Reseta o ID de edição
+    } catch (e) {
+        console.error("Erro ao salvar agendamento: ", e);
+        showToast("Erro ao salvar agendamento.");
+    }
+  }
 
-      document.getElementById('dashTotalClientes').textContent = totalClientes;
-      document.getElementById('dashTotalProfissionais').textContent = totalProfissionais;
-      document.getElementById('dashTotalProdutos').textContent = totalProdutos;
-      document.getElementById('dashTotalAgendamentos').textContent = agendamentosPendentes;
-      document.getElementById('dashCaixaAtual').textContent = caixaAtual.toFixed(2).replace('.', ',');
+  function limparCamposAgendamento() {
+      document.getElementById("selectClienteAgendamento").value = "";
+      document.getElementById("selectProfissionalAgendamento").value = "";
+      document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
+      document.getElementById("dataAgendamento").value = "";
+      document.getElementById("horaAgendamento").value = "";
 
-      const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
-      const data = {
-        labels: ['Ganhos', 'Gastos', 'Lucro'],
-        datasets: [{
-          label: 'Valores em R$',
-          data: [2000, 765, 1235],
-          backgroundColor: ['#7b1fa2', '#e53935', '#43a047'],
-          hoverOffset: 20
-        }]
-      };
+      document.getElementById("selectClienteAgendamento").classList.remove('error');
+      document.getElementById("errorSelectClienteAgendamento").textContent = '';
+      document.getElementById("selectProfissionalAgendamento").classList.remove('error');
+      document.getElementById("errorSelectProfissionalAgendamento").textContent = '';
+      document.getElementById("selectServicoAgendamento").classList.remove('error');
+      document.getElementById("errorSelectServicoAgendamento").textContent = '';
+      document.getElementById("dataAgendamento").classList.remove('error');
+      document.getElementById("errorDataAgendamento").textContent = '';
+      document.getElementById("horaAgendamento").classList.remove('error');
+      document.getElementById("errorHoraAgendamento").textContent = '';
+      agendamentoEditandoId = null;
+  }
 
-      if(grafico) grafico.destroy();
-      grafico = new Chart(ctx, {
-        type: 'pie',
-        data: data,
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: 'Financeiro - Resumo' }
+  function listarAgendamentos() {
+    const busca = document.getElementById("buscaAgendamento").value.toLowerCase();
+    const filtroPendentes = document.getElementById("filtroPendentes").checked;
+    const filtroData = document.getElementById("filtroData").value;
+
+    const lista = document.getElementById("listaAgendamentos");
+    lista.innerHTML = "";
+
+    const agendamentosExibidos = agendamentos.filter(a => {
+        const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "";
+        if (!clienteNome.toLowerCase().includes(busca)) return false;
+
+        if (filtroPendentes && a.status !== "Pendente") return false;
+        if (filtroData && a.data !== filtroData) return false;
+        return true;
+    });
+
+    agendamentosExibidos.forEach(a => {
+      const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
+      const profissional = profissionais.find(p => p.id === a.profId);
+      const servico = profissional?.servicos[a.servIndex];
+
+      lista.innerHTML += `
+      <div class="item">
+        <strong>${clienteNome}</strong> - ${a.data} ${a.hora} <br>
+        Profissional: ${profissional?.nome || "N/A"}<br>
+        Serviço: ${servico?.nome || "N/A"} - ${currencyFormatter.format(servico?.valor || 0)}<br>
+        Status: ${a.status}
+        <div>
+            <button class="editar" onclick="editarAgendamento('${a.id}')">Editar</button>
+            <button class="excluir" onclick="excluirAgendamento('${a.id}')">Excluir</button>
+            <button onclick="alterarStatusAgendamento('${a.id}')">${a.status === 'Pendente' ? 'Concluir' : 'Reabrir'}</button>
+        </div>
+      </div>`;
+    });
+  }
+
+  function editarAgendamento(id) {
+    const a = agendamentos.find(agend => agend.id === id);
+    if (a) {
+      document.getElementById("selectClienteAgendamento").value = a.clienteId;
+      document.getElementById("selectProfissionalAgendamento").value = a.profId;
+      atualizarServicosProfissional();
+      document.getElementById("selectServicoAgendamento").value = a.servIndex;
+      document.getElementById("dataAgendamento").value = a.data;
+      document.getElementById("horaAgendamento").value = a.hora;
+      agendamentoEditandoId = a.id;
+      showToast("Modo de edição de agendamento. Salve para confirmar.");
+    }
+  }
+
+  async function excluirAgendamento(id) {
+    if (confirm("Deseja realmente excluir este agendamento?")) {
+      try {
+        await deleteDoc(doc(db, "agendamentos", id));
+        showToast("Agendamento excluído!");
+      } catch (e) {
+        console.error("Erro ao excluir agendamento: ", e);
+        showToast("Erro ao excluir agendamento.");
+      }
+    }
+  }
+  async function alterarStatusAgendamento(id) {
+    const agendamentoRef = doc(db, "agendamentos", id);
+    const agendamento = agendamentos.find(a => a.id === id);
+    if (agendamento) {
+        const newStatus = agendamento.status === "Pendente" ? "Concluído" : "Pendente";
+        try {
+            await updateDoc(agendamentoRef, { status: newStatus });
+            showToast(`Agendamento ${newStatus.toLowerCase()}!`);
+        } catch (e) {
+            console.error("Erro ao alterar status:", e);
+            showToast("Erro ao alterar status do agendamento.");
+        }
+    }
+  }
+  function limparFiltrosAgendamento() {
+    document.getElementById("buscaAgendamento").value = "";
+    document.getElementById("filtroPendentes").checked = true;
+    document.getElementById("filtroData").value = "";
+    listarAgendamentos();
+  }
+
+  // ================== FINANCEIRO ======================
+  async function salvarCaixaInicial() {
+    const valor = parseFloat(document.getElementById("caixaInicial").value);
+    if (isNaN(valor) || valor < 0) return showToast("Valor inválido para o caixa inicial.");
+    
+    try {
+        const configRef = doc(db, "configuracoes", "caixaInicial");
+        await updateDoc(configRef, { valor: valor });
+        showToast("Caixa inicial salvo.");
+    } catch (e) {
+        console.error("Erro ao salvar caixa inicial: ", e);
+        showToast("Erro ao salvar caixa inicial.");
+    }
+  }
+
+  function carregarFinanceiro() {
+    document.getElementById("caixaInicial").value = caixaInicial.toFixed(2);
+
+    let ganhos = 0;
+    let ganhosHTML = "";
+    agendamentos.forEach(a => {
+      if (a.status === "Concluído") {
+        const prof = profissionais.find(p => p.id === a.profId);
+        const serv = prof?.servicos[a.servIndex];
+        if (serv) {
+          ganhos += serv.valor;
+          const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
+          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - ${currencyFormatter.format(serv.valor)}</div>`;
+        }
+      }
+    });
+    document.getElementById("listaGanhos").innerHTML = ganhosHTML;
+
+    let gastosTotal = 0;
+    let gastosHTML = "";
+    gastos.forEach(g => {
+      gastosTotal += g.valor;
+      gastosHTML += `<div>${g.data} - ${g.descricao} - ${currencyFormatter.format(g.valor)}</div>`;
+    });
+    document.getElementById("listaGastos").innerHTML = gastosHTML;
+
+    const lucro = caixaInicial + ganhos - gastosTotal;
+    document.getElementById("caixaAtual").textContent = currencyFormatter.format(lucro);
+    document.getElementById("ganhosTotais").textContent = currencyFormatter.format(ganhos);
+    document.getElementById("gastosTotais").textContent = currencyFormatter.format(gastosTotal);
+    document.getElementById("lucroTotal").textContent = currencyFormatter.format(lucro);
+  }
+  async function salvarGasto() {
+    const descricaoInput = document.getElementById("descricaoGasto");
+    const valorGastoInput = document.getElementById("valorGasto");
+    const dataGastoInput = document.getElementById("dataGasto");
+
+    let isValid = true;
+    isValid = validateField('descricaoGasto', 'errorDescricaoGasto', 'Descrição é obrigatória.') && isValid;
+    isValid = validateField('dataGasto', 'errorDataGasto', 'Data é obrigatória.') && isValid;
+
+    const valor = parseFloat(valorGastoInput.value);
+    if (isNaN(valor) || valor <= 0) {
+        valorGastoInput.classList.add('error');
+        document.getElementById("errorValorGasto").textContent = 'Valor inválido.';
+        isValid = false;
+    } else {
+        valorGastoInput.classList.remove('error');
+        document.getElementById("errorValorGasto").textContent = '';
+    }
+
+    if (!isValid) return;
+
+    let gastoData = { descricao: descricaoInput.value.trim(), valor, data: dataGastoInput.value };
+    try {
+        await addDoc(collection(db, "gastos"), gastoData);
+        showToast("Gasto salvo com sucesso!");
+        descricaoInput.value = "";
+        valorGastoInput.value = "";
+        dataGastoInput.value = "";
+    } catch (e) {
+        console.error("Erro ao salvar gasto: ", e);
+        showToast("Erro ao salvar gasto.");
+    }
+  }
+
+  // =========== DASHBOARD ==============
+  function atualizarDashboard() {
+    document.getElementById("dashTotalClientes").textContent = clientes.length;
+    document.getElementById("dashTotalProfissionais").textContent = profissionais.length;
+    document.getElementById("dashTotalProdutos").textContent = produtos.reduce((acc, p) => acc + p.quantidade, 0);
+    document.getElementById("dashTotalAgendamentos").textContent = agendamentos.filter(a => a.status === "Pendente").length;
+    
+    const ganhosCalculados = agendamentos.reduce((acc,a) => {
+      if(a.status === "Concluído"){
+        const prof = profissionais.find(p => p.id === a.profId);
+        if(prof && prof.servicos[a.servIndex]){
+          return acc + prof.servicos[a.servIndex].valor;
+        }
+      }
+      return acc;
+    }, 0);
+    const gastosCalculados = gastos.reduce((acc,g) => acc + g.valor, 0);
+    const lucroAtual = caixaInicial + ganhosCalculados - gastosCalculados;
+    document.getElementById("dashCaixaAtual").textContent = currencyFormatter.format(lucroAtual);
+  }
+
+  // ======= GRÁFICO FINANCEIRO ========
+  let chartFinanceiro = null;
+  function desenharGraficoFinanceiro() {
+    const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
+
+    const ganhosMes = {};
+    const gastosMes = {};
+
+    agendamentos.forEach(a => {
+      if (a.status !== "Concluído") return;
+      const prof = profissionais.find(p => p.id === a.profId);
+      const serv = prof?.servicos[a.servIndex];
+      if (!serv) return;
+
+      const mes = a.data.slice(0,7);
+      ganhosMes[mes] = (ganhosMes[mes] || 0) + serv.valor;
+    });
+
+    gastos.forEach(g => {
+      const mes = g.data.slice(0,7);
+      gastosMes[mes] = (gastosMes[mes] || 0) + g.valor;
+    });
+
+    const meses = Array.from(new Set([...Object.keys(ganhosMes), ...Object.keys(gastosMes)])).sort();
+
+    const ganhosData = meses.map(m => ganhosMes[m] || 0);
+    const gastosData = meses.map(m => gastosMes[m] || 0);
+    const lucroData = meses.map((m, i) => (ganhosData[i] - gastosData[i]));
+
+    if(chartFinanceiro) chartFinanceiro.destroy();
+
+    chartFinanceiro = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: meses,
+        datasets: [
+          {
+            label: 'Ganhos',
+            data: ganhosData,
+            backgroundColor: 'rgba(123, 31, 162, 0.7)',
+          },
+          {
+            label: 'Gastos',
+            data: gastosData,
+            backgroundColor: 'rgba(229, 57, 53, 0.7)',
+          },
+          {
+            label: 'Lucro',
+            data: lucroData,
+            type: 'line',
+            borderColor: 'rgba(76,175,80,1)',
+            borderWidth: 3,
+            fill: false,
+            tension: 0.2,
+            yAxisID: 'y1',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            position: 'left',
+            title: {
+              display: true,
+              text: 'R$',
+            },
+            ticks: {
+                callback: function(value) {
+                    return currencyFormatter.format(value);
+                }
+            }
+          },
+          y1: {
+            beginAtZero: true,
+            position: 'right',
+            grid: {
+              drawOnChartArea: false,
+            },
+            title: {
+              display: true,
+              text: 'Lucro R$',
+            },
+            ticks: {
+                callback: function(value) {
+                    return currencyFormatter.format(value);
+                }
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            enabled: true,
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += currencyFormatter.format(context.parsed.y);
+                    }
+                    return label;
+                }
+            }
+          },
+          legend: {
+            labels: {
+              boxWidth: 20,
+            }
           }
         }
-      });
+      }
+    });
+  }
+
+  // ======= BACKUP E RESTAURAÇÃO (Firebase) =======
+  async function exportarDadosFirestore() {
+      try {
+          showToast("Preparando exportação...");
+          const allData = {
+              clientes: (await getDocs(collection(db, "clientes"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
+              profissionais: (await getDocs(collection(db, "profissionais"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
+              produtos: (await getDocs(collection(db, "produtos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
+              agendamentos: (await getDocs(collection(db, "agendamentos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
+              gastos: (await getDocs(collection(db, "gastos"))).docs.map(doc => ({ id: doc.id, ...doc.data() })),
+              caixaInicial: (await getDoc(doc(db, "configuracoes", "caixaInicial"))).data()?.valor || 0
+          };
+
+          const json = JSON.stringify(allData, null, 2);
+          const blob = new Blob([json], {type: "application/json"});
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "backup_firestore_espaco_tai_botelho.json";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast("Dados exportados com sucesso!");
+      } catch (error) {
+          showToast("Erro ao exportar dados: " + error.message);
+          console.error("Erro ao exportar dados:", error);
+      }
+  }
+
+  async function importarDadosFirestore(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+          try {
+              const dados = JSON.parse(e.target.result);
+              if (!confirm("Importar irá substituir TODOS os dados ATUAIS no Firestore. Deseja continuar?")) {
+                  event.target.value = "";
+                  return;
+              }
+
+              showToast("Iniciando importação...");
+
+              // Funções auxiliares para apagar e adicionar
+              const clearAndAddCollection = async (collectionName, items) => {
+                  const collectionRef = collection(db, collectionName);
+                  const docs = await getDocs(collectionRef);
+                  const deletePromises = docs.map(d => deleteDoc(doc(db, collectionName, d.id)));
+                  await Promise.all(deletePromises);
+                  
+                  const addPromises = items.map(item => {
+                      const { id, ...data } = item; // Separa o ID do Firestore dos demais dados
+                      return setDoc(doc(db, collectionName, id || generateUUID()), data); // Usa ID existente ou gera um novo
+                  });
+                  await Promise.all(addPromises);
+              };
+
+              // Importar clientes
+              await clearAndAddCollection("clientes", dados.clientes || []);
+              // Importar profissionais
+              await clearAndAddCollection("profissionais", dados.profissionais || []);
+              // Importar produtos
+              await clearAndAddCollection("produtos", dados.produtos || []);
+              // Importar agendamentos
+              await clearAndAddCollection("agendamentos", dados.agendamentos || []);
+              // Importar gastos
+              await clearAndAddCollection("gastos", dados.gastos || []);
+
+              // Importar caixa inicial (documento único)
+              if (typeof dados.caixaInicial !== 'undefined') {
+                  await setDoc(doc(db, "configuracoes", "caixaInicial"), { valor: parseFloat(dados.caixaInicial) });
+              }
+
+              showToast("Dados importados com sucesso!");
+              abrirSecao("dashboardSection"); // Recarrega o dashboard
+          } catch (error) {
+              showToast("Arquivo de backup inválido ou erro na importação! " + error.message);
+              console.error("Erro ao importar dados:", error);
+          } finally {
+              event.target.value = "";
+          }
+      };
+      reader.readAsText(file);
+  }
+
+  // =============================================================================================================
+  // INICIALIZAÇÃO
+  // =============================================================================================================
+
+  function abrirSecao(id) {
+    document.querySelectorAll("section").forEach(sec => {
+      sec.style.display = "none";
+    });
+    document.getElementById(id).style.display = "block";
+
+    // Recarregar listas e selects ao abrir a seção (onSnapshot já cuida de muitas atualizações)
+    if (id === "clientesSection") {
+      listarClientes();
+      limparCamposCliente();
     }
-  </script>
+    if (id === "profissionaisSection") {
+      listarProfissionais();
+      limparCamposProfissional();
+    }
+    if (id === "produtosSection") {
+      listarProdutos();
+      listarProdutosEmFalta();
+      preencherSelectProdutosUso();
+      listarMovimentacoes();
+      limparCamposProduto();
+    }
+    if (id === "agendamentosSection") {
+      preencherSelectClienteAgendamento();
+      preencherSelectProfissionalAgendamento();
+      listarAgendamentos();
+      limparCamposAgendamento();
+    }
+    if (id === "financeiroSection") carregarFinanceiro();
+    if (id === "dashboardSection") {
+      atualizarDashboard();
+      desenharGraficoFinanceiro();
+    }
+    if (id === "backupSection") { }
+  }
+
+  // window.onload não é mais necessário para controle de login, pois onAuthStateChanged já faz isso
+  // Ele ainda pode ser usado para outras inicializações que não dependam do estado de autenticação
+  // Ex:
+  // window.onload = () => {
+  //    // Outras inicializações que não dependem do login
+  // };
+
+</script>
+
 </body>
 </html>
