@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" /> 
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Espaço Tai Botelho - Sistema Completo</title>
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Espaço Tai Botelho - Sistema Completo</title>
@@ -35,7 +29,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Expondo para window para usar nas funções fora do module
+    // Expor para window para usar fora do módulo
     window.auth = auth;
     window.onAuthStateChanged = onAuthStateChanged;
     window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
@@ -43,18 +37,25 @@
     window.signOut = signOut;
   </script>
 
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
     body {
       margin: 0;
       background: linear-gradient(135deg, #fce4ec, #f8bbd0);
       color: #4a2c4d;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
+
     /* Splash */
     #splash {
       display: flex;
@@ -68,6 +69,7 @@
       position: fixed;
       top: 0; left: 0;
       z-index: 1000;
+      transition: opacity 0.6s ease;
     }
     #splash h1 {
       font-size: 3rem;
@@ -153,23 +155,199 @@
       color: #9c27b0;
     }
 
-    /* App container */
+    /* Main container (app) */
     #app {
       display: none;
       padding: 20px;
-      max-width: 1000px;
+      max-width: 1200px;
       width: 100%;
       margin-top: 50px;
+    }
+
+    /* Menu */
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .menu-item {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 5px 15px rgb(160 75 149 / 0.3);
+      cursor: pointer;
+      flex: 1 1 130px;
+      max-width: 150px;
+      padding: 20px 10px;
+      text-align: center;
+      color: #7b1fa2;
+      user-select: none;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    .menu-item:hover {
+      box-shadow: 0 8px 20px rgb(160 75 149 / 0.6);
+      transform: translateY(-5px);
+    }
+    .menu-item span {
+      font-size: 2.7rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .menu-item p {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    /* Sections */
+    section {
+      background: rgba(255 255 255 / 0.95);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
+      max-width: 100%;
+      margin-bottom: 30px;
+    }
+    section h3 {
+      margin-top: 0;
+      color: #4a2c4d;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #ce93d8;
+      padding-bottom: 6px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1.8px solid #ce93d8;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #7b1fa2;
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    button {
+      background: #7b1fa2;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #9c27b0;
+    }
+
+    /* Busca */
+    .busca input {
+      padding: 10px 12px;
+      border-radius: 20px;
+      border: 1.8px solid #ce93d8;
+      width: 100%;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    /* Listas */
+    .item {
+      background: #f3e5f5;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: 0 2px 6px rgb(160 75 149 / 0.15);
+    }
+    .item strong {
+      font-size: 1.1rem;
+      color: #6a1b9a;
+    }
+    .item small {
+      display: block;
+      margin-top: 4px;
+      color: #7b1fa2cc;
+    }
+    .item button {
+      margin-left: 10px;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.9rem;
+      box-shadow: none;
+    }
+    .item button.editar {
+      background: #9c27b0;
+      color: white;
+    }
+    .item button.excluir {
+      background: #e53935;
+      color: white;
+    }
+    .flex-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .flex-row > * {
+      flex: 1 1 150px;
+    }
+
+    /* Responsivo */
+    @media(max-width: 768px){
+      .menu {
+        justify-content: center;
+      }
+      .menu-item {
+        max-width: 120px;
+        font-size: 0.9rem;
+        padding: 18px 8px;
+      }
+      .menu-item span {
+        font-size: 2rem;
+      }
+      button {
+        width: 100%;
+      }
+    }
+
+    /* Export/Import Buttons */
+    #backupSection {
+      margin-top: 15px;
+      text-align: center;
+    }
+    #backupSection button {
+      margin: 5px;
+      min-width: 120px;
     }
   </style>
 </head>
 <body>
 
+  <!-- Splash -->
   <div id="splash">
     <h1>Espaço Tai Botelho</h1>
     <button id="btnEntrar" onclick="abrirLogin()">Entrar</button>
   </div>
 
+  <!-- Login -->
   <div id="login">
     <div class="form">
       <input type="email" id="email" placeholder="E-mail" autocomplete="username" />
@@ -181,14 +359,41 @@
     </div>
   </div>
 
+  <!-- App -->
   <div id="app">
     <h2>Bem-vindo ao sistema Espaço Tai Botelho!</h2>
     <button onclick="logout()">Sair</button>
-    <!-- Aqui você pode adicionar seu painel com menus e seções -->
+
+    <!-- Menu -->
+    <div class="menu">
+      <div class="menu-item" onclick="abrirSecao('dashboardSection')"><span>📊</span><p>Dashboard</p></div>
+      <div class="menu-item" onclick="abrirSecao('clientesSection')"><span>👥</span><p>Clientes</p></div>
+      <div class="menu-item" onclick="abrirSecao('profissionaisSection')"><span>💇‍♀️</span><p>Profissionais</p></div>
+      <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
+      <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
+      <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
+    </div>
+
+    <!-- Seções -->
+
+    <!-- Dashboard -->
+    <section id="dashboardSection" style="display:none;">
+      <h3>Dashboard</h3>
+      <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
+      <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
+      <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
+      <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
+      <p><strong>Caixa Atual:</strong> R$ <span id="dashCaixaAtual">0,00</span></p>
+
+      <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
+    </section>
+
+    <!-- Aqui você poderá adicionar as outras seções: clientes, profissionais, produtos, agendamentos, financeiro -->
+
   </div>
 
   <script>
-    // Função para ocultar splash e mostrar login
+    // Função para abrir a tela de login
     function abrirLogin() {
       document.getElementById('splash').style.display = 'none';
       document.getElementById('login').style.display = 'flex';
@@ -225,12 +430,15 @@
     // Monitorar estado de autenticação
     onAuthStateChanged(auth, user => {
       if (user) {
-        // Usuário logado: esconde login, splash, mostra app
+        // Usuário logado: esconde login e splash, mostra app
         document.getElementById('login').style.display = 'none';
         document.getElementById('splash').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+
+        // Exibir dashboard por padrão
+        abrirSecao('dashboardSection');
       } else {
-        // Usuário não logado: mostra splash e login, esconde app
+        // Usuário não logado: mostra login, esconde app e splash
         document.getElementById('app').style.display = 'none';
         document.getElementById('login').style.display = 'flex';
         document.getElementById('splash').style.display = 'none';
@@ -243,1132 +451,76 @@
       document.getElementById('login').style.display = 'none';
       document.getElementById('app').style.display = 'none';
     };
-  </script>
 
-</body>
-</html>
-
-<!-- Chart.js para gráficos -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-  /* Reset & base */
-  * {
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  body {
-    margin: 0;
-    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-    color: #4a2c4d;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Splash Screen */
-  #splash {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #ce93d8, #ba68c8);
-    color: white;
-    transition: opacity 0.6s ease;
-    padding: 20px;
-  }
-  #splash h1 {
-    font-size: 3rem;
-    margin-bottom: 20px;
-    text-shadow: 1px 1px 4px #6d3c77;
-  }
-  #btnEntrar {
-    background: #7b1fa2;
-    border: none;
-    padding: 15px 40px;
-    font-size: 1.25rem;
-    border-radius: 30px;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 6px 15px #4a0072;
-    transition: background-color 0.3s ease;
-  }
-  #btnEntrar:hover {
-    background: #9c27b0;
-  }
-
-  /* Main container */
-  #main {
-    display: none;
-    flex: 1;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  /* Menu */
-  .menu {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 30px;
-  }
-  .menu-item {
-    background: white;
-    border-radius: 18px;
-    box-shadow: 0 5px 15px rgb(160 75 149 / 0.3);
-    cursor: pointer;
-    flex: 1 1 130px;
-    max-width: 150px;
-    padding: 20px 10px;
-    text-align: center;
-    color: #7b1fa2;
-    user-select: none;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-  }
-  .menu-item:hover {
-    box-shadow: 0 8px 20px rgb(160 75 149 / 0.6);
-    transform: translateY(-5px);
-  }
-  .menu-item span {
-    font-size: 2.7rem;
-    display: block;
-    margin-bottom: 10px;
-  }
-  .menu-item p {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin: 0;
-  }
-
-  /* Sections */
-  section {
-    background: rgba(255 255 255 / 0.95);
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
-    max-width: 100%;
-    margin-bottom: 30px;
-  }
-  section h3 {
-    margin-top: 0;
-    color: #4a2c4d;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #ce93d8;
-    padding-bottom: 6px;
-  }
-
-  /* Forms */
-  .form-group {
-    margin-bottom: 12px;
-  }
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1.8px solid #ce93d8;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: #7b1fa2;
-    outline: none;
-  }
-  textarea {
-    resize: vertical;
-    min-height: 60px;
-  }
-  button {
-    background: #7b1fa2;
-    border: none;
-    padding: 12px 28px;
-    border-radius: 30px;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-  }
-  button:hover {
-    background: #9c27b0;
-  }
-
-  /* Busca */
-  .busca input {
-    padding: 10px 12px;
-    border-radius: 20px;
-    border: 1.8px solid #ce93d8;
-    width: 100%;
-    font-size: 1rem;
-    margin-bottom: 20px;
-  }
-
-  /* Listas */
-  .item {
-    background: #f3e5f5;
-    margin-bottom: 12px;
-    border-radius: 14px;
-    padding: 14px 18px;
-    box-shadow: 0 2px 6px rgb(160 75 149 / 0.15);
-  }
-  .item strong {
-    font-size: 1.1rem;
-    color: #6a1b9a;
-  }
-  .item small {
-    display: block;
-    margin-top: 4px;
-    color: #7b1fa2cc;
-  }
-  .item button {
-    margin-left: 10px;
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 0.9rem;
-    box-shadow: none;
-  }
-  .item button.editar {
-    background: #9c27b0;
-    color: white;
-  }
-  .item button.excluir {
-    background: #e53935;
-    color: white;
-  }
-  .flex-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .flex-row > * {
-    flex: 1 1 150px;
-  }
-
-  /* Responsivo */
-  @media(max-width: 768px){
-    .menu {
-      justify-content: center;
-    }
-    .menu-item {
-      max-width: 120px;
-      font-size: 0.9rem;
-      padding: 18px 8px;
-    }
-    .menu-item span {
-      font-size: 2rem;
-    }
-    button {
-      width: 100%;
-    }
-  }
-
-  /* Export/Import Buttons */
-  #backupSection {
-    margin-top: 15px;
-    text-align: center;
-  }
-  #backupSection button {
-    margin: 5px;
-    min-width: 120px;
-  }
-</style>
-</head>
-<body>
-
-<div id="splash">
-  <h1>Espaço Tai Botelho</h1>
-  <button id="btnEntrar">Entrar</button>
-</div>
-
-<div id="main">
-  <div class="menu">
-    <div class="menu-item" onclick="abrirSecao('dashboardSection')"><span>📊</span><p>Dashboard</p></div>
-    <div class="menu-item" onclick="abrirSecao('clientesSection')"><span>👥</span><p>Clientes</p></div>
-    <div class="menu-item" onclick="abrirSecao('profissionaisSection')"><span>💇‍♀️</span><p>Profissionais</p></div>
-    <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
-    <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
-    <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
-  </div>
-
-  <!-- Dashboard -->
-  <section id="dashboardSection" style="display:none;">
-    <h3>Dashboard</h3>
-    <p><strong>Total Clientes:</strong> <span id="dashTotalClientes">0</span></p>
-    <p><strong>Total Profissionais:</strong> <span id="dashTotalProfissionais">0</span></p>
-    <p><strong>Total Produtos no Estoque:</strong> <span id="dashTotalProdutos">0</span></p>
-    <p><strong>Agendamentos Pendentes:</strong> <span id="dashTotalAgendamentos">0</span></p>
-    <p><strong>Caixa Atual:</strong> R$ <span id="dashCaixaAtual">0,00</span></p>
-
-    <canvas id="graficoFinanceiro" style="max-width: 100%; margin-top:20px;"></canvas>
-  </section>
-
-  <!-- Clientes -->
-  <section id="clientesSection" style="display:none;">
-    <h3>Cadastro de Clientes</h3>
-    <div class="form-group">
-      <label for="nomeCliente">Nome:</label>
-      <input type="text" id="nomeCliente" />
-    </div>
-    <div class="form-group">
-      <label for="telefoneCliente">Telefone:</label>
-      <input type="text" id="telefoneCliente" />
-    </div>
-    <div class="form-group">
-      <label for="emailCliente">Email:</label>
-      <input type="email" id="emailCliente" />
-    </div>
-    <div class="form-group">
-      <label for="obsCliente">Observações:</label>
-      <textarea id="obsCliente"></textarea>
-    </div>
-    <button onclick="salvarCliente()">Salvar Cliente</button>
-
-    <div class="busca">
-      <input type="text" id="buscaCliente" placeholder="Buscar cliente..." oninput="listarClientes()" />
-    </div>
-    <div id="listaClientes"></div>
-  </section>
-
-  <!-- Profissionais -->
-  <section id="profissionaisSection" style="display:none;">
-    <h3>Cadastro de Profissionais</h3>
-    <div class="form-group">
-      <label for="nomeProf">Nome:</label>
-      <input type="text" id="nomeProf" />
-    </div>
-    <div class="form-group">
-      <label for="espProf">Especialidade:</label>
-      <input type="text" id="espProf" />
-    </div>
-    <div class="form-group">
-      <label for="servicoProf">Serviço:</label>
-      <input type="text" id="servicoProf" />
-    </div>
-    <div class="form-group">
-      <label for="valorProf">Valor (R$):</label>
-      <input type="number" id="valorProf" min="0" step="0.01" />
-    </div>
-    <button onclick="salvarProfissional()">Salvar Profissional</button>
-
-    <div class="busca">
-      <input type="text" id="buscaProfissional" placeholder="Buscar profissional..." oninput="listarProfissionais()" />
-    </div>
-    <div id="listaProfissionais"></div>
-  </section>
-
-  <!-- Produtos -->
-  <section id="produtosSection" style="display:none;">
-    <h3>Cadastro de Produtos</h3>
-    <div class="form-group">
-      <label for="nomeProduto">Nome do Produto:</label>
-      <input type="text" id="nomeProduto" />
-    </div>
-    <div class="form-group">
-      <label for="tipoProduto">Tipo do Produto:</label>
-      <input type="text" id="tipoProduto" />
-    </div>
-    <div class="form-group">
-      <label for="quantidadeProduto">Quantidade em Estoque:</label>
-      <input type="number" id="quantidadeProduto" min="0" />
-    </div>
-    <div class="form-group">
-      <label for="minQuantidadeProduto">Quantidade Mínima para Alerta:</label>
-      <input type="number" id="minQuantidadeProduto" min="0" />
-    </div>
-    <div class="form-group">
-      <label for="validadeProduto">Data de Validade (opcional):</label>
-      <input type="date" id="validadeProduto" />
-    </div>
-    <button onclick="salvarProduto()">Salvar Produto</button>
-
-    <div class="busca">
-      <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="listarProdutos()" />
-    </div>
-    <div id="listaProdutos"></div>
-
-    <h4>Produtos em falta</h4>
-    <div id="produtosEmFalta"></div>
-
-    <h4>Usar Produto</h4>
-    <div class="flex-row" style="gap: 10px; flex-wrap: nowrap; margin-bottom: 10px;">
-      <select id="selectProdutoUso" style="flex-grow:1;"></select>
-      <input type="number" id="quantidadeUso" min="1" placeholder="Quantidade" style="max-width: 100px;" />
-      <button onclick="usarProduto()">Usar Produto</button>
-    </div>
-
-    <h4>Histórico de Movimentações</h4>
-    <div id="historicoMovimentacoes"></div>
-  </section>
-
-  <!-- Agendamentos -->
-  <section id="agendamentosSection" style="display:none;">
-    <h3>Agendamento de Clientes</h3>
-    <div class="form-group">
-      <label for="selectClienteAgendamento">Cliente:</label>
-      <select id="selectClienteAgendamento"></select>
-    </div>
-    <div class="form-group">
-      <label for="selectProfissionalAgendamento">Profissional:</label>
-      <select id="selectProfissionalAgendamento" onchange="atualizarServicosProfissional()"></select>
-    </div>
-    <div class="form-group">
-      <label for="selectServicoAgendamento">Serviço:</label>
-      <select id="selectServicoAgendamento"></select>
-    </div>
-    <div class="form-group">
-      <label for="dataAgendamento">Data:</label>
-      <input type="date" id="dataAgendamento" />
-    </div>
-    <div class="form-group">
-      <label for="horaAgendamento">Hora:</label>
-      <input type="time" id="horaAgendamento" />
-    </div>
-    <button onclick="salvarAgendamento()">Salvar Agendamento</button>
-
-    <div class="busca" style="margin-top:20px;">
-      <input type="text" id="buscaAgendamento" placeholder="Buscar por nome do cliente..." oninput="listarAgendamentos()" />
-    </div>
-    <div class="flex-row" style="gap:10px; margin: 10px 0;">
-      <label>
-        <input type="checkbox" id="filtroPendentes" checked onchange="listarAgendamentos()" />
-        Mostrar apenas pendentes
-      </label>
-      <label style="flex-grow:1;">
-        Filtrar por data:
-        <input type="date" id="filtroData" onchange="listarAgendamentos()" />
-      </label>
-      <button onclick="limparFiltrosAgendamento()">Limpar filtros</button>
-    </div>
-
-    <div id="listaAgendamentos"></div>
-  </section>
-
-  <!-- Financeiro -->
-  <section id="financeiroSection" style="display:none;">
-    <h3>Financeiro</h3>
-
-    <div class="form-group">
-      <label for="caixaInicial">Caixa Inicial (R$):</label>
-      <input type="number" id="caixaInicial" min="0" step="0.01" />
-      <button onclick="salvarCaixaInicial()">Salvar Caixa Inicial</button>
-    </div>
-
-    <h4>Ganhos (Agendamentos realizados)</h4>
-    <div id="listaGanhos" style="max-height: 150px; overflow-y: auto; background: #fce4ec; padding: 10px; border-radius: 12px;"></div>
-
-    <h4>Gastos</h4>
-    <div class="form-group">
-      <label for="descricaoGasto">Descrição:</label>
-      <input type="text" id="descricaoGasto" />
-    </div>
-    <div class="form-group">
-      <label for="valorGasto">Valor (R$):</label>
-      <input type="number" id="valorGasto" min="0" step="0.01" />
-    </div>
-    <div class="form-group">
-      <label for="dataGasto">Data:</label>
-      <input type="date" id="dataGasto" />
-    </div>
-    <button onclick="salvarGasto()">Salvar Gasto</button>
-
-    <h4>Lista de Gastos</h4>
-    <div id="listaGastos" style="max-height: 150px; overflow-y: auto; background: #fce4ec; padding: 10px; border-radius: 12px;"></div>
-
-    <h4>Resumo Financeiro Mensal</h4>
-    <p><strong>Caixa Atual:</strong> R$ <span id="caixaAtual">0,00</span></p>
-    <p><strong>Ganhos Totais:</strong> R$ <span id="ganhosTotais">0,00</span></p>
-    <p><strong>Gastos Totais:</strong> R$ <span id="gastosTotais">0,00</span></p>
-    <p><strong>Lucro Total:</strong> R$ <span id="lucroTotal">0,00</span></p>
-  </section>
-
-  <!-- Backup / Restore -->
-  <section id="backupSection" style="display:none;">
-    <h3>Backup e Restauração de Dados</h3>
-    <button onclick="exportarDados()">Exportar Dados (Backup)</button>
-    <button onclick="document.getElementById('inputImport').click()">Importar Dados</button>
-    <input type="file" id="inputImport" accept="application/json" style="display:none" onchange="importarDados(event)" />
-  </section>
-</div>
-
-<script>
-  // Dados em memória
-  let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-  let profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
-  let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-  let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
-  let gastos = JSON.parse(localStorage.getItem("gastos")) || [];
-  let caixaInicial = parseFloat(localStorage.getItem("caixaInicial")) || 0;
-
-  // Estados edição
-  let clienteEditando = null;
-  let profissionalEditando = null;
-  let produtoEditando = null;
-
-  // ====== CONTROLE DE SEÇÕES =======
-  function abrirSecao(id) {
-    document.querySelectorAll("section").forEach(sec => {
-      sec.style.display = "none";
-    });
-    document.getElementById(id).style.display = "block";
-
-    if (id === "clientesSection") listarClientes();
-    if (id === "profissionaisSection") listarProfissionais();
-    if (id === "produtosSection") {
-      listarProdutos();
-      listarProdutosEmFalta();
-      preencherSelectProdutosUso();
-      listarMovimentacoes();
-    }
-    if (id === "agendamentosSection") {
-      preencherSelectClienteAgendamento();
-      preencherSelectProfissionalAgendamento();
-      listarAgendamentos();
-    }
-    if (id === "financeiroSection") carregarFinanceiro();
-    if (id === "dashboardSection") {
-      atualizarDashboard();
-      desenharGraficoFinanceiro();
-    }
-    if (id === "backupSection") { }
-  }
-
-  // Entrar
-  document.getElementById("btnEntrar").onclick = () => {
-    document.getElementById("splash").style.opacity = 0;
-    setTimeout(() => {
-      document.getElementById("splash").style.display = "none";
-      document.getElementById("main").style.display = "block";
-      abrirSecao("dashboardSection");
-    }, 600);
-  };
-
-  // ================== CLIENTES ======================
-  function salvarCliente() {
-    const nome = document.getElementById("nomeCliente").value.trim();
-    const telefone = document.getElementById("telefoneCliente").value.trim();
-    const email = document.getElementById("emailCliente").value.trim();
-    const obs = document.getElementById("obsCliente").value.trim();
-
-    if (!nome) return alert("Nome do cliente é obrigatório.");
-
-    const dados = { nome, telefone, email, obs };
-
-    if (clienteEditando !== null) {
-      clientes[clienteEditando] = dados;
-      clienteEditando = null;
-    } else {
-      clientes.push(dados);
-    }
-    localStorage.setItem("clientes", JSON.stringify(clientes));
-    listarClientes();
-    limparCamposCliente();
-    atualizarDashboard();
-  }
-  function limparCamposCliente() {
-    document.getElementById("nomeCliente").value = "";
-    document.getElementById("telefoneCliente").value = "";
-    document.getElementById("emailCliente").value = "";
-    document.getElementById("obsCliente").value = "";
-  }
-  function listarClientes() {
-    const busca = document.getElementById("buscaCliente").value.toLowerCase();
-    const lista = document.getElementById("listaClientes");
-    lista.innerHTML = "";
-    clientes.forEach((c, i) => {
-      if (!c.nome.toLowerCase().includes(busca)) return;
-      lista.innerHTML += `
-      <div class="item">
-        <strong>${c.nome}</strong> <small>${c.telefone || ""} | ${c.email || ""}</small><br>
-        <small>${c.obs || ""}</small>
-        <button class="editar" onclick="editarCliente(${i})">Editar</button>
-        <button class="excluir" onclick="excluirCliente(${i})">Excluir</button>
-      </div>`;
-    });
-  }
-  function editarCliente(i) {
-    const c = clientes[i];
-    document.getElementById("nomeCliente").value = c.nome;
-    document.getElementById("telefoneCliente").value = c.telefone;
-    document.getElementById("emailCliente").value = c.email;
-    document.getElementById("obsCliente").value = c.obs;
-    clienteEditando = i;
-  }
-  function excluirCliente(i) {
-    if (confirm("Excluir cliente?")) {
-      clientes.splice(i, 1);
-      localStorage.setItem("clientes", JSON.stringify(clientes));
-      listarClientes();
-      atualizarDashboard();
-    }
-  }
-
-  // ================== PROFISSIONAIS ======================
-  function salvarProfissional() {
-    const nome = document.getElementById("nomeProf").value.trim();
-    const esp = document.getElementById("espProf").value.trim();
-    const servNome = document.getElementById("servicoProf").value.trim();
-    const servValor = parseFloat(document.getElementById("valorProf").value);
-
-    if (!nome || !esp || !servNome || isNaN(servValor) || servValor < 0) return alert("Preencha todos os campos corretamente.");
-
-    let servicos = [{ nome: servNome, valor: servValor }];
-
-    const dados = { nome, especialidade: esp, servicos };
-
-    if (profissionalEditando !== null) {
-      profissionais[profissionalEditando] = dados;
-      profissionalEditando = null;
-    } else {
-      profissionais.push(dados);
-    }
-    localStorage.setItem("profissionais", JSON.stringify(profissionais));
-    listarProfissionais();
-    limparCamposProfissional();
-    atualizarDashboard();
-  }
-  function limparCamposProfissional() {
-    document.getElementById("nomeProf").value = "";
-    document.getElementById("espProf").value = "";
-    document.getElementById("servicoProf").value = "";
-    document.getElementById("valorProf").value = "";
-  }
-  function listarProfissionais() {
-    const busca = document.getElementById("buscaProfissional").value.toLowerCase();
-    const lista = document.getElementById("listaProfissionais");
-    lista.innerHTML = "";
-    profissionais.forEach((p, i) => {
-      if (!p.nome.toLowerCase().includes(busca)) return;
-      let servicosHTML = p.servicos.map(s => `<li>${s.nome} - R$${s.valor.toFixed(2)}</li>`).join("");
-      lista.innerHTML += `
-      <div class="item">
-        <strong>${p.nome}</strong> <small>(${p.especialidade})</small>
-        <ul>${servicosHTML}</ul>
-        <button class="editar" onclick="editarProfissional(${i})">Editar</button>
-        <button class="excluir" onclick="excluirProfissional(${i})">Excluir</button>
-      </div>`;
-    });
-  }
-  function editarProfissional(i) {
-    const p = profissionais[i];
-    document.getElementById("nomeProf").value = p.nome;
-    document.getElementById("espProf").value = p.especialidade;
-    document.getElementById("servicoProf").value = p.servicos[0]?.nome || "";
-    document.getElementById("valorProf").value = p.servicos[0]?.valor || "";
-    profissionalEditando = i;
-  }
-  function excluirProfissional(i) {
-    if (confirm("Excluir profissional?")) {
-      profissionais.splice(i, 1);
-      localStorage.setItem("profissionais", JSON.stringify(profissionais));
-      listarProfissionais();
-      atualizarDashboard();
-    }
-  }
-
-  // ================== PRODUTOS (Estoque avançado) ======================
-  function salvarProduto() {
-    const nome = document.getElementById("nomeProduto").value.trim();
-    const tipo = document.getElementById("tipoProduto").value.trim();
-    const quantidade = parseInt(document.getElementById("quantidadeProduto").value);
-    const minQtd = parseInt(document.getElementById("minQuantidadeProduto").value);
-    const validade = document.getElementById("validadeProduto").value;
-
-    if (!nome || !tipo || isNaN(quantidade) || quantidade < 0 || isNaN(minQtd) || minQtd < 0) {
-      return alert("Preencha todos os campos corretamente.");
-    }
-
-    const dados = { nome, tipo, quantidade, minQtd, validade, movimentacoes: produtos[produtoEditando]?.movimentacoes || [] };
-
-    if (produtoEditando !== null) {
-      dados.movimentacoes = produtos[produtoEditando].movimentacoes || [];
-      produtos[produtoEditando] = dados;
-      produtoEditando = null;
-    } else {
-      produtos.push(dados);
-    }
-
-    localStorage.setItem("produtos", JSON.stringify(produtos));
-    limparCamposProduto();
-    listarProdutos();
-    listarProdutosEmFalta();
-    preencherSelectProdutosUso();
-    listarMovimentacoes();
-    atualizarDashboard();
-  }
-  function limparCamposProduto() {
-    document.getElementById("nomeProduto").value = "";
-    document.getElementById("tipoProduto").value = "";
-    document.getElementById("quantidadeProduto").value = "";
-    document.getElementById("minQuantidadeProduto").value = "";
-    document.getElementById("validadeProduto").value = "";
-  }
-  function listarProdutos() {
-    const busca = document.getElementById("buscaProduto").value.toLowerCase();
-    const lista = document.getElementById("listaProdutos");
-    lista.innerHTML = "";
-    produtos.forEach((p, i) => {
-      if (!p.nome.toLowerCase().includes(busca)) return;
-      const validadeText = p.validade ? ` | Validade: ${p.validade}` : "";
-      lista.innerHTML += `
-      <div class="item">
-        <strong>${p.nome}</strong> <small>(${p.tipo})</small><br>
-        <small>Quantidade: ${p.quantidade} | Mínimo: ${p.minQtd}${validadeText}</small><br>
-        <button class="editar" onclick="editarProduto(${i})">Editar</button>
-        <button class="excluir" onclick="excluirProduto(${i})">Excluir</button>
-      </div>`;
-    });
-  }
-  function listarProdutosEmFalta() {
-    const div = document.getElementById("produtosEmFalta");
-    div.innerHTML = "";
-    const emFalta = produtos.filter(p => p.quantidade < p.minQtd);
-    if (emFalta.length === 0) {
-      div.textContent = "Nenhum produto em falta.";
-      return;
-    }
-    emFalta.forEach(p => {
-      div.innerHTML += `<div class="item"><strong>${p.nome}</strong> - Quantidade: ${p.quantidade} (mínimo: ${p.minQtd})</div>`;
-    });
-  }
-  function editarProduto(i) {
-    const p = produtos[i];
-    document.getElementById("nomeProduto").value = p.nome;
-    document.getElementById("tipoProduto").value = p.tipo;
-    document.getElementById("quantidadeProduto").value = p.quantidade;
-    document.getElementById("minQuantidadeProduto").value = p.minQtd;
-    document.getElementById("validadeProduto").value = p.validade || "";
-    produtoEditando = i;
-  }
-  function excluirProduto(i) {
-    if (confirm("Deseja excluir este produto?")) {
-      produtos.splice(i, 1);
-      localStorage.setItem("produtos", JSON.stringify(produtos));
-      listarProdutos();
-      listarProdutosEmFalta();
-      preencherSelectProdutosUso();
-      listarMovimentacoes();
-      atualizarDashboard();
-    }
-  }
-  function preencherSelectProdutosUso() {
-    const select = document.getElementById("selectProdutoUso");
-    select.innerHTML = "<option value=''>-- Selecione um produto --</option>";
-    produtos.forEach((p, i) => {
-      select.innerHTML += `<option value="${i}">${p.nome} (Qtd: ${p.quantidade})</option>`;
-    });
-  }
-  function usarProduto() {
-    const select = document.getElementById("selectProdutoUso");
-    const index = parseInt(select.value);
-    const qtdUso = parseInt(document.getElementById("quantidadeUso").value);
-
-    if (isNaN(index) || index < 0 || index >= produtos.length) return alert("Selecione um produto válido.");
-    if (isNaN(qtdUso) || qtdUso <= 0) return alert("Informe uma quantidade válida.");
-
-    if (produtos[index].quantidade < qtdUso) {
-      return alert("Quantidade insuficiente em estoque.");
-    }
-
-    produtos[index].quantidade -= qtdUso;
-    const hoje = new Date().toISOString().slice(0,10);
-    produtos[index].movimentacoes = produtos[index].movimentacoes || [];
-    produtos[index].movimentacoes.push({
-      tipo: "Saída",
-      quantidade: qtdUso,
-      data: hoje,
-      descricao: "Uso no salão"
-    });
-
-    localStorage.setItem("produtos", JSON.stringify(produtos));
-    listarProdutos();
-    listarProdutosEmFalta();
-    preencherSelectProdutosUso();
-    listarMovimentacoes();
-    document.getElementById("quantidadeUso").value = "";
-    select.value = "";
-    atualizarDashboard();
-  }
-  function listarMovimentacoes() {
-    const div = document.getElementById("historicoMovimentacoes");
-    div.innerHTML = "";
-    produtos.forEach((p) => {
-      if (!p.movimentacoes || p.movimentacoes.length === 0) return;
-      div.innerHTML += `<h5>${p.nome}</h5>`;
-      p.movimentacoes.forEach(m => {
-        div.innerHTML += `<div class="item">${m.data} - ${m.tipo}: ${m.quantidade} - ${m.descricao || ''}</div>`;
+    // Função para abrir seções no app
+    function abrirSecao(idSecao) {
+      const sections = document.querySelectorAll('#app section');
+      sections.forEach(sec => {
+        sec.style.display = (sec.id === idSecao) ? 'block' : 'none';
       });
-    });
-  }
-
-  // ================== AGENDAMENTOS ======================
-  function preencherSelectClienteAgendamento() {
-    const select = document.getElementById("selectClienteAgendamento");
-    select.innerHTML = "<option value=''>-- Selecione um cliente --</option>";
-    clientes.forEach((c, i) => {
-      select.innerHTML += `<option value="${i}">${c.nome}</option>`;
-    });
-  }
-  function preencherSelectProfissionalAgendamento() {
-    const select = document.getElementById("selectProfissionalAgendamento");
-    select.innerHTML = "<option value=''>-- Selecione um profissional --</option>";
-    profissionais.forEach((p, i) => {
-      select.innerHTML += `<option value="${i}">${p.nome}</option>`;
-    });
-    document.getElementById("selectServicoAgendamento").innerHTML = "<option value=''>-- Selecione o serviço --</option>";
-  }
-  function atualizarServicosProfissional() {
-    const profIndex = parseInt(document.getElementById("selectProfissionalAgendamento").value);
-    const selectServico = document.getElementById("selectServicoAgendamento");
-    selectServico.innerHTML = "<option value=''>-- Selecione o serviço --</option>";
-    if (isNaN(profIndex) || profIndex < 0 || profIndex >= profissionais.length) return;
-    profissionais[profIndex].servicos.forEach((s, i) => {
-      selectServico.innerHTML += `<option value="${i}">${s.nome} - R$${s.valor.toFixed(2)}</option>`;
-    });
-  }
-  function salvarAgendamento() {
-    const clienteIndex = parseInt(document.getElementById("selectClienteAgendamento").value);
-    const profIndex = parseInt(document.getElementById("selectProfissionalAgendamento").value);
-    const servIndex = parseInt(document.getElementById("selectServicoAgendamento").value);
-    const data = document.getElementById("dataAgendamento").value;
-    const hora = document.getElementById("horaAgendamento").value;
-
-    if (isNaN(clienteIndex) || isNaN(profIndex) || isNaN(servIndex) || !data || !hora) {
-      return alert("Preencha todos os campos corretamente.");
     }
 
-    const agendamento = {
-      clienteIndex,
-      profIndex,
-      servIndex,
-      data,
-      hora,
-      status: "Pendente"
-    };
+    // Código exemplo para o gráfico financeiro no Dashboard
+    let grafico;
 
-    agendamentos.push(agendamento);
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
-    atualizarDashboard();
-    carregarFinanceiro();
-  }
+    function atualizarDashboard() {
+      // Exemplo de dados - futuramente busque do banco ou localStorage
+      const totalClientes = 10;
+      const totalProfissionais = 5;
+      const totalProdutos = 25;
+      const agendamentosPendentes = 7;
+      const caixaAtual = 1234.56;
 
-  function listarAgendamentos() {
-    const busca = document.getElementById("buscaAgendamento").value.toLowerCase();
-    const filtroPendentes = document.getElementById("filtroPendentes").checked;
-    const filtroData = document.getElementById("filtroData").value;
+      document.getElementById('dashTotalClientes').textContent = totalClientes;
+      document.getElementById('dashTotalProfissionais').textContent = totalProfissionais;
+      document.getElementById('dashTotalProdutos').textContent = totalProdutos;
+      document.getElementById('dashTotalAgendamentos').textContent = agendamentosPendentes;
+      document.getElementById('dashCaixaAtual').textContent = caixaAtual.toFixed(2).replace('.', ',');
 
-    const lista = document.getElementById("listaAgendamentos");
-    lista.innerHTML = "";
+      // Dados do gráfico
+      const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
 
-    agendamentos.forEach((a, i) => {
-      const clienteNome = clientes[a.clienteIndex]?.nome || "";
-      if (!clienteNome.toLowerCase().includes(busca)) return;
+      const data = {
+        labels: ['Ganhos', 'Gastos', 'Lucro'],
+        datasets: [{
+          label: 'Valores em R$',
+          data: [2000, 765, 1235],
+          backgroundColor: ['#7b1fa2', '#e53935', '#43a047'],
+          hoverOffset: 20
+        }]
+      };
 
-      if (filtroPendentes && a.status !== "Pendente") return;
-      if (filtroData && a.data !== filtroData) return;
-
-      const profissional = profissionais[a.profIndex];
-      const servico = profissional?.servicos[a.servIndex];
-
-      lista.innerHTML += `
-      <div class="item">
-        <strong>${clienteNome}</strong> - ${a.data} ${a.hora} <br>
-        Profissional: ${profissional?.nome || "N/A"}<br>
-        Serviço: ${servico?.nome || "N/A"} - R$${servico?.valor?.toFixed(2) || "0.00"}<br>
-        Status: ${a.status}
-        <button class="editar" onclick="editarAgendamento(${i})">Editar</button>
-        <button class="excluir" onclick="excluirAgendamento(${i})">Excluir</button>
-        <button onclick="alterarStatusAgendamento(${i})">${a.status === 'Pendente' ? 'Concluir' : 'Reabrir'}</button>
-      </div>`;
-    });
-  }
-  function editarAgendamento(i) {
-    const a = agendamentos[i];
-    document.getElementById("selectClienteAgendamento").value = a.clienteIndex;
-    document.getElementById("selectProfissionalAgendamento").value = a.profIndex;
-    atualizarServicosProfissional();
-    document.getElementById("selectServicoAgendamento").value = a.servIndex;
-    document.getElementById("dataAgendamento").value = a.data;
-    document.getElementById("horaAgendamento").value = a.hora;
-
-    // Remover o antigo e editar após salvar
-    agendamentos.splice(i, 1);
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
-  }
-  function excluirAgendamento(i) {
-    if (confirm("Excluir agendamento?")) {
-      agendamentos.splice(i, 1);
-      localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-      listarAgendamentos();
-      atualizarDashboard();
-      carregarFinanceiro();
-    }
-  }
-  function alterarStatusAgendamento(i) {
-    if (agendamentos[i].status === "Pendente") {
-      agendamentos[i].status = "Concluído";
-    } else {
-      agendamentos[i].status = "Pendente";
-    }
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
-    carregarFinanceiro();
-    atualizarDashboard();
-  }
-  function limparFiltrosAgendamento() {
-    document.getElementById("buscaAgendamento").value = "";
-    document.getElementById("filtroPendentes").checked = true;
-    document.getElementById("filtroData").value = "";
-    listarAgendamentos();
-  }
-
-  // ================== FINANCEIRO ======================
-  function salvarCaixaInicial() {
-    const valor = parseFloat(document.getElementById("caixaInicial").value);
-    if (isNaN(valor) || valor < 0) return alert("Valor inválido.");
-    caixaInicial = valor;
-    localStorage.setItem("caixaInicial", caixaInicial);
-    alert("Caixa inicial salvo.");
-    atualizarDashboard();
-    carregarFinanceiro();
-  }
-
-  function carregarFinanceiro() {
-    // Ganhos = soma dos agendamentos concluídos
-    let ganhos = 0;
-    let ganhosHTML = "";
-    agendamentos.forEach(a => {
-      if (a.status === "Concluído") {
-        const prof = profissionais[a.profIndex];
-        const serv = prof?.servicos[a.servIndex];
-        if (serv) {
-          ganhos += serv.valor;
-          const clienteNome = clientes[a.clienteIndex]?.nome || "N/A";
-          ganhosHTML += `<div>${clienteNome} - Serviço: ${serv.nome} - R$${serv.valor.toFixed(2)}</div>`;
-        }
+      if(grafico) {
+        grafico.destroy();
       }
-    });
-    document.getElementById("listaGanhos").innerHTML = ganhosHTML;
 
-    // Gastos
-    let gastosTotal = 0;
-    let gastosHTML = "";
-    gastos.forEach(g => {
-      gastosTotal += g.valor;
-      gastosHTML += `<div>${g.data} - ${g.descricao} - R$${g.valor.toFixed(2)}</div>`;
-    });
-    document.getElementById("listaGastos").innerHTML = gastosHTML;
-
-    // Atualizar resumo financeiro
-    const lucro = caixaInicial + ganhos - gastosTotal;
-    document.getElementById("caixaAtual").textContent = lucro.toFixed(2).replace('.', ',');
-    document.getElementById("ganhosTotais").textContent = ganhos.toFixed(2).replace('.', ',');
-    document.getElementById("gastosTotais").textContent = gastosTotal.toFixed(2).replace('.', ',');
-    document.getElementById("lucroTotal").textContent = lucro.toFixed(2).replace('.', ',');
-  }
-  function salvarGasto() {
-    const descricao = document.getElementById("descricaoGasto").value.trim();
-    const valor = parseFloat(document.getElementById("valorGasto").value);
-    const data = document.getElementById("dataGasto").value;
-
-    if (!descricao || isNaN(valor) || valor <= 0 || !data) return alert("Preencha todos os campos corretamente.");
-
-    gastos.push({ descricao, valor, data });
-    localStorage.setItem("gastos", JSON.stringify(gastos));
-    carregarFinanceiro();
-
-    document.getElementById("descricaoGasto").value = "";
-    document.getElementById("valorGasto").value = "";
-    document.getElementById("dataGasto").value = "";
-  }
-
-  // =========== DASHBOARD ==============
-  function atualizarDashboard() {
-    document.getElementById("dashTotalClientes").textContent = clientes.length;
-    document.getElementById("dashTotalProfissionais").textContent = profissionais.length;
-    document.getElementById("dashTotalProdutos").textContent = produtos.reduce((acc, p) => acc + p.quantidade, 0);
-    document.getElementById("dashTotalAgendamentos").textContent = agendamentos.filter(a => a.status === "Pendente").length;
-    const lucroAtual = caixaInicial + agendamentos.reduce((acc,a) => {
-      if(a.status === "Concluído"){
-        const p = profissionais[a.profIndex];
-        if(p && p.servicos[a.servIndex]){
-          return acc + p.servicos[a.servIndex].valor;
-        }
-      }
-      return acc;
-    }, 0) - gastos.reduce((acc,g) => acc + g.valor, 0);
-    document.getElementById("dashCaixaAtual").textContent = lucroAtual.toFixed(2).replace('.', ',');
-  }
-
-  // ======= GRÁFICO FINANCEIRO ========
-  let chartFinanceiro = null;
-  function desenharGraficoFinanceiro() {
-    const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
-
-    // Agrupar ganhos e gastos por mês
-    const ganhosMes = {};
-    const gastosMes = {};
-
-    agendamentos.forEach(a => {
-      if (a.status !== "Concluído") return;
-      const prof = profissionais[a.profIndex];
-      const serv = prof?.servicos[a.servIndex];
-      if (!serv) return;
-
-      const mes = a.data.slice(0,7); // yyyy-mm
-      ganhosMes[mes] = (ganhosMes[mes] || 0) + serv.valor;
-    });
-
-    gastos.forEach(g => {
-      const mes = g.data.slice(0,7);
-      gastosMes[mes] = (gastosMes[mes] || 0) + g.valor;
-    });
-
-    // Criar lista de meses únicos (ordenados)
-    const meses = Array.from(new Set([...Object.keys(ganhosMes), ...Object.keys(gastosMes)])).sort();
-
-    const ganhosData = meses.map(m => ganhosMes[m] || 0);
-    const gastosData = meses.map(m => gastosMes[m] || 0);
-    const lucroData = meses.map((m, i) => (ganhosData[i] - gastosData[i]));
-
-    if(chartFinanceiro) chartFinanceiro.destroy();
-
-    chartFinanceiro = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: meses,
-        datasets: [
-          {
-            label: 'Ganhos',
-            data: ganhosData,
-            backgroundColor: 'rgba(123, 31, 162, 0.7)',
-          },
-          {
-            label: 'Gastos',
-            data: gastosData,
-            backgroundColor: 'rgba(229, 57, 53, 0.7)',
-          },
-          {
-            label: 'Lucro',
-            data: lucroData,
-            type: 'line',
-            borderColor: 'rgba(76,175,80,1)',
-            borderWidth: 3,
-            fill: false,
-            tension: 0.2,
-            yAxisID: 'y1',
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            position: 'left',
+      grafico = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' },
             title: {
               display: true,
-              text: 'R$',
-            },
-          },
-          y1: {
-            beginAtZero: true,
-            position: 'right',
-            grid: {
-              drawOnChartArea: false,
-            },
-            title: {
-              display: true,
-              text: 'Lucro R$',
-            },
-          }
-        },
-        plugins: {
-          tooltip: {
-            enabled: true,
-          },
-          legend: {
-            labels: {
-              boxWidth: 20,
+              text: 'Financeiro - Resumo'
             }
           }
         }
+      });
+    }
+
+    // Atualizar dashboard quando abrir a seção
+    document.querySelector('.menu-item').addEventListener('click', () => {
+      atualizarDashboard();
+    });
+
+    // Atualiza dashboard assim que o app abre e o usuário está logado
+    onAuthStateChanged(auth, user => {
+      if(user) {
+        atualizarDashboard();
       }
     });
-  }
-
-  // ======= BACKUP E RESTAURAÇÃO =======
-  function exportarDados() {
-    const dados = {
-      clientes,
-      profissionais,
-      produtos,
-      agendamentos,
-      gastos,
-      caixaInicial
-    };
-    const json = JSON.stringify(dados, null, 2);
-    const blob = new Blob([json], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "backup_espaco_tai_botelho.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-  function importarDados(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const dados = JSON.parse(e.target.result);
-        if (!confirm("Importar irá substituir os dados atuais. Deseja continuar?")) return;
-
-        clientes = dados.clientes || [];
-        profissionais = dados.profissionais || [];
-        produtos = dados.produtos || [];
-        agendamentos = dados.agendamentos || [];
-        gastos = dados.gastos || [];
-        caixaInicial = dados.caixaInicial || 0;
-
-        localStorage.setItem("clientes", JSON.stringify(clientes));
-        localStorage.setItem("profissionais", JSON.stringify(profissionais));
-        localStorage.setItem("produtos", JSON.stringify(produtos));
-        localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-        localStorage.setItem("gastos", JSON.stringify(gastos));
-        localStorage.setItem("caixaInicial", caixaInicial);
-
-        alert("Dados importados com sucesso!");
-        abrirSecao("dashboardSection");
-      } catch (error) {
-        alert("Arquivo inválido!");
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  // Inicializar dashboard ao carregar
-  window.onload = () => {
-    atualizarDashboard();
-  };
-</script>
-
+  </script>
 </body>
 </html>
