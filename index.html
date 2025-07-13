@@ -113,7 +113,6 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  /* No main, apenas queremos que ele ocupe o espaço disponível e se alinhe */
 }
 
 /* Menu */
@@ -160,8 +159,6 @@ section {
   box-shadow: 0 6px 18px rgb(160 75 149 / 0.25);
   max-width: 100%;
   margin-bottom: 30px;
-  /* Não adiciona overflow-y aqui para que o body controle a rolagem principal */
-  /* Remove as propriedades max-height e overflow-y daqui */
 }
 
 section h3 {
@@ -1801,8 +1798,8 @@ function listarTodosAgendamentos() {
   }
 
   agendamentosExibidos.forEach(a => {
-    const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "Cliente Removido";
-    const profissional = profissionais.find(p => p.id === a.profId);
+    const clienteNome = clients.find(c => c.id === a.clienteId)?.name || "Cliente Removido"; // Fixed from 'clientes' to 'clients'
+    const profissional = professionals.find(p => p.id === a.profId); // Fixed from 'profissionais' to 'professionals'
     const servico = profissional?.servicos[a.servIndex];
 
     let statusText = a.status;
