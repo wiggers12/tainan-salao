@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Espaço Tai Botelho - Sistema Completo</title>
 
-<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNpemVzIjoiNTEyeNTEyIiwic3JjIjoiaWNvbnMvaWNvbi01MTJ4NTEyLnBuYyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiSBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRaiSBCb3RlbGhvIiIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGJiZDAiLCJ0aGVtZV9jb2xvciI6IiM3YjFmYTIiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0In0=">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJpY29ucyI6W3sic2l6ZXMiOiIxOTJ4MTkyIiwic3JjIjoiaWNvbnMvaWNvbi0xOTJ4MTkyLnBuZyIsInR5cGUiOiJpbWFnZS9wbmcifV0sIm5hbWUiOiJFc3Bhw6dvIFRaiSBCb3RlbGhvIiwic2hvcnRfbmFtZSI6IlRaiSBCb3RlbGhvIiwiZGVzY3JpcHRpb24iOiJTaXN0ZW1hIGRlIEplc3TDo28gcGFyYSBFc3Bhw6dvIFRaiSBCb3RlbGhvIiIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGJiZDAiLCJ0aGVtZV9jb2xvciI6IiM3YjFmYTIiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0In0=">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -549,7 +549,8 @@ input.error, select.error, textarea.error {
     overflow-y: auto;
     padding-right: 10px; /* Adiciona padding para evitar que o conteúdo encoste na barra de rolagem */
 }
-#listaAgendamentos {
+/* A lista de agendamentos agora está em #listaTodosAgendamentos */
+#listaAgendamentos, #listaTodosAgendamentos {
     max-height: 400px; /* Um pouco mais alta para a lista de agendamentos */
     overflow-y: auto;
     padding-right: 10px;
@@ -581,7 +582,8 @@ input.error, select.error, textarea.error {
     <div class="menu-item" onclick="abrirSecao('clientesSection')"><span>👥</span><p>Clientes</p></div>
     <div class="menu-item" onclick="abrirSecao('profissionaisSection')"><span>💇‍♀️</span><p>Profissionais</p></div>
     <div class="menu-item" onclick="abrirSecao('produtosSection')"><span>🧴</span><p>Produtos</p></div>
-    <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>📅</span><p>Agendamentos</p></div>
+    <div class="menu-item" onclick="abrirSecao('agendamentosSection')"><span>➕📅</span><p>Agendar</p></div>
+    <div class="menu-item" onclick="abrirSecao('agendadosSection')"><span>✅📅</span><p>Agendados</p></div>
     <div class="menu-item" onclick="abrirSecao('financeiroSection')"><span>💰</span><p>Financeiro</p></div>
     <div class="menu-item" onclick="abrirSecao('backupSection')"><span>💾</span><p>Backup</p></div>
   </div>
@@ -779,7 +781,7 @@ input.error, select.error, textarea.error {
   </section>
 
   <section id="agendamentosSection" style="display:none;">
-    <h3>Agendamento de Clientes</h3>
+    <h3>Novo Agendamento</h3>
     <div class="form-group">
       <label for="selectClienteAgendamento">Cliente:</label>
       <select id="selectClienteAgendamento" onblur="validateSelect('selectClienteAgendamento', 'errorSelectClienteAgendamento', 'Selecione um cliente.')"></select>
@@ -807,24 +809,25 @@ input.error, select.error, textarea.error {
     </div>
     <button onclick="salvarAgendamento()">Salvar Agendamento</button>
     <input type="hidden" id="agendamentoEditandoId" />
+  </section>
 
-
-    <div class="busca" style="margin-top:20px;">
-      <input type="text" id="buscaAgendamento" placeholder="Buscar por nome do cliente..." oninput="listarAgendamentos()" />
+  <section id="agendadosSection" style="display:none;">
+    <h3>Clientes Agendados (Futuros e Histórico)</h3>
+    <div class="busca" style="margin-top:0;">
+      <input type="text" id="buscaTodosAgendamentos" placeholder="Buscar por nome do cliente..." oninput="listarTodosAgendamentos()" />
     </div>
     <div class="flex-row" style="gap:10px; margin: 10px 0;">
       <label>
-        <input type="checkbox" id="filtroPendentes" checked onchange="listarAgendamentos()" />
-        Mostrar apenas pendentes
+        <input type="checkbox" id="filtroAgendadosPendentes" checked onchange="listarTodosAgendamentos()" />
+        Mostrar apenas pendentes/futuros
       </label>
       <label style="flex-grow:1;">
         Filtrar por data:
-        <input type="date" id="filtroData" onchange="listarAgendamentos()" />
+        <input type="date" id="filtroAgendadosData" onchange="listarTodosAgendamentos()" />
       </label>
-      <button onclick="limparFiltrosAgendamento()">Limpar filtros</button>
+      <button onclick="limparFiltrosTodosAgendamentos()">Limpar filtros</button>
     </div>
-
-    <div id="listaAgendamentos"></div>
+    <div id="listaTodosAgendamentos"></div>
   </section>
 
   <section id="financeiroSection" style="display:none;">
@@ -1169,11 +1172,13 @@ function abrirSecao(id) {
     listarMovimentacoes();
     limparCamposProduto();
   }
-  if (id === "agendamentosSection") {
+  if (id === "agendamentosSection") { // Módulo de Agendar (novo agendamento)
     preencherSelectClienteAgendamento();
     preencherSelectProfissionalAgendamento();
-    listarAgendamentos();
     limparCamposAgendamento();
+  }
+  if (id === "agendadosSection") { // Módulo de Clientes Agendados
+    listarTodosAgendamentos(); // Exibe todos os agendamentos (futuros e históricos)
   }
   if (id === "financeiroSection") carregarFinanceiro();
   if (id === "dashboardSection") {
@@ -1226,6 +1231,8 @@ function salvarCliente() {
   limparCamposCliente();
   atualizarDashboard();
   desenharGraficoNovosClientes();
+  preencherSelectClienteAgendamento(); // Atualiza o select de clientes nos agendamentos
+  listarTodosAgendamentos(); // Atualiza a lista de agendamentos se houver clientes novos/editados
 }
 function limparCamposCliente() {
   document.getElementById("nomeCliente").value = "";
@@ -1278,6 +1285,9 @@ function excluirCliente(id) {
     atualizarDashboard();
     desenharGraficoNovosClientes();
     showToast("Cliente excluído!");
+    preencherSelectClienteAgendamento(); // Atualiza o select de clientes
+    listarTodosAgendamentos(); // Atualiza a lista de agendamentos
+    carregarFinanceiro(); // Recalcula ganhos
 }
 
 // ================== PROFISSIONAIS ======================
@@ -1331,6 +1341,7 @@ function salvarProfissional() {
   atualizarDashboard();
   desenharGraficoAgendamentosProfissional();
   preencherSelectProfissionalAgendamento(); // Atualiza select de agendamentos
+  listarTodosAgendamentos(); // Atualiza a lista de agendamentos se houver profs novos/editados
 }
 function limparCamposProfissional() {
   document.getElementById("nomeProf").value = "";
@@ -1387,6 +1398,8 @@ function excluirProfissional(id) {
     desenharGraficoAgendamentosProfissional();
     preencherSelectProfissionalAgendamento(); // Atualiza select de agendamentos
     showToast("Profissional excluído!");
+    listarTodosAgendamentos(); // Atualiza a lista de agendamentos
+    carregarFinanceiro(); // Recalcula ganhos
 }
 
 // ================== PRODUTOS (Estoque avançado) ======================
@@ -1578,7 +1591,7 @@ function listarMovimentacoes() {
   });
 }
 
-// ================== AGENDAMENTOS ======================
+// ================== AGENDAMENTOS (Criação) ======================
 function validarFormAgendamento() {
     let isValid = true;
     isValid = validateSelect('selectClienteAgendamento', 'errorSelectClienteAgendamento', 'Selecione um cliente.') && isValid;
@@ -1670,7 +1683,7 @@ function salvarAgendamento() {
   }
   
   localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-  listarAgendamentos();
+  listarTodosAgendamentos(); // Atualiza a nova lista de agendamentos
   atualizarDashboard();
   carregarFinanceiro();
   limparCamposAgendamento();
@@ -1699,6 +1712,7 @@ function limparCamposAgendamento() {
     document.getElementById("errorHoraAgendamento").textContent = '';
 }
 
+// ================== AGENDAMENTOS (Visualização e Gerenciamento - Novo Módulo) ======================
 async function alterarStatusAgendamento(id) {
   const agendamento = agendamentos.find(a => a.id === id);
   if (!agendamento) return;
@@ -1740,7 +1754,7 @@ async function alterarStatusAgendamento(id) {
   }
   
   localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-  listarAgendamentos();
+  listarTodosAgendamentos(); // Atualiza a nova lista de agendamentos
   carregarFinanceiro();
   atualizarDashboard();
   desenharGraficoServicosPopulares();
@@ -1749,22 +1763,33 @@ async function alterarStatusAgendamento(id) {
   currentAgendamentoIdForPayment = null; // Limpa o ID após o processamento
 }
 
-function listarAgendamentos() {
-  const busca = document.getElementById("buscaAgendamento").value.toLowerCase();
-  const filtroPendentes = document.getElementById("filtroPendentes").checked;
-  const filtroData = document.getElementById("filtroData").value;
+// Nova função para listar todos os agendamentos (futuros e passados, concluídos ou pendentes)
+function listarTodosAgendamentos() {
+  const busca = document.getElementById("buscaTodosAgendamentos").value.toLowerCase();
+  const filtroPendentes = document.getElementById("filtroAgendadosPendentes").checked;
+  const filtroData = document.getElementById("filtroAgendadosData").value;
 
-  const lista = document.getElementById("listaAgendamentos");
+  const lista = document.getElementById("listaTodosAgendamentos");
   lista.innerHTML = "";
 
   const agendamentosExibidos = agendamentos.filter(a => {
       const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "";
       if (!clienteNome.toLowerCase().includes(busca)) return false;
 
-      if (filtroPendentes && a.status !== "Pendente") return false;
+      // Se o filtroPendentes estiver marcado, mostra APENAS os pendentes/futuros
+      // Se a data do agendamento é HOJE ou no FUTURO E o status é PENDENTE, ou se for NOVO e o status é PENDENTE
+      const agendamentoDateTime = new Date(`${a.data}T${a.hora}`);
+      const hoje = new Date();
+      hoje.setHours(0,0,0,0); // Normaliza para comparar apenas a data
+
+      if (filtroPendentes) {
+        if (a.status !== "Pendente" || agendamentoDateTime < hoje) return false;
+      }
+
       if (filtroData && a.data !== filtroData) return false;
       return true;
   }).sort((a,b) => {
+      // Ordena por data e hora para manter a sequência cronológica
       const dateTimeA = new Date(`${a.data}T${a.hora}`);
       const dateTimeB = new Date(`${b.data}T${b.hora}`);
       return dateTimeA - dateTimeB;
@@ -1783,6 +1808,7 @@ function listarAgendamentos() {
     let statusText = a.status;
     let statusClass = '';
     let pagamentoInfo = '';
+    let actionButton = '';
 
     if (a.status === 'Concluído') {
         statusClass = 'status-concluido';
@@ -1792,8 +1818,10 @@ function listarAgendamentos() {
         } else if (a.formaPagamento) {
             pagamentoInfo = `<br>Pagamento: ${a.formaPagamento}`;
         }
+        actionButton = `<button class="info" onclick="alterarStatusAgendamento('${a.id}')">Reabrir</button>`;
     } else if (a.status === 'Pendente') {
         statusClass = 'status-pendente';
+        actionButton = `<button onclick="alterarStatusAgendamento('${a.id}')">Concluir</button>`;
     }
 
     lista.innerHTML += `
@@ -1803,32 +1831,34 @@ function listarAgendamentos() {
       Serviço: ${servico?.nome || "N/A"} - ${currencyFormatter.format(servico?.valor || 0)}<br>
       Status: <span class="${statusClass}">${statusText}</span> ${pagamentoInfo}
       <div>
-          <button class="editar" onclick="editarAgendamento('${a.id}')">Editar</button>
+          <button class="editar" onclick="editarAgendamentoParaCriacao('${a.id}')">Editar</button>
           <button class="excluir" onclick="confirmarExclusao('agendamento', '${a.id}', 'de ${clienteNome} em ${a.data} ${a.hora}')">Excluir</button>
-          ${a.status === 'Pendente' ? `<button onclick="alterarStatusAgendamento('${a.id}')">Concluir</button>` : `<button class="info" onclick="alterarStatusAgendamento('${a.id}')">Reabrir</button>`}
+          ${actionButton}
       </div>
     </div>`;
   });
 }
 
-function editarAgendamento(id) {
-  const a = agendamentos.find(agend => agend.id === id);
-  if (a) {
-    document.getElementById("selectClienteAgendamento").value = a.clienteId;
-    document.getElementById("selectProfissionalAgendamento").value = a.profId;
-    atualizarServicosProfissional();
-    document.getElementById("selectServicoAgendamento").value = a.servIndex;
-    document.getElementById("dataAgendamento").value = a.data;
-    document.getElementById("horaAgendamento").value = a.hora;
-    document.getElementById("agendamentoEditandoId").value = a.id;
-    showToast("Editando agendamento. Salve para confirmar.");
-  }
+function editarAgendamentoParaCriacao(id) {
+    const a = agendamentos.find(agend => agend.id === id);
+    if (a) {
+        document.getElementById("selectClienteAgendamento").value = a.clienteId;
+        document.getElementById("selectProfissionalAgendamento").value = a.profId;
+        atualizarServicosProfissional();
+        document.getElementById("selectServicoAgendamento").value = a.servIndex;
+        document.getElementById("dataAgendamento").value = a.data;
+        document.getElementById("horaAgendamento").value = a.hora;
+        document.getElementById("agendamentoEditandoId").value = a.id;
+        showToast("Editando agendamento. Salve para confirmar.");
+        abrirSecao('agendamentosSection'); // Volta para a seção de criação/edição
+    }
 }
+
 
 function excluirAgendamento(id) {
     agendamentos = agendamentos.filter(a => a.id !== id);
     localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    listarAgendamentos();
+    listarTodosAgendamentos(); // Atualiza a nova lista de agendamentos
     atualizarDashboard();
     carregarFinanceiro();
     desenharGraficoServicosPopulares();
@@ -1837,12 +1867,13 @@ function excluirAgendamento(id) {
     showToast("Agendamento excluído!");
 }
 
-function limparFiltrosAgendamento() {
-  document.getElementById("buscaAgendamento").value = "";
-  document.getElementById("filtroPendentes").checked = true;
-  document.getElementById("filtroData").value = "";
-  listarAgendamentos();
+function limparFiltrosTodosAgendamentos() {
+  document.getElementById("buscaTodosAgendamentos").value = "";
+  document.getElementById("filtroAgendadosPendentes").checked = true;
+  document.getElementById("filtroAgendadosData").value = "";
+  listarTodosAgendamentos();
 }
+
 
 // ================== FINANCEIRO ======================
 function salvarCaixaInicial() {
@@ -1873,7 +1904,7 @@ function carregarFinanceiro() {
         ganhos += serv.valor;
         const clienteNome = clientes.find(c => c.id === a.clienteId)?.nome || "N/A";
         const formaPagamento = a.formaPagamento || "N/A";
-        ganhosHTML += `<div class="item"><strong>${clienteNome}</strong> - ${a.data} - ${serv.nome} - ${currencyFormatter.format(serv.valor)} (${formaPagamento})</div>`;
+        ganhosHTML += `<div class="item"><strong>${clienteNome}</strong> - ${a.dataConclusao} - ${serv.nome} - ${currencyFormatter.format(serv.valor)} (${formaPagamento})</div>`;
       }
     }
   });
@@ -2145,10 +2176,10 @@ function desenharGraficoFinanceiro() {
             color: chartColors.dark
           },
           ticks: {
-              color: chartColors.dark,
-              callback: function(value) {
-                  return currencyFormatter.format(value);
-              }
+            color: chartColors.dark,
+            callback: function(value) {
+                return currencyFormatter.format(value);
+            }
           }
         },
         x: {
