@@ -160,9 +160,9 @@ document.querySelectorAll("aside a").forEach(link=>{
   });
 });
 
-// Corrigido: agora busca a aba correta com acento
+// Corrigido: agora busca a aba correta sem acento
 async function carregarDashboard(){
-  const range="FUNIL PRECATÓRIO_INÍCIO MARÇO25";
+  const range="FUNIL PRECATÓRIO_INICIO MARÇO25";
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
   const res=await fetch(url);
   const data=await res.json();
