@@ -1,53 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Jurídico</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="libs/chart.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Jurídico 2025</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
+  <div class="sidebar">
     <h2>📊 Jurídico</h2>
-    <nav>
-      <ul>
-        <li onclick="loadPage('funil-precatorio')">Funil Precatórios</li>
-        <li onclick="loadPage('crm-precatorio')">CRM Precatório</li>
-        <li onclick="loadPage('funil-geral')">Funil Geral</li>
-        <li onclick="loadPage('ranking')">Ranking</li>
-        <li onclick="loadPage('sla')">SLA</li>
-        <li onclick="loadPage('controle-processos')">Controle Processos</li>
-        <li onclick="loadPage('distratos')">Distratos</li>
-        <li onclick="loadPage('pdi')">PDI</li>
-      </ul>
-    </nav>
-  </aside>
+    <a href="#" class="active">Funil Precatórios</a>
+    <a href="#">CRM Precatório</a>
+    <a href="#">Funil Geral</a>
+    <a href="#">Ranking</a>
+    <a href="#">SLA</a>
+    <a href="#">Controle Processos</a>
+    <a href="#">Distratos</a>
+    <a href="#">PDI</a>
+  </div>
 
-  <main class="content">
-    <header>
-      <h1>Dashboard Jurídico</h1>
-      <select id="mesFiltro" onchange="atualizarFiltroMes()">
-        <option value="Todos">Todos os meses</option>
-        <option value="Janeiro">Janeiro</option>
-        <option value="Fevereiro">Fevereiro</option>
-        <option value="Março">Março</option>
-        <option value="Abril">Abril</option>
-        <option value="Maio">Maio</option>
-        <option value="Junho">Junho</option>
-        <option value="Julho">Julho</option>
-        <option value="Agosto">Agosto</option>
-        <option value="Setembro">Setembro</option>
-        <option value="Outubro">Outubro</option>
-        <option value="Novembro">Novembro</option>
-        <option value="Dezembro">Dezembro</option>
-      </select>
-    </header>
+  <div class="main">
+    <h1>Dashboard Jurídico 2025</h1>
+    <div class="cards">
+      <div class="card" id="totalLeads">Total de Leads: 0</div>
+      <div class="card" id="alta">Alta: 0</div>
+      <div class="card" id="media">Média: 0</div>
+      <div class="card" id="baixa">Baixa: 0</div>
+      <div class="card" id="consultorTop">Consultor Destaque: —</div>
+    </div>
 
-    <div id="pageContainer"></div>
-  </main>
+    <div class="charts">
+      <canvas id="graficoPrioridade"></canvas>
+      <canvas id="graficoStatus"></canvas>
+      <canvas id="graficoLinha"></canvas>
+    </div>
 
-  <script src="config.js"></script>
+    <h2>📋 Tabela de Dados</h2>
+    <input type="text" id="filtro" placeholder="Buscar por nome ou consultor..." />
+    <table id="tabela">
+      <thead id="tabelaHead"></thead>
+      <tbody id="tabelaBody"></tbody>
+    </table>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
