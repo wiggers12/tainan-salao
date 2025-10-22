@@ -2,30 +2,52 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Jurídico</title>
   <link rel="stylesheet" href="style.css">
   <script src="libs/chart.min.js"></script>
-  <script src="config.js"></script>
 </head>
 <body>
   <aside class="sidebar">
-    <h2>📊 Painel Jurídico</h2>
+    <h2>📊 Jurídico</h2>
     <nav>
-      <a onclick="mostrarPagina('funil-precatorio')">Funil Precatórios</a>
-      <a onclick="mostrarPagina('crm-precatorio')">CRM Precatório</a>
-      <a onclick="mostrarPagina('funil-geral')">Funil Trabalhista / Previdenciário</a>
-      <a onclick="mostrarPagina('ranking')">Ranking</a>
-      <a onclick="mostrarPagina('sla')">Contratos x SLA</a>
-      <a onclick="mostrarPagina('controle-processos')">Controle de Processos</a>
-      <a onclick="mostrarPagina('distratos')">Distratos</a>
-      <a onclick="mostrarPagina('pdi')">PDI</a>
+      <ul>
+        <li onclick="loadPage('funil-precatorio')">Funil Precatórios</li>
+        <li onclick="loadPage('crm-precatorio')">CRM Precatório</li>
+        <li onclick="loadPage('funil-geral')">Funil Geral</li>
+        <li onclick="loadPage('ranking')">Ranking</li>
+        <li onclick="loadPage('sla')">SLA</li>
+        <li onclick="loadPage('controle-processos')">Controle Processos</li>
+        <li onclick="loadPage('distratos')">Distratos</li>
+        <li onclick="loadPage('pdi')">PDI</li>
+      </ul>
     </nav>
   </aside>
 
-  <main id="conteudo">
-    <h1>Selecione uma aba no menu para visualizar os indicadores</h1>
+  <main class="content">
+    <header>
+      <h1>Dashboard Jurídico</h1>
+      <select id="mesFiltro" onchange="atualizarFiltroMes()">
+        <option value="Todos">Todos os meses</option>
+        <option value="Janeiro">Janeiro</option>
+        <option value="Fevereiro">Fevereiro</option>
+        <option value="Março">Março</option>
+        <option value="Abril">Abril</option>
+        <option value="Maio">Maio</option>
+        <option value="Junho">Junho</option>
+        <option value="Julho">Julho</option>
+        <option value="Agosto">Agosto</option>
+        <option value="Setembro">Setembro</option>
+        <option value="Outubro">Outubro</option>
+        <option value="Novembro">Novembro</option>
+        <option value="Dezembro">Dezembro</option>
+      </select>
+    </header>
+
+    <div id="pageContainer"></div>
   </main>
 
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
