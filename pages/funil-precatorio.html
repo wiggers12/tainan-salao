@@ -1,0 +1,45 @@
+<h1>Funil Precatórios</h1>
+<div class="filtros">
+  <label>Mês:</label>
+  <select id="filtroMes"></select>
+</div>
+<section class="cards">
+  <div class="card"><h2 id="conversaoGeral">0%</h2><p>Taxa de Conversão</p></div>
+  <div class="card"><h2 id="encerrados">0</h2><p>Encerrados</p></div>
+  <div class="card"><h2 id="pendentes">0</h2><p>Pendentes</p></div>
+  <div class="card"><h2 id="contratosMes">0</h2><p>Contratos no Mês</p></div>
+</section>
+<canvas id="graficoStatus"></canvas>
+
+<script>
+async function init_funil_precatorio() {
+  const dados = await carregarDados(TABS.funilPrecatorio);
+  const linhas = dados.linhas;
+  const mesFiltro = document.getElementById('filtroMes');
+
+  // Montar lista de meses
+  const meses = [...new Set(linhas.map(l => l[0].split('/')[1]))];
+  mesFiltro.innerHTML = meses.map(m => `<option>${m}</option>`).join('');
+
+  mesFiltro.onchange = () => atualizar();
+  atualizar();
+
+  function atualizar() {
+    const mesSel = mesFiltro.value;
+    const filtrados = linhas.filter(l => l[0].split('/')[1] === mesSel);
+
+    const total = filtrados.length;
+    const encerrados = filtrados.filter(l => l[2] === 'Encerrado').length;
+    const pendentes = filtrados.filter(l => l[2] === 'Pendente').length;
+
+    document.getElementById('encerrados').textContent = encerrados;
+    document.getElementById('pendentes').textContent = pendentes;
+    document.getElementById('contratosMes').textContent = total;
+    document.getElementById('conversaoGeral').textContent = ((encerrados/total)*100).toFixed(1)+'%';
+
+    const status = {};
+    filtrados.forEach(l => { status[l[2]] = (status[l[2]]||0)+1; });
+    criarGrafico('graficoStatus', Object.keys(status), Object.values(status), 'Status dos Contratos');
+  }
+}
+</script>
