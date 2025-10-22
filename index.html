@@ -1,49 +1,184 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Jurídico 2025</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Jurídico 2025</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+  body{
+    background:linear-gradient(145deg,#0d1b2a,#1b263b);
+    color:#e0e1dd;display:flex;min-height:100vh;overflow-x:hidden;
+  }
+  aside{
+    width:230px;background:#1b263b;padding:25px 15px;
+    display:flex;flex-direction:column;align-items:flex-start;
+    position:fixed;height:100%;box-shadow:3px 0 10px rgba(0,0,0,.3);
+  }
+  aside h2{color:#00b4d8;margin-bottom:25px;text-align:left;}
+  aside a{
+    text-decoration:none;color:#e0e1dd;margin:8px 0;width:100%;
+    padding:10px;border-radius:8px;transition:.3s;
+  }
+  aside a:hover,aside a.active{background:#00b4d8;color:#fff;}
+  main{
+    margin-left:260px;padding:30px;width:calc(100% - 260px);
+    display:flex;flex-direction:column;gap:25px;
+  }
+  h1{font-size:1.8rem;color:#fff;margin-bottom:10px;}
+  .cards{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;
+  }
+  .card{
+    background:linear-gradient(145deg,#1e2a47,#24345c);
+    border-radius:12px;padding:18px;color:#fff;
+    box-shadow:inset 0 0 10px rgba(0,180,216,.3),0 0 8px rgba(0,0,0,.5);
+  }
+  .card h3{font-size:1rem;color:#90e0ef;margin-bottom:6px;}
+  .card p{font-size:1.5rem;font-weight:600;}
+  .charts{
+    display:grid;grid-template-columns:2fr 1fr;gap:20px;
+  }
+  .chartBox{
+    background:#1b263b;padding:20px;border-radius:15px;
+    box-shadow:0 0 12px rgba(0,0,0,.4);
+  }
+  canvas{width:100%!important;height:280px!important;}
+  .ranking{
+    background:linear-gradient(145deg,#14213d,#1b263b);
+    padding:20px;border-radius:15px;
+    box-shadow:0 0 10px rgba(0,180,216,.3);
+  }
+  .ranking h2{color:#00b4d8;margin-bottom:15px;}
+  .ranking ul{list-style:none;}
+  .ranking li{
+    background:#1e2a47;margin:8px 0;padding:10px 15px;
+    border-radius:10px;display:flex;justify-content:space-between;
+    color:#fff;font-size:0.9rem;
+  }
+</style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>📊 Jurídico</h2>
-    <a href="#" class="active">Funil Precatórios</a>
-    <a href="#">crm-precatorio.html</a>
-    <a href="#">Funil Geral</a>
-    <a href="#">Ranking</a>
-    <a href="#">SLA</a>
-    <a href="#">Controle Processos</a>
-    <a href="#">Distratos</a>
-    <a href="#">PDI</a>
+<aside>
+  <h2>⚖️ Jurídico</h2>
+  <a class="active">Dashboard</a>
+  <a>Funil Precatórios</a>
+  <a>CRM Precatório</a>
+  <a>Ranking</a>
+  <a>SLA</a>
+  <a>Controle Processos</a>
+  <a>Distratos</a>
+  <a>PDI</a>
+</aside>
+
+<main>
+  <h1>Dashboard Jurídico 2025</h1>
+  <div class="cards">
+    <div class="card"><h3>Total de Leads</h3><p id="totalLeads">0</p></div>
+    <div class="card"><h3>Alta Prioridade</h3><p id="alta">0</p></div>
+    <div class="card"><h3>Média</h3><p id="media">0</p></div>
+    <div class="card"><h3>Baixa</h3><p id="baixa">0</p></div>
+    <div class="card"><h3>Consultor Destaque</h3><p id="consultorTop">—</p></div>
   </div>
 
-  <div class="main">
-    <h1>Dashboard Jurídico 2025</h1>
-    <div class="cards">
-      <div class="card" id="totalLeads">Total de Leads: 0</div>
-      <div class="card" id="alta">Alta: 0</div>
-      <div class="card" id="media">Média: 0</div>
-      <div class="card" id="baixa">Baixa: 0</div>
-      <div class="card" id="consultorTop">Consultor Destaque: —</div>
-    </div>
-
-    <div class="charts">
-      <canvas id="graficoPrioridade"></canvas>
+  <div class="charts">
+    <div class="chartBox">
+      <h2>📊 Status dos Processos</h2>
       <canvas id="graficoStatus"></canvas>
-      <canvas id="graficoLinha"></canvas>
     </div>
-
-    <h2>📋 Tabela de Dados</h2>
-    <input type="text" id="filtro" placeholder="Buscar por nome ou consultor..." />
-    <table id="tabela">
-      <thead id="tabelaHead"></thead>
-      <tbody id="tabelaBody"></tbody>
-    </table>
+    <div class="ranking">
+      <h2>🏆 Top Consultores</h2>
+      <ul id="ranking"></ul>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <div class="chartBox">
+    <h2>📈 Evolução de Contratos no Ano</h2>
+    <canvas id="graficoLinha"></canvas>
+  </div>
+</main>
+
+<script>
+const SHEET_ID = "1baSrMHddB1BeFEjhkBpR0ES4ZIF5EJ9MIWnK83NW9hc";
+const API_KEY = "AIzaSyC4AuWdBjcwRoZnkQjhIPxBQKpvKhyjir0";
+const RANGE = "FUNIL PRECATÓRIO_INICIO MARÇO25";
+const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
+
+async function carregarDados(){
+  try{
+    const res = await fetch(URL);
+    const data = await res.json();
+    const linhas = data.values;
+    if(!linhas || linhas.length < 2) return;
+    const headers = linhas[1];
+    const registros = linhas.slice(2).map(l=>{
+      const obj={};
+      headers.forEach((h,i)=>obj[h]=l[i]||"");
+      return obj;
+    });
+    atualizarDashboard(registros);
+  }catch(e){console.error(e);}
+}
+
+function atualizarDashboard(registros){
+  document.getElementById("totalLeads").innerText = registros.length;
+  const prioridade={Alta:0,Média:0,Baixa:0};
+  const status={},consultores={},linha={};
+
+  registros.forEach(r=>{
+    const p=(r["PRIORIDADE: ALTA,MÉDIA OU BAIXA"]||"").trim();
+    if(p) prioridade[p]=(prioridade[p]||0)+1;
+    const s=(r["STATUS"]||"").trim();
+    if(s) status[s]=(status[s]||0)+1;
+    const c=(r["CONSULTOR"]||"").trim();
+    if(c) consultores[c]=(consultores[c]||0)+1;
+    const d=(r["DATA DO PRIMEIRO CONTATO COM O CLIENTE"]||"").slice(0,10);
+    if(d) linha[d]=(linha[d]||0)+1;
+  });
+
+  document.getElementById("alta").innerText = prioridade.Alta||0;
+  document.getElementById("media").innerText = prioridade.Média||0;
+  document.getElementById("baixa").innerText = prioridade.Baixa||0;
+  const top = Object.entries(consultores).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById("consultorTop").innerText = top?top[0]+" ("+top[1]+")":"—";
+
+  const rankList=document.getElementById("ranking");
+  rankList.innerHTML = Object.entries(consultores)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,5)
+    .map(([nome,qt],i)=>`<li><span>${i+1}. ${nome}</span><span>${qt}</span></li>`).join("");
+
+  gerarGraficos(status,linha);
+}
+
+function gerarGraficos(status,linha){
+  new Chart(document.getElementById("graficoStatus"),{
+    type:"bar",
+    data:{
+      labels:Object.keys(status),
+      datasets:[{label:"Qtd",data:Object.values(status),
+        backgroundColor:"#00b4d8",borderRadius:8}]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:"#fff"}},y:{ticks:{color:"#fff"}}}
+    }
+  });
+
+  const ordenado = Object.entries(linha).sort((a,b)=>new Date(a[0])-new Date(b[0]));
+  new Chart(document.getElementById("graficoLinha"),{
+    type:"line",
+    data:{
+      labels:ordenado.map(e=>e[0]),
+      datasets:[{label:"Contratos",data:ordenado.map(e=>e[1]),
+        borderColor:"#00b4d8",backgroundColor:"rgba(0,180,216,.2)",fill:true,tension:.3}]
+    },
+    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#fff"}},y:{ticks:{color:"#fff"}}}}
+  });
+}
+carregarDados();
+setInterval(carregarDados,300000);
+</script>
 </body>
 </html>
