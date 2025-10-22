@@ -1,65 +1,97 @@
-let mesSelecionado = 'Todos';
+const SHEET_ID = "1baSrMHddB1BeFEjhkBpR0ES4ZIF5EJ9MIWnK83NW9hc";
+const API_KEY = "AIzaSyC4AuWdBjcwRoZnkQjhIPxBQKpvKhyjir0";
+const RANGE = "FUNIL PRECATÓRIO_INICIO MARÇO25";
+const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(RANGE)}?key=${API_KEY}`;
 
-function loadPage(page) {
-  fetch(`pages/${page}.html`)
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById('pageContainer').innerHTML = html;
-      carregarDados(page);
+async function carregarDados() {
+  try {
+    const res = await fetch(URL);
+    const data = await res.json();
+    const linhas = data.values;
+    if (!linhas || linhas.length < 2) return;
+
+    const headers = linhas[1];
+    const registros = linhas.slice(2).map(l => {
+      const obj = {};
+      headers.forEach((h, i) => (obj[h] = l[i] || ""));
+      return obj;
     });
+
+    exibirCards(registros);
+    exibirTabela(headers, registros);
+    exibirGraficos(registros);
+  } catch (e) {
+    console.error("Erro ao carregar dados:", e);
+  }
 }
 
-function carregarDados(page) {
-  fetch(buildSheetURL(page))
-    .then(res => res.json())
-    .then(data => {
-      const rows = data.values;
-      if (!rows) return;
-      renderizarCards(page, rows);
-      renderizarGraficos(page, rows);
-    });
+function exibirCards(registros) {
+  document.getElementById("totalLeads").innerText = `Total de Leads: ${registros.length}`;
+  const prioridade = { Alta: 0, Média: 0, Baixa: 0 };
+  const consultores = {};
+
+  registros.forEach(r => {
+    const p = (r["PRIORIDADE: ALTA,MÉDIA OU BAIXA"] || "").trim();
+    if (p) prioridade[p] = (prioridade[p] || 0) + 1;
+    const c = (r["CONSULTOR"] || "").trim();
+    if (c) consultores[c] = (consultores[c] || 0) + 1;
+  });
+
+  document.getElementById("alta").innerText = `Alta: ${prioridade["Alta"] || 0}`;
+  document.getElementById("media").innerText = `Média: ${prioridade["Média"] || 0}`;
+  document.getElementById("baixa").innerText = `Baixa: ${prioridade["Baixa"] || 0}`;
+
+  let top = Object.entries(consultores).sort((a, b) => b[1] - a[1])[0];
+  document.getElementById("consultorTop").innerText = top ? `Consultor Destaque: ${top[0]} (${top[1]})` : "Consultor Destaque: —";
 }
 
-function atualizarFiltroMes() {
-  mesSelecionado = document.getElementById('mesFiltro').value;
-  const currentPage = document.querySelector('[data-current-page]');
-  if (currentPage) carregarDados(currentPage.dataset.currentPage);
-}
+function exibirTabela(headers, registros) {
+  const head = document.getElementById("tabelaHead");
+  const body = document.getElementById("tabelaBody");
+  head.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>`;
+  body.innerHTML = registros.map(r => `<tr>${headers.map(h => `<td>${r[h] || ""}</td>`).join("")}</tr>`).join("");
 
-function renderizarCards(page, rows) {
-  const cardsContainer = document.getElementById('cards');
-  if (!cardsContainer) return;
-
-  const total = rows.length - 1; // remove header
-  cardsContainer.innerHTML = `
-    <div class="card">📄 Total de Registros: <strong>${total}</strong></div>
-    <div class="card">📅 Mês atual: <strong>${mesSelecionado}</strong></div>
-  `;
-}
-
-function renderizarGraficos(page, rows) {
-  const canvas = document.getElementById('chart');
-  if (!canvas) return;
-
-  const labels = rows.slice(1).map(r => r[0]);
-  const valores = rows.slice(1).map(r => Number(r[1]) || 0);
-
-  new Chart(canvas.getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Registros',
-        data: valores,
-        backgroundColor: '#4B7BEC'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } }
-    }
+  document.getElementById("filtro").addEventListener("input", e => {
+    const termo = e.target.value.toLowerCase();
+    const filtrado = registros.filter(r =>
+      (r["NOME"] || "").toLowerCase().includes(termo) ||
+      (r["CONSULTOR"] || "").toLowerCase().includes(termo)
+    );
+    body.innerHTML = filtrado.map(r => `<tr>${headers.map(h => `<td>${r[h] || ""}</td>`).join("")}</tr>`).join("");
   });
 }
 
-// Carregar página inicial
-loadPage('funil-precatorio');
+function exibirGraficos(registros) {
+  const prioridade = { Alta: 0, Média: 0, Baixa: 0 };
+  const status = {};
+  const linha = {};
+
+  registros.forEach(r => {
+    const p = (r["PRIORIDADE: ALTA,MÉDIA OU BAIXA"] || "").trim();
+    if (p) prioridade[p] = (prioridade[p] || 0) + 1;
+    const s = (r["STATUS"] || "").trim();
+    if (s) status[s] = (status[s] || 0) + 1;
+    const d = (r["DATA DO PRIMEIRO CONTATO COM O CLIENTE"] || "").slice(0,10);
+    if (d) linha[d] = (linha[d] || 0) + 1;
+  });
+
+  new Chart(document.getElementById("graficoPrioridade"), {
+    type: "pie",
+    data: { labels: Object.keys(prioridade), datasets: [{ data: Object.values(prioridade), backgroundColor: ["#ff4d4d","#ffaa00","#00cc99"] }] },
+  });
+
+  new Chart(document.getElementById("graficoStatus"), {
+    type: "bar",
+    data: { labels: Object.keys(status), datasets: [{ data: Object.values(status), backgroundColor: "#00bfff" }] },
+    options: { plugins: { legend: { display: false } } }
+  });
+
+  new Chart(document.getElementById("graficoLinha"), {
+    type: "line",
+    data: { labels: Object.keys(linha), datasets: [{ data: Object.values(linha), borderColor: "#00bfff", fill: false }] },
+    options: { plugins: { legend: { display: false } } }
+  });
+}
+
+carregarDados();
+setInterval(carregarDados, 300000); // 5 minutos
