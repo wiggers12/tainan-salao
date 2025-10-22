@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+  background: #f4f5f7;
+}
+.sidebar {
+  background: #2c3e50;
+  color: #fff;
+  width: 250px;
+  min-height: 100vh;
+  padding: 20px;
+}
+.sidebar h2 { margin-top: 0; }
+.sidebar nav a {
+  display: block;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin: 5px 0;
+}
+.sidebar nav a:hover {
+  background: #34495e;
+}
+main {
+  flex: 1;
+  padding: 20px;
+}
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  min-width: 180px;
+  flex: 1;
+}
+canvas {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+.filtros {
+  margin-bottom: 20px;
+}
