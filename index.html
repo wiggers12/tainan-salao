@@ -3,404 +3,383 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Espaço Taai Botelho</title>
-
     <meta name="theme-color" content="#b69245">
 
     <style>
-
         /* =========================================================
-           RESET
+           VARIÁVEIS DE DESIGN & RESET
         ========================================================= */
+        :root {
+            --primary: #b69245;
+            --primary-dark: #8a6c2f;
+            --primary-light: #fffaf0;
+            --primary-border: #eadbb4;
+            --bg-body: #f5f5f7;
+            --bg-card: #ffffff;
+            --text-main: #222222;
+            --text-muted: #777777;
+            --border: #eeeeee;
+            --radius-main: 16px;
+            --radius-btn: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Arial,
-                sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: #f6f6f6;
-            color: #222;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.4;
         }
 
-        button,
-        input,
-        select,
-        textarea {
+        button, input, select, textarea {
             font: inherit;
         }
 
         button {
             cursor: pointer;
+            border: none;
+            outline: none;
         }
 
-
         /* =========================================================
-           APP
+           LAYOUT & CONTAINER
         ========================================================= */
-
         .app {
-            max-width: 520px;
+            max-width: 500px;
             min-height: 100vh;
-            margin: auto;
-            background: #fff;
-            position: relative;
+            margin: 0 auto;
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
         }
 
-
         /* =========================================================
-           HEADER
+           HEADER & STATUS
         ========================================================= */
-
         header {
             text-align: center;
-            padding: 30px 20px 24px;
-            border-bottom: 1px solid #eee;
-            background: #fff;
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
         }
 
         .logo {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
             margin-bottom: 12px;
             display: none;
         }
 
         header h1 {
-            font-size: 12px;
-            letter-spacing: 5px;
-            font-weight: 500;
-            color: #777;
+            font-size: 11px;
+            letter-spacing: 4px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
         header h2 {
-            font-size: 30px;
-            margin-top: 5px;
-            color: #b69245;
-            font-weight: 600;
+            font-size: 28px;
+            margin-top: 2px;
+            color: var(--primary);
+            font-weight: 700;
         }
 
         header p {
-            margin-top: 7px;
-            color: #999;
+            margin-top: 4px;
+            color: var(--text-muted);
             font-size: 13px;
         }
 
+        .connection {
+            text-align: center;
+            padding: 6px 12px;
+            font-size: 11px;
+            background: #f9f9f9;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .connection.connected {
+            color: #2e7d32;
+            background: #e8f5e9;
+        }
+
+        .connection.error {
+            background: #ffebee;
+            color: #c62828;
+        }
 
         /* =========================================================
-           CONTEÚDO
+           CONTEÚDO PRINCIPAL & MENU
         ========================================================= */
-
         main {
             padding: 20px;
+            flex: 1;
         }
 
         .welcome {
-            background:
-                linear-gradient(
-                    135deg,
-                    #fffdf8,
-                    #f8efd9
-                );
-
-            border: 1px solid #eadbb4;
-            border-radius: 20px;
-            padding: 22px;
-            margin-bottom: 18px;
+            background: linear-gradient(135deg, #fffdf8 0%, #f8efd9 100%);
+            border: 1px solid var(--primary-border);
+            border-radius: var(--radius-main);
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
         .welcome h3 {
-            font-size: 21px;
-            margin-bottom: 6px;
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: var(--text-main);
         }
 
         .welcome p {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #777;
+            font-size: 13px;
+            color: var(--text-muted);
         }
-
-
-        /* =========================================================
-           MENU
-        ========================================================= */
 
         .menu {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
 
         .menu button {
-            min-height: 110px;
-            border: 1px solid #ddc58c;
-            background: white;
-            border-radius: 18px;
-            padding: 18px 10px;
-            font-size: 14px;
+            min-height: 100px;
+            border: 1px solid var(--primary-border);
+            background: var(--bg-card);
+            border-radius: var(--radius-main);
+            padding: 16px 10px;
+            font-size: 13px;
             font-weight: 600;
-            color: #333;
-            transition: .2s;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .menu button:active {
-            transform: scale(.97);
-            background: #fffaf0;
+            transform: scale(0.97);
+            background: var(--primary-light);
         }
 
         .menu-icon {
-            display: block;
-            font-size: 27px;
-            margin-bottom: 9px;
+            font-size: 26px;
         }
 
-
         /* =========================================================
-           SEÇÕES
+           SEÇÕES & ANIMAÇÃO
         ========================================================= */
-
         .section {
             display: none;
         }
 
         .section.active {
             display: block;
-            animation: fade .2s ease;
+            animation: fadeIn 0.25s ease-out;
         }
 
-        @keyframes fade {
-
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(5px);
+                transform: translateY(6px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
-
         }
 
-
         /* =========================================================
-           CARDS
+           CARDS & FORMULÁRIOS
         ========================================================= */
-
         .card {
-            border: 1px solid #eee;
-            border-radius: 19px;
-            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-main);
+            padding: 20px;
             margin-bottom: 16px;
-            background: #fff;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
         }
 
         .card h3 {
-            color: #a98234;
-            margin-bottom: 17px;
+            color: var(--primary);
+            margin-bottom: 16px;
             font-size: 18px;
+            font-weight: 700;
         }
-
-
-        /* =========================================================
-           FORMULÁRIOS
-        ========================================================= */
 
         label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: #555;
             margin-bottom: 6px;
         }
 
-        input,
-        select,
-        textarea {
+        input, select, textarea {
             width: 100%;
             border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 15px;
-            margin-bottom: 14px;
-            outline: none;
+            border-radius: var(--radius-btn);
+            padding: 12px 14px;
+            font-size: 14px;
+            margin-bottom: 16px;
             background: #fff;
-            color: #222;
+            color: var(--text-main);
+            transition: border-color 0.2s ease;
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: #b69245;
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
         }
 
         textarea {
-            min-height: 90px;
-            resize: none;
+            min-height: 80px;
+            resize: vertical;
         }
-
 
         /* =========================================================
            BOTÕES
         ========================================================= */
-
         .btn-primary {
             width: 100%;
-            border: none;
-            border-radius: 13px;
-            padding: 15px;
-            background: #b69245;
-            color: white;
+            border-radius: var(--radius-btn);
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
             font-weight: 700;
             font-size: 15px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-dark);
         }
 
         .btn-primary:disabled {
-            opacity: .6;
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
         .btn-secondary {
             width: 100%;
             margin-top: 10px;
-            border: 1px solid #d7c18c;
-            border-radius: 13px;
-            padding: 13px;
-            background: white;
-            color: #896a2e;
+            border: 1px solid var(--primary-border);
+            border-radius: var(--radius-btn);
+            padding: 12px;
+            background: #fff;
+            color: var(--primary-dark);
             font-weight: 600;
+            font-size: 14px;
         }
 
-
         /* =========================================================
-           AGENDAMENTOS
+           CARDS DE AGENDAMENTO & STATUS
         ========================================================= */
-
         .appointment {
-            border: 1px solid #eee;
-            border-radius: 16px;
-            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-main);
+            padding: 16px;
             margin-bottom: 12px;
-            background: #fff;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
         }
 
         .appointment-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 9px;
+            margin-bottom: 8px;
         }
 
         .appointment-top strong {
             font-size: 16px;
+            color: var(--text-main);
         }
 
         .time {
-            color: #a98234;
+            color: var(--primary);
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .appointment p {
-            margin-top: 5px;
+            margin-top: 4px;
             font-size: 13px;
-            color: #666;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .price {
-            font-size: 16px !important;
-            color: #a98234 !important;
+            font-size: 15px !important;
+            color: var(--primary) !important;
             font-weight: 700;
+
         }
 
-
-        /* =========================================================
-           STATUS
-        ========================================================= */
+        .whatsapp-link {
+            color: #25D366;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
         .status {
             display: inline-block;
             margin-top: 10px;
-            padding: 5px 10px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
+            text-transform: uppercase;
         }
 
-        .status-agendado {
-            background: #fff5d9;
-            color: #89680c;
-        }
-
-        .status-confirmado {
-            background: #eaf7ec;
-            color: #23752b;
-        }
-
-        .status-cancelado {
-            background: #fff0f0;
-            color: #a82e2e;
-        }
-
-
-        /* =========================================================
-           AÇÕES
-        ========================================================= */
+        .status-agendado { background: #fff5d9; color: #89680c; }
+        .status-confirmado { background: #eaf7ec; color: #23752b; }
+        .status-cancelado { background: #fff0f0; color: #a82e2e; }
 
         .actions {
             display: flex;
-            gap: 7px;
-            margin-top: 13px;
+            gap: 6px;
+            margin-top: 12px;
         }
 
         .actions button {
             flex: 1;
-            border: none;
-            border-radius: 9px;
-            padding: 10px 4px;
+            border-radius: 8px;
+            padding: 8px 4px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .confirm-btn {
-            background: #edf8ef;
-            color: #25752c;
-        }
-
-        .edit-btn {
-            background: #f4f4f4;
-            color: #555;
-        }
-
-        .cancel-btn {
-            background: #fff0f0;
-            color: #ae3030;
-        }
-
+        .confirm-btn { background: #edf8ef; color: #25752c; }
+        .edit-btn { background: #f4f4f4; color: #555; }
+        .cancel-btn { background: #fff0f0; color: #ae3030; }
 
         /* =========================================================
-           SERVIÇOS
+           LISTA DE SERVIÇOS & GERENCIAR
         ========================================================= */
-
         .service-row {
-            border-bottom: 1px solid #eee;
-            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
         }
 
         .service-row:last-child {
@@ -410,3059 +389,792 @@
         .service-info {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
-        }
-
-        .service-info strong {
-            font-size: 15px;
-        }
-
-        .service-info small {
-            color: #999;
-            line-height: 1.8;
+            align-items: center;
         }
 
         .service-price {
-            color: #a98234;
-            white-space: nowrap;
+            color: var(--primary);
+            font-weight: 700;
         }
 
         .service-actions {
             display: flex;
             gap: 8px;
-            margin-top: 11px;
+            margin-top: 10px;
         }
 
         .service-actions button {
             flex: 1;
-            border: none;
-            border-radius: 9px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .delete-btn {
-            background: #fff0f0;
-            color: #aa3030;
-        }
-
-
-        /* =========================================================
-           GERENCIAR
-        ========================================================= */
+        .delete-btn { background: #fff0f0; color: #aa3030; }
 
         .manage-box {
-            border: 1px solid #eee;
-            border-radius: 15px;
-            padding: 17px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-main);
+            padding: 16px;
             margin-bottom: 12px;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .manage-box:active {
-            background: #fffaf2;
-        }
-
-        .manage-box h4 {
-            color: #a98234;
-            margin-bottom: 6px;
-        }
-
-        .manage-box p {
-            font-size: 13px;
-            color: #777;
-        }
-
-
-        /* =========================================================
-           PREÇO SELECIONADO
-        ========================================================= */
+        .manage-box:active { background: var(--primary-light); }
+        .manage-box h4 { color: var(--primary); margin-bottom: 4px; }
+        .manage-box p { font-size: 12px; color: var(--text-muted); }
 
         .selected-price {
-            background: #fffaf0;
-            border-radius: 11px;
-            padding: 11px 13px;
-            margin-top: -5px;
-            margin-bottom: 15px;
-            color: #9b772e;
+            background: var(--primary-light);
+            border-radius: var(--radius-btn);
+            padding: 10px;
+            margin-top: -8px;
+            margin-bottom: 14px;
+            color: var(--primary-dark);
             font-size: 13px;
             font-weight: 700;
             display: none;
         }
 
-
         /* =========================================================
-           VAZIO / LOADING
+           ESTADOS VAZIOS & TOAST
         ========================================================= */
-
-        .empty {
+        .empty, .loading {
             text-align: center;
-            color: #999;
-            padding: 35px 10px;
-            line-height: 1.5;
-        }
-
-        .loading {
-            text-align: center;
-            color: #999;
+            color: var(--text-muted);
             padding: 30px 10px;
+            font-size: 14px;
         }
-
-
-        /* =========================================================
-           CONEXÃO
-        ========================================================= */
-
-        .connection {
-            text-align: center;
-            padding: 8px;
-            font-size: 11px;
-            background: #f9f9f9;
-            color: #888;
-        }
-
-        .connection.connected {
-            color: #438348;
-        }
-
-        .connection.error {
-            background: #fff0f0;
-            color: #ae3030;
-        }
-
-
-        /* =========================================================
-           TOAST
-        ========================================================= */
 
         #toast {
             position: fixed;
             left: 50%;
-            bottom: 25px;
+            bottom: 24px;
             transform: translateX(-50%) translateY(100px);
-
             width: calc(100% - 40px);
-            max-width: 480px;
-
-            padding: 14px 17px;
-            border-radius: 13px;
-
+            max-width: 460px;
+            padding: 12px 16px;
+            border-radius: var(--radius-btn);
             background: #222;
-            color: white;
-
+            color: #fff;
             text-align: center;
             font-size: 13px;
-
             opacity: 0;
             pointer-events: none;
-
-            transition: .3s;
+            transition: all 0.3s ease;
             z-index: 1000;
         }
 
         #toast.show {
             opacity: 1;
-            transform:
-                translateX(-50%)
-                translateY(0);
+            transform: translateX(-50%) translateY(0);
         }
-
-
-        /* =========================================================
-           FOOTER
-        ========================================================= */
 
         footer {
             text-align: center;
             color: #aaa;
-            font-size: 12px;
-            padding: 25px 20px 35px;
+            font-size: 11px;
+            padding: 20px;
         }
-
     </style>
-
 </head>
 
 <body>
 
-
 <div class="app">
 
-
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
+    <!-- HEADER -->
     <header>
-
-        <!--
-        QUANDO TIVER A LOGO:
-        salve como logo.png na mesma pasta
-        e remova display:none da classe .logo
-        -->
-
-        <img
-            src="logo.png"
-            class="logo"
-            alt="Espaço Taai Botelho"
-            onerror="this.style.display='none'"
-        >
-
-        <h1>ESPAÇO</h1>
-
+        <img src="logo.png" class="logo" alt="Espaço Taai Botelho" onerror="this.style.display='none'">
+        <h1>Espaço</h1>
         <h2>Taai Botelho</h2>
-
-        <p>
-            Beleza • Cuidado • Bem-estar
-        </p>
-
+        <p>Beleza • Cuidado • Bem-estar</p>
     </header>
 
+    <div id="connection" class="connection">Conectando ao banco...</div>
 
-    <div
-        id="connection"
-        class="connection"
-    >
-        Conectando ao banco...
-    </div>
-
-
-    <!-- =====================================================
-         PRINCIPAL
-    ====================================================== -->
-
+    <!-- MAIN CONTAINER -->
     <main>
-
-
         <div class="welcome">
-
-            <h3>
-                Olá ✨
-            </h3>
-
-            <p>
-                Gerencie seus horários,
-                clientes e serviços de forma simples.
-            </p>
-
+            <h3>Olá ✨</h3>
+            <p>Gerencie seus horários, clientes e serviços de forma simples.</p>
         </div>
 
-
-        <!-- MENU -->
-
+        <!-- MENU PRINCIPAL -->
         <div class="menu">
-
             <button onclick="newAppointment()">
-
-                <span class="menu-icon">
-                    📅
-                </span>
-
+                <span class="menu-icon">📅</span>
                 Novo Agendamento
-
             </button>
-
-
             <button onclick="showSection('agenda')">
-
-                <span class="menu-icon">
-                    📋
-                </span>
-
+                <span class="menu-icon">📋</span>
                 Agenda
-
             </button>
-
-
             <button onclick="showSection('servicos')">
-
-                <span class="menu-icon">
-                    💇‍♀️
-                </span>
-
+                <span class="menu-icon">💇‍♀️</span>
                 Serviços
-
             </button>
-
-
             <button onclick="showSection('gerenciar')">
-
-                <span class="menu-icon">
-                    ⚙️
-                </span>
-
+                <span class="menu-icon">⚙️</span>
                 Gerenciar
-
             </button>
-
         </div>
 
-
-
-        <!-- =================================================
-             INÍCIO
-        ================================================== -->
-
-        <section
-            id="inicio"
-            class="section active"
-        >
-
+        <!-- INÍCIO (AGENDA DE HOJE) -->
+        <section id="inicio" class="section active">
             <div class="card">
-
-                <h3>
-                    Agenda de hoje
-                </h3>
-
+                <h3>Agenda de hoje</h3>
                 <div id="todayAppointments">
-
-                    <div class="loading">
-                        Carregando agenda...
-                    </div>
-
+                    <div class="loading">Carregando agenda...</div>
                 </div>
-
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             NOVO / EDITAR AGENDAMENTO
-        ================================================== -->
-
-        <section
-            id="novo"
-            class="section"
-        >
-
+        <!-- NOVO / EDITAR AGENDAMENTO -->
+        <section id="novo" class="section">
             <div class="card">
+                <h3 id="appointmentTitle">Novo Agendamento</h3>
+                <input type="hidden" id="editAppointmentId">
 
+                <label for="clientName">Nome da cliente</label>
+                <input type="text" id="clientName" placeholder="Digite o nome completo" autocomplete="name">
 
-                <h3 id="appointmentTitle">
-                    Novo Agendamento
-                </h3>
+                <label for="clientPhone">WhatsApp</label>
+                <input type="tel" id="clientPhone" placeholder="(51) 99999-9999" inputmode="tel" oninput="applyPhoneMask(this)">
 
-
-                <input
-                    type="hidden"
-                    id="editAppointmentId"
-                >
-
-
-                <label>
-                    Nome da cliente
-                </label>
-
-                <input
-                    type="text"
-                    id="clientName"
-                    placeholder="Digite o nome"
-                    autocomplete="name"
-                >
-
-
-                <label>
-                    WhatsApp
-                </label>
-
-                <input
-                    type="tel"
-                    id="clientPhone"
-                    placeholder="(51) 99999-9999"
-                    inputmode="tel"
-                >
-
-
-                <label>
-                    Serviço
-                </label>
-
-                <select
-                    id="service"
-                    onchange="showSelectedServicePrice()"
-                >
-
-                    <option value="">
-                        Carregando...
-                    </option>
-
+                <label for="service">Serviço</label>
+                <select id="service" onchange="showSelectedServicePrice()">
+                    <option value="">Carregando...</option>
                 </select>
 
+                <div id="selectedServicePrice" class="selected-price"></div>
 
-                <div
-                    id="selectedServicePrice"
-                    class="selected-price"
-                ></div>
+                <label for="date">Data</label>
+                <input type="date" id="date">
 
+                <label for="time">Horário</label>
+                <input type="time" id="time">
 
-                <label>
-                    Data
-                </label>
+                <label for="notes">Observação</label>
+                <textarea id="notes" placeholder="Detalhes opcionais..."></textarea>
 
-                <input
-                    type="date"
-                    id="date"
-                >
-
-
-                <label>
-                    Horário
-                </label>
-
-                <input
-                    type="time"
-                    id="time"
-                >
-
-
-                <label>
-                    Observação
-                </label>
-
-                <textarea
-                    id="notes"
-                    placeholder="Opcional"
-                ></textarea>
-
-
-                <button
-                    id="saveAppointmentButton"
-                    class="btn-primary"
-                    onclick="saveAppointment()"
-                >
-
-                    Salvar Agendamento
-
-                </button>
-
-
-                <button
-                    class="btn-secondary"
-                    onclick="showSection('inicio')"
-                >
-
-                    Voltar
-
-                </button>
-
-
+                <button id="saveAppointmentButton" class="btn-primary" onclick="saveAppointment()">Salvar Agendamento</button>
+                <button class="btn-secondary" onclick="showSection('inicio')">Voltar</button>
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             AGENDA
-        ================================================== -->
-
-        <section
-            id="agenda"
-            class="section"
-        >
-
+        <!-- AGENDA COMPLETA -->
+        <section id="agenda" class="section">
             <div class="card">
-
-                <h3>
-                    Agenda
-                </h3>
-
-
-                <label>
-                    Filtrar por data
-                </label>
-
-
-                <input
-                    type="date"
-                    id="filterDate"
-                    onchange="renderAgenda()"
-                >
-
-
+                <h3>Agenda</h3>
+                <label for="filterDate">Filtrar por data</label>
+                <input type="date" id="filterDate" onchange="renderAgenda()">
                 <div id="appointmentsList">
-
-                    <div class="loading">
-                        Carregando...
-                    </div>
-
+                    <div class="loading">Carregando...</div>
                 </div>
-
-
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             SERVIÇOS
-        ================================================== -->
-
-        <section
-            id="servicos"
-            class="section"
-        >
-
+        <!-- LISTA DE SERVIÇOS (PÚBLICA) -->
+        <section id="servicos" class="section">
             <div class="card">
-
-                <h3>
-                    Serviços
-                </h3>
-
+                <h3>Serviços Disponíveis</h3>
                 <div id="publicServices"></div>
-
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             GERENCIAR
-        ================================================== -->
-
-        <section
-            id="gerenciar"
-            class="section"
-        >
-
+        <!-- PAINEL GERENCIAR -->
+        <section id="gerenciar" class="section">
             <div class="card">
-
-                <h3>
-                    Gerenciar
-                </h3>
-
-
-                <div
-                    class="manage-box"
-                    onclick="showSection('gerenciarServicos')"
-                >
-
-                    <h4>
-                        💇‍♀️ Serviços e valores
-                    </h4>
-
-                    <p>
-                        Adicionar, alterar valores,
-                        duração ou excluir serviços.
-                    </p>
-
+                <h3>Gerenciar</h3>
+                <div class="manage-box" onclick="showSection('gerenciarServicos')">
+                    <h4>💇‍♀️ Serviços e Valores</h4>
+                    <p>Adicionar, alterar valores, duração ou excluir serviços.</p>
                 </div>
-
-
-                <div
-                    class="manage-box"
-                    onclick="showSection('agenda')"
-                >
-
-                    <h4>
-                        📅 Agendamentos
-                    </h4>
-
-                    <p>
-                        Editar clientes,
-                        serviços, datas e horários.
-                    </p>
-
+                <div class="manage-box" onclick="showSection('agenda')">
+                    <h4>📅 Agendamentos</h4>
+                    <p>Editar clientes, serviços, datas e horários.</p>
                 </div>
-
-
-                <button
-                    class="btn-secondary"
-                    onclick="showSection('inicio')"
-                >
-
-                    Voltar ao início
-
-                </button>
-
-
+                <button class="btn-secondary" onclick="showSection('inicio')">Voltar ao início</button>
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             GERENCIAR SERVIÇOS
-        ================================================== -->
-
-        <section
-            id="gerenciarServicos"
-            class="section"
-        >
-
+        <!-- GERENCIAR SERVIÇOS -->
+        <section id="gerenciarServicos" class="section">
             <div class="card">
-
-
-                <h3>
-                    Gerenciar Serviços
-                </h3>
-
-
-                <button
-                    class="btn-primary"
-                    onclick="openNewService()"
-                >
-
-                    + Adicionar Serviço
-
-                </button>
-
-
-                <div
-                    id="manageServices"
-                    style="margin-top:20px;"
-                ></div>
-
-
-                <button
-                    class="btn-secondary"
-                    onclick="showSection('gerenciar')"
-                >
-
-                    Voltar
-
-                </button>
-
-
+                <h3>Gerenciar Serviços</h3>
+                <button class="btn-primary" onclick="openNewService()">+ Adicionar Serviço</button>
+                <div id="manageServices" style="margin-top: 15px;"></div>
+                <button class="btn-secondary" onclick="showSection('gerenciar')">Voltar</button>
             </div>
-
         </section>
 
-
-
-        <!-- =================================================
-             FORMULÁRIO SERVIÇO
-        ================================================== -->
-
-        <section
-            id="formServico"
-            class="section"
-        >
-
+        <!-- FORMULÁRIO DE SERVIÇO -->
+        <section id="formServico" class="section">
             <div class="card">
+                <h3 id="serviceFormTitle">Novo Serviço</h3>
+                <input type="hidden" id="editServiceId">
 
+                <label for="serviceName">Nome do serviço</label>
+                <input type="text" id="serviceName" placeholder="Ex: Escova">
 
-                <h3 id="serviceFormTitle">
-                    Novo Serviço
-                </h3>
+                <label for="servicePrice">Valor (R$)</label>
+                <input type="number" id="servicePrice" placeholder="Ex: 50" min="0" step="0.01" inputmode="decimal">
 
+                <label for="serviceDuration">Duração em minutos</label>
+                <input type="number" id="serviceDuration" placeholder="Ex: 45" min="1" inputmode="numeric">
 
-                <input
-                    type="hidden"
-                    id="editServiceId"
-                >
-
-
-                <label>
-                    Nome do serviço
-                </label>
-
-                <input
-                    type="text"
-                    id="serviceName"
-                    placeholder="Ex: Escova"
-                >
-
-
-                <label>
-                    Valor
-                </label>
-
-                <input
-                    type="number"
-                    id="servicePrice"
-                    placeholder="Ex: 50"
-                    min="0"
-                    step="0.01"
-                    inputmode="decimal"
-                >
-
-
-                <label>
-                    Duração em minutos
-                </label>
-
-                <input
-                    type="number"
-                    id="serviceDuration"
-                    placeholder="Ex: 45"
-                    min="1"
-                    inputmode="numeric"
-                >
-
-
-                <button
-                    id="saveServiceButton"
-                    class="btn-primary"
-                    onclick="saveService()"
-                >
-
-                    Salvar Serviço
-
-                </button>
-
-
-                <button
-                    class="btn-secondary"
-                    onclick="showSection('gerenciarServicos')"
-                >
-
-                    Cancelar
-
-                </button>
-
-
+                <button id="saveServiceButton" class="btn-primary" onclick="saveService()">Salvar Serviço</button>
+                <button class="btn-secondary" onclick="showSection('gerenciarServicos')">Cancelar</button>
             </div>
-
         </section>
-
 
     </main>
 
-
     <footer>
-
-        Espaço Taai Botelho
-        <br>
-        Sistema de Agendamentos
-
+        Espaço Taai Botelho • Sistema de Agendamentos
     </footer>
-
 
 </div>
 
-
 <div id="toast"></div>
 
-
-
 <!-- =========================================================
-     FIREBASE + SISTEMA
+     MÓDULO FIREBASE & APLICAÇÃO
 ========================================================= -->
-
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { 
+        getFirestore, collection, addDoc, getDocs, doc, setDoc, 
+        updateDoc, deleteDoc, onSnapshot, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-
-    /* =====================================================
-       IMPORTAÇÕES FIREBASE
-    ====================================================== */
-
-    import {
-        initializeApp
-    }
-    from
-    "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-
-
-    import {
-
-        getFirestore,
-
-        collection,
-
-        addDoc,
-
-        getDocs,
-
-        doc,
-
-        setDoc,
-
-        updateDoc,
-
-        deleteDoc,
-
-        onSnapshot,
-
-        serverTimestamp
-
-    }
-    from
-    "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-
-
-    /* =====================================================
-       CONFIGURAÇÃO FIREBASE
-    ====================================================== */
-
+    // Configuração do Firebase
     const firebaseConfig = {
-
-        apiKey:
-        "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
-
-        authDomain:
-        "tainan-salao.firebaseapp.com",
-
-        projectId:
-        "tainan-salao",
-
-        storageBucket:
-        "tainan-salao.firebasestorage.app",
-
-        messagingSenderId:
-        "965996001179",
-
-        appId:
-        "1:965996001179:web:e805a9e1087aaa9306533e",
-
-        measurementId:
-        "G-E6EN58PXVB"
-
+        apiKey: "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
+        authDomain: "tainan-salao.firebaseapp.com",
+        projectId: "tainan-salao",
+        storageBucket: "tainan-salao.firebasestorage.app",
+        messagingSenderId: "965996001179",
+        appId: "1:965996001179:web:e805a9e1087aaa9306533e",
+        measurementId: "G-E6EN58PXVB"
     };
 
-
-
-    /* =====================================================
-       INICIALIZA FIREBASE
-    ====================================================== */
-
-    const app =
-        initializeApp(firebaseConfig);
-
-
-    const db =
-        getFirestore(app);
-
-
-
-    /* =====================================================
-       VARIÁVEIS
-    ====================================================== */
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     let services = [];
-
     let appointments = [];
 
-
-
-    /* =====================================================
-       SERVIÇOS INICIAIS
-    ====================================================== */
-
     const defaultServices = [
-
-        {
-            id: "corte",
-            name: "Corte",
-            price: 60,
-            duration: 40
-        },
-
-        {
-            id: "escova",
-            name: "Escova",
-            price: 50,
-            duration: 45
-        },
-
-        {
-            id: "coloracao",
-            name: "Coloração",
-            price: 150,
-            duration: 120
-        },
-
-        {
-            id: "manicure",
-            name: "Manicure",
-            price: 40,
-            duration: 45
-        },
-
-        {
-            id: "pedicure",
-            name: "Pedicure",
-            price: 45,
-            duration: 50
-        },
-
-        {
-            id: "sobrancelha",
-            name: "Sobrancelha",
-            price: 35,
-            duration: 30
-        }
-
+        { id: "corte", name: "Corte", price: 60, duration: 40 },
+        { id: "escova", name: "Escova", price: 50, duration: 45 },
+        { id: "coloracao", name: "Coloração", price: 150, duration: 120 },
+        { id: "manicure", name: "Manicure", price: 40, duration: 45 },
+        { id: "pedicure", name: "Pedicure", price: 45, duration: 50 },
+        { id: "sobrancelha", name: "Sobrancelha", price: 35, duration: 30 }
     ];
 
-
-
-    /* =====================================================
-       CRIA SERVIÇOS INICIAIS SOMENTE SE ESTIVER VAZIO
-    ====================================================== */
-
     async function ensureDefaultServices() {
-
         try {
+            const snapshot = await getDocs(collection(db, "servicos"));
+            if (!snapshot.empty) return;
 
-            const snapshot =
-                await getDocs(
-                    collection(
-                        db,
-                        "servicos"
-                    )
-                );
-
-
-            if (!snapshot.empty) {
-                return;
+            for (const service of defaultServices) {
+                await setDoc(doc(db, "servicos", service.id), {
+                    name: service.name,
+                    price: service.price,
+                    duration: service.duration,
+                    createdAt: serverTimestamp()
+                });
             }
-
-
-            for (
-                const service
-                of
-                defaultServices
-            ) {
-
-                await setDoc(
-
-                    doc(
-                        db,
-                        "servicos",
-                        service.id
-                    ),
-
-                    {
-
-                        name:
-                        service.name,
-
-                        price:
-                        service.price,
-
-                        duration:
-                        service.duration,
-
-                        createdAt:
-                        serverTimestamp()
-
-                    }
-
-                );
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Erro ao criar serviços:",
-                error
-            );
-
+        } catch (error) {
+            console.error("Erro ao popular serviços default:", error);
             showDatabaseError(error);
-
         }
-
     }
-
-
-
-    /* =====================================================
-       LISTENER SERVIÇOS
-    ====================================================== */
 
     function listenServices() {
+        onSnapshot(collection(db, "servicos"), snapshot => {
+            services = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            services.sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
 
-        onSnapshot(
-
-            collection(
-                db,
-                "servicos"
-            ),
-
-            snapshot => {
-
-                services = [];
-
-
-                snapshot.forEach(
-                    documentSnapshot => {
-
-                        services.push({
-
-                            id:
-                            documentSnapshot.id,
-
-                            ...documentSnapshot.data()
-
-                        });
-
-                    }
-                );
-
-
-                services.sort(
-                    (a, b) =>
-                        String(a.name)
-                        .localeCompare(
-                            String(b.name),
-                            "pt-BR"
-                        )
-                );
-
-
-                loadServiceSelect();
-
-                renderPublicServices();
-
-                renderManageServices();
-
-                setConnected();
-
-            },
-
-            error => {
-
-                console.error(
-                    "Erro serviços:",
-                    error
-                );
-
-                showDatabaseError(error);
-
-            }
-
-        );
-
+            loadServiceSelect();
+            renderPublicServices();
+            renderManageServices();
+            setConnected();
+        }, error => showDatabaseError(error));
     }
-
-
-
-    /* =====================================================
-       LISTENER AGENDAMENTOS
-    ====================================================== */
 
     function listenAppointments() {
-
-        onSnapshot(
-
-            collection(
-                db,
-                "agendamentos"
-            ),
-
-            snapshot => {
-
-                appointments = [];
-
-
-                snapshot.forEach(
-                    documentSnapshot => {
-
-                        appointments.push({
-
-                            id:
-                            documentSnapshot.id,
-
-                            ...documentSnapshot.data()
-
-                        });
-
-                    }
-                );
-
-
-                renderToday();
-
-                renderAgenda();
-
-                setConnected();
-
-            },
-
-            error => {
-
-                console.error(
-                    "Erro agendamentos:",
-                    error
-                );
-
-                showDatabaseError(error);
-
-            }
-
-        );
-
+        onSnapshot(collection(db, "agendamentos"), snapshot => {
+            appointments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderToday();
+            renderAgenda();
+            setConnected();
+        }, error => showDatabaseError(error));
     }
-
-
-
-    /* =====================================================
-       NAVEGAÇÃO
-    ====================================================== */
 
     function showSection(id) {
+        document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+        const target = document.getElementById(id);
+        if (target) target.classList.add("active");
 
-        document
-        .querySelectorAll(
-            ".section"
-        )
-        .forEach(section => {
+        if (id === "inicio") renderToday();
+        if (id === "agenda") renderAgenda();
+        if (id === "servicos") renderPublicServices();
+        if (id === "gerenciarServicos") renderManageServices();
 
-            section
-            .classList
-            .remove("active");
-
-        });
-
-
-        const section =
-            document.getElementById(id);
-
-
-        if (section) {
-
-            section
-            .classList
-            .add("active");
-
-        }
-
-
-        if (
-            id === "inicio"
-        ) {
-
-            renderToday();
-
-        }
-
-
-        if (
-            id === "agenda"
-        ) {
-
-            renderAgenda();
-
-        }
-
-
-        if (
-            id === "servicos"
-        ) {
-
-            renderPublicServices();
-
-        }
-
-
-        if (
-            id === "gerenciarServicos"
-        ) {
-
-            renderManageServices();
-
-        }
-
-
-        window.scrollTo({
-
-            top: 0,
-
-            behavior:
-            "smooth"
-
-        });
-
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
-
-
-
-    /* =====================================================
-       SELECT SERVIÇOS
-    ====================================================== */
 
     function loadServiceSelect() {
+        const select = document.getElementById("service");
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Selecione um serviço</option>';
 
-        const select =
-            document.getElementById(
-                "service"
-            );
+        services.forEach(s => {
+            const option = document.createElement("option");
+            option.value = s.id;
+            option.textContent = `${s.name} - ${formatMoney(s.price)}`;
+            select.appendChild(option);
+        });
 
-
-        const selected =
-            select.value;
-
-
-        select.innerHTML =
-            `
-            <option value="">
-                Selecione um serviço
-            </option>
-            `;
-
-
-        services.forEach(
-            service => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    service.id;
-
-
-                option.textContent =
-                    `${service.name} - ${formatMoney(service.price)}`;
-
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-        if (
-            services.some(
-                service =>
-                    service.id === selected
-            )
-        ) {
-
-            select.value =
-                selected;
-
+        if (services.some(s => s.id === currentVal)) {
+            select.value = currentVal;
         }
-
     }
-
-
-
-    /* =====================================================
-       MOSTRAR PREÇO
-    ====================================================== */
 
     function showSelectedServicePrice() {
-
-        const serviceId =
-            document
-            .getElementById(
-                "service"
-            )
-            .value;
-
-
-        const service =
-            services.find(
-                item =>
-                    item.id === serviceId
-            );
-
-
-        const box =
-            document.getElementById(
-                "selectedServicePrice"
-            );
-
+        const serviceId = document.getElementById("service").value;
+        const service = services.find(s => s.id === serviceId);
+        const box = document.getElementById("selectedServicePrice");
 
         if (!service) {
-
-            box.style.display =
-                "none";
-
-            box.innerHTML =
-                "";
-
+            box.style.display = "none";
             return;
-
         }
 
-
-        box.innerHTML =
-            `
-            ${formatMoney(service.price)}
-            •
-            ${service.duration} minutos
-            `;
-
-
-        box.style.display =
-            "block";
-
+        box.innerHTML = `${formatMoney(service.price)} • ${service.duration} minutos`;
+        box.style.display = "block";
     }
-
-
-
-    /* =====================================================
-       NOVO AGENDAMENTO
-    ====================================================== */
 
     function newAppointment() {
-
         clearAppointmentForm();
-
-
-        document.getElementById(
-            "appointmentTitle"
-        ).textContent =
-            "Novo Agendamento";
-
-
-        showSection(
-            "novo"
-        );
-
+        document.getElementById("appointmentTitle").textContent = "Novo Agendamento";
+        showSection("novo");
     }
-
-
-
-    /* =====================================================
-       SALVAR AGENDAMENTO
-    ====================================================== */
 
     async function saveAppointment() {
+        const btn = document.getElementById("saveAppointmentButton");
+        const editId = document.getElementById("editAppointmentId").value;
+        const name = document.getElementById("clientName").value.trim();
+        const phone = document.getElementById("clientPhone").value.trim();
+        const serviceId = document.getElementById("service").value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const notes = document.getElementById("notes").value.trim();
 
-        const button =
-            document.getElementById(
-                "saveAppointmentButton"
-            );
-
-
-        const editId =
-            document.getElementById(
-                "editAppointmentId"
-            ).value;
-
-
-        const name =
-            document.getElementById(
-                "clientName"
-            ).value.trim();
-
-
-        const phone =
-            document.getElementById(
-                "clientPhone"
-            ).value.trim();
-
-
-        const serviceId =
-            document.getElementById(
-                "service"
-            ).value;
-
-
-        const date =
-            document.getElementById(
-                "date"
-            ).value;
-
-
-        const time =
-            document.getElementById(
-                "time"
-            ).value;
-
-
-        const notes =
-            document.getElementById(
-                "notes"
-            ).value.trim();
-
-
-
-        if (
-            !name ||
-            !phone ||
-            !serviceId ||
-            !date ||
-            !time
-        ) {
-
-            showToast(
-                "Preencha todos os campos obrigatórios."
-            );
-
+        if (!name || !phone || !serviceId || !date || !time) {
+            showToast("Preencha todos os campos obrigatórios.");
             return;
-
         }
 
-
-
-        const service =
-            services.find(
-                item =>
-                    item.id === serviceId
-            );
-
-
+        const service = services.find(s => s.id === serviceId);
         if (!service) {
-
-            showToast(
-                "Serviço não encontrado."
-            );
-
+            showToast("Serviço selecionado é inválido.");
             return;
-
         }
 
-
-
-        /* ---------------------------------------------
-           VERIFICA CONFLITO DE HORÁRIO
-        ---------------------------------------------- */
-
-        const conflict =
-            appointments.some(
-                appointment =>
-
-                    appointment.date === date &&
-
-                    appointment.time === time &&
-
-                    appointment.status !==
-                    "Cancelado" &&
-
-                    appointment.id !==
-                    editId
-
-            );
-
+        const conflict = appointments.some(a => 
+            a.date === date && 
+            a.time === time && 
+            a.status !== "Cancelado" && 
+            a.id !== editId
+        );
 
         if (conflict) {
-
-            showToast(
-                "Esse horário já possui um agendamento."
-            );
-
+            showToast("Esse horário já está ocupado.");
             return;
-
         }
 
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
 
-
-        button.disabled =
-            true;
-
-
-        button.textContent =
-            "Salvando...";
-
-
-
-        const data = {
-
-            name,
-
-            phone,
-
-            serviceId,
-
-            serviceName:
-            service.name,
-
-            price:
-            Number(service.price),
-
-            duration:
-            Number(service.duration),
-
-            date,
-
-            time,
-
-            notes,
-
-            updatedAt:
-            serverTimestamp()
-
+        const payload = {
+            name, phone, serviceId,
+            serviceName: service.name,
+            price: Number(service.price),
+            duration: Number(service.duration),
+            date, time, notes,
+            updatedAt: serverTimestamp()
         };
 
-
-
         try {
-
-
-            /* EDITAR */
-
             if (editId) {
-
-
-                await updateDoc(
-
-                    doc(
-                        db,
-                        "agendamentos",
-                        editId
-                    ),
-
-                    data
-
-                );
-
-
-                showToast(
-                    "Agendamento atualizado com sucesso!"
-                );
-
+                await updateDoc(doc(db, "agendamentos", editId), payload);
+                showToast("Agendamento atualizado!");
+            } else {
+                await addDoc(collection(db, "agendamentos"), {
+                    ...payload,
+                    status: "Agendado",
+                    createdAt: serverTimestamp()
+                });
+                showToast("Agendamento realizado!");
             }
-
-
-            /* NOVO */
-
-            else {
-
-
-                await addDoc(
-
-                    collection(
-                        db,
-                        "agendamentos"
-                    ),
-
-                    {
-
-                        ...data,
-
-                        status:
-                        "Agendado",
-
-                        createdAt:
-                        serverTimestamp()
-
-                    }
-
-                );
-
-
-                showToast(
-                    "Agendamento realizado com sucesso!"
-                );
-
-            }
-
-
 
             clearAppointmentForm();
-
-
-            showSection(
-                "agenda"
-            );
-
+            showSection("agenda");
+        } catch (error) {
+            showDatabaseError(error);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Salvar Agendamento";
         }
-
-        catch (error) {
-
-            console.error(
-                error
-            );
-
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
-        finally {
-
-            button.disabled =
-                false;
-
-
-            button.textContent =
-                "Salvar Agendamento";
-
-        }
-
     }
-
-
-
-    /* =====================================================
-       EDITAR AGENDAMENTO
-    ====================================================== */
 
     function editAppointment(id) {
+        const item = appointments.find(a => a.id === id);
+        if (!item) return showToast("Agendamento não encontrado.");
 
-        const appointment =
-            appointments.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (!appointment) {
-
-            showToast(
-                "Agendamento não encontrado."
-            );
-
-            return;
-
-        }
-
-
-        document.getElementById(
-            "editAppointmentId"
-        ).value =
-            appointment.id;
-
-
-        document.getElementById(
-            "clientName"
-        ).value =
-            appointment.name || "";
-
-
-        document.getElementById(
-            "clientPhone"
-        ).value =
-            appointment.phone || "";
-
-
-        document.getElementById(
-            "service"
-        ).value =
-            appointment.serviceId || "";
-
-
-        document.getElementById(
-            "date"
-        ).value =
-            appointment.date || "";
-
-
-        document.getElementById(
-            "time"
-        ).value =
-            appointment.time || "";
-
-
-        document.getElementById(
-            "notes"
-        ).value =
-            appointment.notes || "";
-
-
-        document.getElementById(
-            "appointmentTitle"
-        ).textContent =
-            "Editar Agendamento";
-
+        document.getElementById("editAppointmentId").value = item.id;
+        document.getElementById("clientName").value = item.name || "";
+        document.getElementById("clientPhone").value = item.phone || "";
+        document.getElementById("service").value = item.serviceId || "";
+        document.getElementById("date").value = item.date || "";
+        document.getElementById("time").value = item.time || "";
+        document.getElementById("notes").value = item.notes || "";
+        document.getElementById("appointmentTitle").textContent = "Editar Agendamento";
 
         showSelectedServicePrice();
-
-
-        showSection(
-            "novo"
-        );
-
+        showSection("novo");
     }
-
-
-
-    /* =====================================================
-       LIMPA FORMULÁRIO
-    ====================================================== */
 
     function clearAppointmentForm() {
-
-        document.getElementById(
-            "editAppointmentId"
-        ).value = "";
-
-
-        document.getElementById(
-            "clientName"
-        ).value = "";
-
-
-        document.getElementById(
-            "clientPhone"
-        ).value = "";
-
-
-        document.getElementById(
-            "service"
-        ).value = "";
-
-
-        document.getElementById(
-            "date"
-        ).value = "";
-
-
-        document.getElementById(
-            "time"
-        ).value = "";
-
-
-        document.getElementById(
-            "notes"
-        ).value = "";
-
-
-        const priceBox =
-            document.getElementById(
-                "selectedServicePrice"
-            );
-
-
-        priceBox.innerHTML =
-            "";
-
-
-        priceBox.style.display =
-            "none";
-
+        ["editAppointmentId", "clientName", "clientPhone", "service", "date", "time", "notes"].forEach(id => {
+            document.getElementById(id).value = "";
+        });
+        const box = document.getElementById("selectedServicePrice");
+        box.innerHTML = "";
+        box.style.display = "none";
     }
-
-
-
-    /* =====================================================
-       CONFIRMAR AGENDAMENTO
-    ====================================================== */
 
     async function confirmAppointment(id) {
-
         try {
-
-            await updateDoc(
-
-                doc(
-                    db,
-                    "agendamentos",
-                    id
-                ),
-
-                {
-
-                    status:
-                    "Confirmado",
-
-                    updatedAt:
-                    serverTimestamp()
-
-                }
-
-            );
-
-
-            showToast(
-                "Agendamento confirmado!"
-            );
-
+            await updateDoc(doc(db, "agendamentos", id), {
+                status: "Confirmado",
+                updatedAt: serverTimestamp()
+            });
+            showToast("Agendamento confirmado!");
+        } catch (error) {
+            showDatabaseError(error);
         }
-
-        catch (error) {
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
     }
-
-
-
-    /* =====================================================
-       CANCELAR AGENDAMENTO
-    ====================================================== */
 
     async function cancelAppointment(id) {
-
-        const confirmation =
-            confirm(
-                "Deseja realmente cancelar este agendamento?"
-            );
-
-
-        if (!confirmation) {
-            return;
-        }
-
+        if (!confirm("Deseja realmente cancelar este agendamento?")) return;
 
         try {
-
-            await updateDoc(
-
-                doc(
-                    db,
-                    "agendamentos",
-                    id
-                ),
-
-                {
-
-                    status:
-                    "Cancelado",
-
-                    updatedAt:
-                    serverTimestamp()
-
-                }
-
-            );
-
-
-            showToast(
-                "Agendamento cancelado."
-            );
-
+            await updateDoc(doc(db, "agendamentos", id), {
+                status: "Cancelado",
+                updatedAt: serverTimestamp()
+            });
+            showToast("Agendamento cancelado.");
+        } catch (error) {
+            showDatabaseError(error);
         }
-
-        catch (error) {
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
     }
-
-
-
-    /* =====================================================
-       RENDER AGENDA
-    ====================================================== */
 
     function renderAgenda() {
+        const container = document.getElementById("appointmentsList");
+        const filter = document.getElementById("filterDate").value;
 
-        const container =
-            document.getElementById(
-                "appointmentsList"
-            );
+        let list = [...appointments];
+        if (filter) list = list.filter(a => a.date === filter);
 
-
-        const filter =
-            document.getElementById(
-                "filterDate"
-            ).value;
-
-
-
-        let list =
-            [...appointments];
-
-
-
-        if (filter) {
-
-            list =
-                list.filter(
-                    appointment =>
-                        appointment.date === filter
-                );
-
-        }
-
-
-
-        list.sort(
-
-            (a, b) => {
-
-                const first =
-                    `${a.date || ""} ${a.time || ""}`;
-
-
-                const second =
-                    `${b.date || ""} ${b.time || ""}`;
-
-
-                return first.localeCompare(
-                    second
-                );
-
-            }
-
-        );
-
-
+        list.sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
         if (!list.length) {
-
-            container.innerHTML =
-                `
-                <div class="empty">
-                    📅
-                    <br><br>
-                    Nenhum agendamento encontrado.
-                </div>
-                `;
-
+            container.innerHTML = '<div class="empty">📅<br><br>Nenhum agendamento encontrado.</div>';
             return;
-
         }
 
-
-
-        container.innerHTML =
-            list
-            .map(
-                appointment =>
-
-                createAppointmentHTML(
-                    appointment,
-                    true
-                )
-
-            )
-            .join("");
-
+        container.innerHTML = list.map(a => createAppointmentHTML(a, true)).join("");
     }
-
-
-
-    /* =====================================================
-       AGENDA DE HOJE
-    ====================================================== */
 
     function renderToday() {
+        const container = document.getElementById("todayAppointments");
+        const today = getTodayString();
 
-        const container =
-            document.getElementById(
-                "todayAppointments"
-            );
-
-
-        const today =
-            getTodayString();
-
-
-
-        const list =
-            appointments
-            .filter(
-                appointment =>
-
-                    appointment.date === today &&
-
-                    appointment.status !==
-                    "Cancelado"
-            )
-            .sort(
-                (a, b) =>
-                    String(a.time)
-                    .localeCompare(
-                        String(b.time)
-                    )
-            );
-
-
+        const list = appointments
+            .filter(a => a.date === today && a.status !== "Cancelado")
+            .sort((a, b) => String(a.time).localeCompare(String(b.time)));
 
         if (!list.length) {
-
-            container.innerHTML =
-                `
-                <div class="empty">
-
-                    ✨
-                    <br><br>
-
-                    Nenhum horário marcado
-                    para hoje.
-
-                </div>
-                `;
-
+            container.innerHTML = '<div class="empty">✨<br><br>Nenhum horário marcado para hoje.</div>';
             return;
-
         }
 
-
-
-        container.innerHTML =
-            list
-            .map(
-                appointment =>
-
-                    createAppointmentHTML(
-                        appointment,
-                        false
-                    )
-
-            )
-            .join("");
-
+        container.innerHTML = list.map(a => createAppointmentHTML(a, false)).join("");
     }
 
-
-
-    /* =====================================================
-       HTML AGENDAMENTO
-    ====================================================== */
-
-    function createAppointmentHTML(
-        appointment,
-        showActions
-    ) {
-
-        const status =
-            appointment.status ||
-            "Agendado";
-
-
-        const statusClass =
-            status === "Confirmado"
-
-            ? "status-confirmado"
-
-            : status === "Cancelado"
-
-            ? "status-cancelado"
-
-            : "status-agendado";
-
-
+    function createAppointmentHTML(item, showActions) {
+        const status = item.status || "Agendado";
+        const statusClass = status === "Confirmado" ? "status-confirmado" :
+                            status === "Cancelado" ? "status-cancelado" : "status-agendado";
+        
+        const cleanPhone = (item.phone || "").replace(/\D/g, "");
+        const waLink = cleanPhone ? `https://wa.me/55${cleanPhone}` : null;
 
         return `
-
             <div class="appointment">
-
-
                 <div class="appointment-top">
-
-                    <strong>
-                        ${escapeHTML(
-                            appointment.name || ""
-                        )}
-                    </strong>
-
-
-                    <span class="time">
-                        ${escapeHTML(
-                            appointment.time || ""
-                        )}
-                    </span>
-
+                    <strong>${escapeHTML(item.name)}</strong>
+                    <span class="time">${escapeHTML(item.time)}</span>
                 </div>
-
-
+                <p>💇‍♀️ ${escapeHTML(item.serviceName)}</p>
+                <p class="price">${formatMoney(item.price)}</p>
+                <p>📅 ${formatDate(item.date)}</p>
                 <p>
-                    💇‍♀️
-                    ${escapeHTML(
-                        appointment.serviceName || ""
-                    )}
+                    📱 ${escapeHTML(item.phone)} 
+                    ${waLink ? `<a href="${waLink}" target="_blank" class="whatsapp-link">(Conversar)</a>` : ''}
                 </p>
+                ${item.notes ? `<p>📝 ${escapeHTML(item.notes)}</p>` : ''}
+                
+                <span class="status ${statusClass}">${escapeHTML(status)}</span>
 
-
-                <p class="price">
-
-                    ${formatMoney(
-                        appointment.price || 0
-                    )}
-
-                </p>
-
-
-                <p>
-                    📅
-                    ${formatDate(
-                        appointment.date
-                    )}
-                </p>
-
-
-                <p>
-                    📱
-                    ${escapeHTML(
-                        appointment.phone || ""
-                    )}
-                </p>
-
-
-                ${
-                    appointment.notes
-
-                    ? `
-
-                    <p>
-                        📝
-                        ${escapeHTML(
-                            appointment.notes
-                        )}
-                    </p>
-
-                    `
-
-                    : ""
-                }
-
-
-                <span
-                    class="
-                        status
-                        ${statusClass}
-                    "
-                >
-
-                    ${escapeHTML(status)}
-
-                </span>
-
-
-                ${
-                    showActions
-
-                    ? `
-
+                ${showActions ? `
                     <div class="actions">
-
-
-                        ${
-                            status !==
-                            "Confirmado" &&
-                            status !==
-                            "Cancelado"
-
-                            ? `
-
-                            <button
-                                class="confirm-btn"
-                                onclick="
-                                    confirmAppointment(
-                                        '${appointment.id}'
-                                    )
-                                "
-                            >
-                                Confirmar
-                            </button>
-
-                            `
-
-                            : ""
-                        }
-
-
-                        <button
-                            class="edit-btn"
-                            onclick="
-                                editAppointment(
-                                    '${appointment.id}'
-                                )
-                            "
-                        >
-                            Editar
-                        </button>
-
-
-                        ${
-                            status !==
-                            "Cancelado"
-
-                            ? `
-
-                            <button
-                                class="cancel-btn"
-                                onclick="
-                                    cancelAppointment(
-                                        '${appointment.id}'
-                                    )
-                                "
-                            >
-                                Cancelar
-                            </button>
-
-                            `
-
-                            : ""
-                        }
-
-
+                        ${status !== "Confirmado" && status !== "Cancelado" ? `
+                            <button class="confirm-btn" onclick="confirmAppointment('${item.id}')">Confirmar</button>
+                        ` : ''}
+                        <button class="edit-btn" onclick="editAppointment('${item.id}')">Editar</button>
+                        ${status !== "Cancelado" ? `
+                            <button class="cancel-btn" onclick="cancelAppointment('${item.id}')">Cancelar</button>
+                        ` : ''}
                     </div>
-
-                    `
-
-                    : ""
-                }
-
-
+                ` : ''}
             </div>
-
         `;
-
     }
-
-
-
-    /* =====================================================
-       SERVIÇOS VISÍVEIS
-    ====================================================== */
 
     function renderPublicServices() {
-
-        const container =
-            document.getElementById(
-                "publicServices"
-            );
-
-
+        const container = document.getElementById("publicServices");
         if (!services.length) {
-
-            container.innerHTML =
-                `
-                <div class="empty">
-                    Nenhum serviço cadastrado.
-                </div>
-                `;
-
+            container.innerHTML = '<div class="empty">Nenhum serviço cadastrado.</div>';
             return;
-
         }
 
-
-        container.innerHTML =
-            services
-            .map(
-                service => `
-
-                <div class="service-row">
-
-                    <div class="service-info">
-
-                        <div>
-
-                            <strong>
-                                ${escapeHTML(
-                                    service.name
-                                )}
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                ${Number(
-                                    service.duration
-                                )}
-                                minutos
-                            </small>
-
-                        </div>
-
-
-                        <strong
-                            class="service-price"
-                        >
-
-                            ${formatMoney(
-                                service.price
-                            )}
-
-                        </strong>
-
+        container.innerHTML = services.map(s => `
+            <div class="service-row">
+                <div class="service-info">
+                    <div>
+                        <strong>${escapeHTML(s.name)}</strong><br>
+                        <small style="color:var(--text-muted)">${Number(s.duration)} minutos</small>
                     </div>
-
+                    <strong class="service-price">${formatMoney(s.price)}</strong>
                 </div>
-
-                `
-            )
-            .join("");
-
+            </div>
+        `).join("");
     }
-
-
-
-    /* =====================================================
-       GERENCIAR SERVIÇOS
-    ====================================================== */
 
     function renderManageServices() {
-
-        const container =
-            document.getElementById(
-                "manageServices"
-            );
-
-
+        const container = document.getElementById("manageServices");
         if (!services.length) {
-
-            container.innerHTML =
-                `
-                <div class="empty">
-                    Nenhum serviço cadastrado.
-                </div>
-                `;
-
+            container.innerHTML = '<div class="empty">Nenhum serviço cadastrado.</div>';
             return;
-
         }
 
-
-        container.innerHTML =
-            services
-            .map(
-                service => `
-
-                <div class="service-row">
-
-
-                    <div class="service-info">
-
-                        <div>
-
-                            <strong>
-                                ${escapeHTML(
-                                    service.name
-                                )}
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                ${Number(
-                                    service.duration
-                                )}
-                                minutos
-                            </small>
-
-                        </div>
-
-
-                        <strong
-                            class="service-price"
-                        >
-
-                            ${formatMoney(
-                                service.price
-                            )}
-
-                        </strong>
-
+        container.innerHTML = services.map(s => `
+            <div class="service-row">
+                <div class="service-info">
+                    <div>
+                        <strong>${escapeHTML(s.name)}</strong><br>
+                        <small style="color:var(--text-muted)">${Number(s.duration)} min</small>
                     </div>
-
-
-                    <div class="service-actions">
-
-                        <button
-                            class="edit-btn"
-                            onclick="
-                                editService(
-                                    '${service.id}'
-                                )
-                            "
-                        >
-                            Editar
-                        </button>
-
-
-                        <button
-                            class="delete-btn"
-                            onclick="
-                                deleteService(
-                                    '${service.id}'
-                                )
-                            "
-                        >
-                            Excluir
-                        </button>
-
-                    </div>
-
-
+                    <strong class="service-price">${formatMoney(s.price)}</strong>
                 </div>
-
-                `
-            )
-            .join("");
-
+                <div class="service-actions">
+                    <button class="edit-btn" onclick="editService('${s.id}')">Editar</button>
+                    <button class="delete-btn" onclick="deleteService('${s.id}')">Excluir</button>
+                </div>
+            </div>
+        `).join("");
     }
-
-
-
-    /* =====================================================
-       NOVO SERVIÇO
-    ====================================================== */
 
     function openNewService() {
-
-        document.getElementById(
-            "editServiceId"
-        ).value = "";
-
-
-        document.getElementById(
-            "serviceName"
-        ).value = "";
-
-
-        document.getElementById(
-            "servicePrice"
-        ).value = "";
-
-
-        document.getElementById(
-            "serviceDuration"
-        ).value = "";
-
-
-        document.getElementById(
-            "serviceFormTitle"
-        ).textContent =
-            "Novo Serviço";
-
-
-        showSection(
-            "formServico"
-        );
-
+        document.getElementById("editServiceId").value = "";
+        document.getElementById("serviceName").value = "";
+        document.getElementById("servicePrice").value = "";
+        document.getElementById("serviceDuration").value = "";
+        document.getElementById("serviceFormTitle").textContent = "Novo Serviço";
+        showSection("formServico");
     }
-
-
-
-    /* =====================================================
-       EDITAR SERVIÇO
-    ====================================================== */
 
     function editService(id) {
+        const s = services.find(item => item.id === id);
+        if (!s) return showToast("Serviço não encontrado.");
 
-        const service =
-            services.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (!service) {
-
-            showToast(
-                "Serviço não encontrado."
-            );
-
-            return;
-
-        }
-
-
-        document.getElementById(
-            "editServiceId"
-        ).value =
-            service.id;
-
-
-        document.getElementById(
-            "serviceName"
-        ).value =
-            service.name || "";
-
-
-        document.getElementById(
-            "servicePrice"
-        ).value =
-            service.price || "";
-
-
-        document.getElementById(
-            "serviceDuration"
-        ).value =
-            service.duration || "";
-
-
-        document.getElementById(
-            "serviceFormTitle"
-        ).textContent =
-            "Editar Serviço";
-
-
-        showSection(
-            "formServico"
-        );
-
+        document.getElementById("editServiceId").value = s.id;
+        document.getElementById("serviceName").value = s.name || "";
+        document.getElementById("servicePrice").value = s.price || "";
+        document.getElementById("serviceDuration").value = s.duration || "";
+        document.getElementById("serviceFormTitle").textContent = "Editar Serviço";
+        showSection("formServico");
     }
-
-
-
-    /* =====================================================
-       SALVAR SERVIÇO
-    ====================================================== */
 
     async function saveService() {
+        const btn = document.getElementById("saveServiceButton");
+        const editId = document.getElementById("editServiceId").value;
+        const name = document.getElementById("serviceName").value.trim();
+        const price = Number(document.getElementById("servicePrice").value);
+        const duration = Number(document.getElementById("serviceDuration").value);
 
-        const button =
-            document.getElementById(
-                "saveServiceButton"
-            );
-
-
-        const editId =
-            document.getElementById(
-                "editServiceId"
-            ).value;
-
-
-        const name =
-            document.getElementById(
-                "serviceName"
-            ).value.trim();
-
-
-        const price =
-            Number(
-                document.getElementById(
-                    "servicePrice"
-                ).value
-            );
-
-
-        const duration =
-            Number(
-                document.getElementById(
-                    "serviceDuration"
-                ).value
-            );
-
-
-
-        if (
-            !name ||
-            Number.isNaN(price) ||
-            price < 0 ||
-            !duration ||
-            duration <= 0
-        ) {
-
-            showToast(
-                "Preencha corretamente os dados do serviço."
-            );
-
+        if (!name || isNaN(price) || price < 0 || !duration || duration <= 0) {
+            showToast("Preencha corretamente os dados do serviço.");
             return;
-
         }
 
-
-
-        button.disabled =
-            true;
-
-
-        button.textContent =
-            "Salvando...";
-
-
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
 
         try {
-
-
-            /* EDITAR */
-
             if (editId) {
-
-
-                await updateDoc(
-
-                    doc(
-                        db,
-                        "servicos",
-                        editId
-                    ),
-
-                    {
-
-                        name,
-
-                        price,
-
-                        duration,
-
-                        updatedAt:
-                        serverTimestamp()
-
-                    }
-
-                );
-
-
-                showToast(
-                    "Serviço atualizado!"
-                );
-
+                await updateDoc(doc(db, "servicos", editId), {
+                    name, price, duration,
+                    updatedAt: serverTimestamp()
+                });
+                showToast("Serviço atualizado!");
+            } else {
+                await addDoc(collection(db, "servicos"), {
+                    name, price, duration,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+                showToast("Serviço cadastrado!");
             }
-
-
-            /* NOVO */
-
-            else {
-
-
-                await addDoc(
-
-                    collection(
-                        db,
-                        "servicos"
-                    ),
-
-                    {
-
-                        name,
-
-                        price,
-
-                        duration,
-
-                        createdAt:
-                        serverTimestamp(),
-
-                        updatedAt:
-                        serverTimestamp()
-
-                    }
-
-                );
-
-
-                showToast(
-                    "Serviço cadastrado!"
-                );
-
-            }
-
-
-
-            showSection(
-                "gerenciarServicos"
-            );
-
+            showSection("gerenciarServicos");
+        } catch (error) {
+            showDatabaseError(error);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Salvar Serviço";
         }
-
-        catch (error) {
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
-        finally {
-
-            button.disabled =
-                false;
-
-
-            button.textContent =
-                "Salvar Serviço";
-
-        }
-
     }
-
-
-
-    /* =====================================================
-       EXCLUIR SERVIÇO
-    ====================================================== */
 
     async function deleteService(id) {
-
-        const service =
-            services.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (!service) {
-            return;
-        }
-
-
-        const confirmation =
-            confirm(
-                `Deseja excluir "${service.name}"?`
-            );
-
-
-        if (!confirmation) {
-            return;
-        }
-
+        const s = services.find(item => item.id === id);
+        if (!s || !confirm(`Deseja excluir "${s.name}"?`)) return;
 
         try {
-
-            await deleteDoc(
-
-                doc(
-                    db,
-                    "servicos",
-                    id
-                )
-
-            );
-
-
-            showToast(
-                "Serviço excluído."
-            );
-
+            await deleteDoc(doc(db, "servicos", id));
+            showToast("Serviço excluído.");
+        } catch (error) {
+            showDatabaseError(error);
         }
-
-        catch (error) {
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
     }
 
-
-
-    /* =====================================================
-       DATA ATUAL
-    ====================================================== */
+    /* UTILS & FORMATADORES */
+    function applyPhoneMask(input) {
+        let v = input.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11);
+        
+        if (v.length > 10) {
+            v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+        } else if (v.length > 6) {
+            v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d{2})(\d{0,5})$/, "($1) $2");
+        } else if (v.length > 0) {
+            v = v.replace(/^(\d{0,2})$/, "($1");
+        }
+        input.value = v;
+    }
 
     function getTodayString() {
-
-        const today =
-            new Date();
-
-
-        const year =
-            today.getFullYear();
-
-
-        const month =
-            String(
-                today.getMonth() + 1
-            )
-            .padStart(
-                2,
-                "0"
-            );
-
-
-        const day =
-            String(
-                today.getDate()
-            )
-            .padStart(
-                2,
-                "0"
-            );
-
-
-        return `${year}-${month}-${day}`;
-
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
-
-
-
-    /* =====================================================
-       FORMATA DATA
-    ====================================================== */
 
     function formatDate(date) {
-
-        if (!date) {
-            return "";
-        }
-
-
-        const parts =
-            date.split("-");
-
-
-        if (
-            parts.length !== 3
-        ) {
-
-            return date;
-
-        }
-
-
-        return (
-            parts[2] +
-            "/" +
-            parts[1] +
-            "/" +
-            parts[0]
-        );
-
+        if (!date) return "";
+        const parts = date.split("-");
+        return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
     }
 
-
-
-    /* =====================================================
-       FORMATA DINHEIRO
-    ====================================================== */
-
-    function formatMoney(value) {
-
-        return Number(
-            value || 0
-        )
-        .toLocaleString(
-
-            "pt-BR",
-
-            {
-
-                style:
-                "currency",
-
-                currency:
-                "BRL"
-
-            }
-
-        );
-
+    function formatMoney(val) {
+        return Number(val || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
-
-
-    /* =====================================================
-       PROTEÇÃO HTML
-    ====================================================== */
-
-    function escapeHTML(value) {
-
-        return String(
-            value ?? ""
-        )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+    function escapeHTML(str) {
+        return String(str ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
-
-
-
-    /* =====================================================
-       TOAST
-    ====================================================== */
 
     let toastTimer;
-
-
-    function showToast(message) {
-
-        const toast =
-            document.getElementById(
-                "toast"
-            );
-
-
-        toast.textContent =
-            message;
-
-
-        toast.classList.add(
-            "show"
-        );
-
-
-        clearTimeout(
-            toastTimer
-        );
-
-
-        toastTimer =
-            setTimeout(
-                () => {
-
-                    toast.classList.remove(
-                        "show"
-                    );
-
-                },
-
-                3000
-            );
-
+    function showToast(msg) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
     }
-
-
-
-    /* =====================================================
-       CONEXÃO
-    ====================================================== */
 
     function setConnected() {
-
-        const connection =
-            document.getElementById(
-                "connection"
-            );
-
-
-        connection.textContent =
-            "● Banco de dados conectado";
-
-
-        connection.className =
-            "connection connected";
-
+        const el = document.getElementById("connection");
+        el.textContent = "● Banco de dados conectado";
+        el.className = "connection connected";
     }
 
-
-
-    function showDatabaseError(error) {
-
-        console.error(
-            "Firebase:",
-            error
-        );
-
-
-        const connection =
-            document.getElementById(
-                "connection"
-            );
-
-
-        connection.textContent =
-            "Erro ao conectar com o banco";
-
-
-        connection.className =
-            "connection error";
-
-
-        if (
-            error?.code ===
-            "permission-denied"
-        ) {
-
-            showToast(
-                "O Firestore bloqueou o acesso. Verifique as regras do banco."
-            );
-
-        }
-
-        else {
-
-            showToast(
-                "Erro ao acessar o banco de dados."
-            );
-
-        }
-
+    function showDatabaseError(err) {
+        console.error("Firebase:", err);
+        const el = document.getElementById("connection");
+        el.textContent = "Erro ao conectar com o banco";
+        el.className = "connection error";
+        
+        const msg = err?.code === "permission-denied" 
+            ? "Acesso negado. Verifique as regras do Firestore." 
+            : "Erro ao acessar banco de dados.";
+        showToast(msg);
     }
 
+    /* GLOBAL BINDINGS */
+    window.showSection = showSection;
+    window.newAppointment = newAppointment;
+    window.showSelectedServicePrice = showSelectedServicePrice;
+    window.saveAppointment = saveAppointment;
+    window.editAppointment = editAppointment;
+    window.confirmAppointment = confirmAppointment;
+    window.cancelAppointment = cancelAppointment;
+    window.openNewService = openNewService;
+    window.editService = editService;
+    window.saveService = saveService;
+    window.deleteService = deleteService;
+    window.applyPhoneMask = applyPhoneMask;
 
-
-    /* =====================================================
-       DISPONIBILIZA FUNÇÕES PARA HTML onclick
-    ====================================================== */
-
-    window.showSection =
-        showSection;
-
-
-    window.newAppointment =
-        newAppointment;
-
-
-    window.showSelectedServicePrice =
-        showSelectedServicePrice;
-
-
-    window.saveAppointment =
-        saveAppointment;
-
-
-    window.editAppointment =
-        editAppointment;
-
-
-    window.confirmAppointment =
-        confirmAppointment;
-
-
-    window.cancelAppointment =
-        cancelAppointment;
-
-
-    window.openNewService =
-        openNewService;
-
-
-    window.editService =
-        editService;
-
-
-    window.saveService =
-        saveService;
-
-
-    window.deleteService =
-        deleteService;
-
-
-
-    /* =====================================================
-       INICIALIZAÇÃO
-    ====================================================== */
-
+    /* INICIALIZAÇÃO */
     async function startApp() {
-
         try {
-
             await ensureDefaultServices();
-
-
             listenServices();
-
-
             listenAppointments();
 
-
-            document.getElementById(
-                "date"
-            ).min =
-                getTodayString();
-
-
-            document.getElementById(
-                "filterDate"
-            ).value =
-                getTodayString();
-
+            const today = getTodayString();
+            document.getElementById("date").min = today;
+            document.getElementById("filterDate").value = today;
+        } catch (error) {
+            showDatabaseError(error);
         }
-
-        catch (error) {
-
-            showDatabaseError(
-                error
-            );
-
-        }
-
     }
 
-
     startApp();
-
-
 </script>
 
-
 </body>
-
 </html>
