@@ -1,215 +1,3468 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dashboard Jurídico 2025</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-body{
-  background:linear-gradient(145deg,#0d1b2a,#1b263b);
-  color:#e0e1dd;display:flex;min-height:100vh;overflow-x:hidden;
-}
-aside{
-  width:240px;background:#1b263b;padding:25px 15px;
-  display:flex;flex-direction:column;align-items:flex-start;
-  position:fixed;height:100%;box-shadow:3px 0 10px rgba(0,0,0,.3);
-}
-aside h2{color:#00b4d8;margin-bottom:25px;}
-aside a{
-  text-decoration:none;color:#e0e1dd;margin:8px 0;width:100%;
-  padding:10px;border-radius:8px;transition:.3s;
-}
-aside a:hover,aside a.active{background:#00b4d8;color:#fff;}
-main{margin-left:260px;padding:30px;width:calc(100% - 260px);}
-section{display:none;}
-section.active{display:block;}
-h1,h2{color:#fff;}
-.filtros{margin-bottom:15px;}
-.filtros select{
-  background:#1b263b;color:#fff;border:none;padding:8px 12px;border-radius:6px;margin-right:10px;
-}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;}
-.card{
-  background:linear-gradient(145deg,#1e2a47,#24345c);
-  border-radius:12px;padding:18px;color:#fff;
-  box-shadow:inset 0 0 10px rgba(0,180,216,.3),0 0 8px rgba(0,0,0,.5);
-}
-.card h3{font-size:1rem;color:#90e0ef;margin-bottom:6px;}
-.card p{font-size:1.5rem;font-weight:600;}
-.chartBox{background:#1b263b;padding:20px;border-radius:15px;
-  box-shadow:0 0 12px rgba(0,0,0,.4);margin-bottom:25px;}
-canvas{width:100%!important;height:280px!important;}
-.ranking{background:linear-gradient(145deg,#14213d,#1b263b);
-  padding:20px;border-radius:15px;box-shadow:0 0 10px rgba(0,180,216,.3);}
-.ranking h3{color:#00b4d8;margin-bottom:10px;}
-.ranking ul{list-style:none;}
-.ranking li{background:#1e2a47;margin:8px 0;padding:8px 15px;border-radius:8px;
-  display:flex;justify-content:space-between;}
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <title>Espaço Taai Botelho</title>
+
+    <meta name="theme-color" content="#b69245">
+
+    <style>
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        body {
+            background: #f6f6f6;
+            color: #222;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+
+        /* =========================================================
+           APP
+        ========================================================= */
+
+        .app {
+            max-width: 520px;
+            min-height: 100vh;
+            margin: auto;
+            background: #fff;
+            position: relative;
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        header {
+            text-align: center;
+            padding: 30px 20px 24px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        header h1 {
+            font-size: 12px;
+            letter-spacing: 5px;
+            font-weight: 500;
+            color: #777;
+        }
+
+        header h2 {
+            font-size: 30px;
+            margin-top: 5px;
+            color: #b69245;
+            font-weight: 600;
+        }
+
+        header p {
+            margin-top: 7px;
+            color: #999;
+            font-size: 13px;
+        }
+
+
+        /* =========================================================
+           CONTEÚDO
+        ========================================================= */
+
+        main {
+            padding: 20px;
+        }
+
+        .welcome {
+            background:
+                linear-gradient(
+                    135deg,
+                    #fffdf8,
+                    #f8efd9
+                );
+
+            border: 1px solid #eadbb4;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+
+        .welcome h3 {
+            font-size: 21px;
+            margin-bottom: 6px;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #777;
+        }
+
+
+        /* =========================================================
+           MENU
+        ========================================================= */
+
+        .menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .menu button {
+            min-height: 110px;
+            border: 1px solid #ddc58c;
+            background: white;
+            border-radius: 18px;
+            padding: 18px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            transition: .2s;
+        }
+
+        .menu button:active {
+            transform: scale(.97);
+            background: #fffaf0;
+        }
+
+        .menu-icon {
+            display: block;
+            font-size: 27px;
+            margin-bottom: 9px;
+        }
+
+
+        /* =========================================================
+           SEÇÕES
+        ========================================================= */
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fade .2s ease;
+        }
+
+        @keyframes fade {
+
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+
+        /* =========================================================
+           CARDS
+        ========================================================= */
+
+        .card {
+            border: 1px solid #eee;
+            border-radius: 19px;
+            padding: 18px;
+            margin-bottom: 16px;
+            background: #fff;
+        }
+
+        .card h3 {
+            color: #a98234;
+            margin-bottom: 17px;
+            font-size: 18px;
+        }
+
+
+        /* =========================================================
+           FORMULÁRIOS
+        ========================================================= */
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            margin-bottom: 14px;
+            outline: none;
+            background: #fff;
+            color: #222;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #b69245;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: none;
+        }
+
+
+        /* =========================================================
+           BOTÕES
+        ========================================================= */
+
+        .btn-primary {
+            width: 100%;
+            border: none;
+            border-radius: 13px;
+            padding: 15px;
+            background: #b69245;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid #d7c18c;
+            border-radius: 13px;
+            padding: 13px;
+            background: white;
+            color: #896a2e;
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
+           AGENDAMENTOS
+        ========================================================= */
+
+        .appointment {
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+
+        .appointment-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .appointment-top strong {
+            font-size: 16px;
+        }
+
+        .time {
+            color: #a98234;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .appointment p {
+            margin-top: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .price {
+            font-size: 16px !important;
+            color: #a98234 !important;
+            font-weight: 700;
+        }
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .status {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-agendado {
+            background: #fff5d9;
+            color: #89680c;
+        }
+
+        .status-confirmado {
+            background: #eaf7ec;
+            color: #23752b;
+        }
+
+        .status-cancelado {
+            background: #fff0f0;
+            color: #a82e2e;
+        }
+
+
+        /* =========================================================
+           AÇÕES
+        ========================================================= */
+
+        .actions {
+            display: flex;
+            gap: 7px;
+            margin-top: 13px;
+        }
+
+        .actions button {
+            flex: 1;
+            border: none;
+            border-radius: 9px;
+            padding: 10px 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .confirm-btn {
+            background: #edf8ef;
+            color: #25752c;
+        }
+
+        .edit-btn {
+            background: #f4f4f4;
+            color: #555;
+        }
+
+        .cancel-btn {
+            background: #fff0f0;
+            color: #ae3030;
+        }
+
+
+        /* =========================================================
+           SERVIÇOS
+        ========================================================= */
+
+        .service-row {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .service-row:last-child {
+            border-bottom: none;
+        }
+
+        .service-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .service-info strong {
+            font-size: 15px;
+        }
+
+        .service-info small {
+            color: #999;
+            line-height: 1.8;
+        }
+
+        .service-price {
+            color: #a98234;
+            white-space: nowrap;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 11px;
+        }
+
+        .service-actions button {
+            flex: 1;
+            border: none;
+            border-radius: 9px;
+            padding: 10px;
+        }
+
+        .delete-btn {
+            background: #fff0f0;
+            color: #aa3030;
+        }
+
+
+        /* =========================================================
+           GERENCIAR
+        ========================================================= */
+
+        .manage-box {
+            border: 1px solid #eee;
+            border-radius: 15px;
+            padding: 17px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .manage-box:active {
+            background: #fffaf2;
+        }
+
+        .manage-box h4 {
+            color: #a98234;
+            margin-bottom: 6px;
+        }
+
+        .manage-box p {
+            font-size: 13px;
+            color: #777;
+        }
+
+
+        /* =========================================================
+           PREÇO SELECIONADO
+        ========================================================= */
+
+        .selected-price {
+            background: #fffaf0;
+            border-radius: 11px;
+            padding: 11px 13px;
+            margin-top: -5px;
+            margin-bottom: 15px;
+            color: #9b772e;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+        }
+
+
+        /* =========================================================
+           VAZIO / LOADING
+        ========================================================= */
+
+        .empty {
+            text-align: center;
+            color: #999;
+            padding: 35px 10px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 30px 10px;
+        }
+
+
+        /* =========================================================
+           CONEXÃO
+        ========================================================= */
+
+        .connection {
+            text-align: center;
+            padding: 8px;
+            font-size: 11px;
+            background: #f9f9f9;
+            color: #888;
+        }
+
+        .connection.connected {
+            color: #438348;
+        }
+
+        .connection.error {
+            background: #fff0f0;
+            color: #ae3030;
+        }
+
+
+        /* =========================================================
+           TOAST
+        ========================================================= */
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            transform: translateX(-50%) translateY(100px);
+
+            width: calc(100% - 40px);
+            max-width: 480px;
+
+            padding: 14px 17px;
+            border-radius: 13px;
+
+            background: #222;
+            color: white;
+
+            text-align: center;
+            font-size: 13px;
+
+            opacity: 0;
+            pointer-events: none;
+
+            transition: .3s;
+            z-index: 1000;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform:
+                translateX(-50%)
+                translateY(0);
+        }
+
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            padding: 25px 20px 35px;
+        }
+
+    </style>
+
 </head>
+
 <body>
 
-<aside>
-  <h2>⚖️ Jurídico</h2>
-  <a class="active" data-target="dashboard">Dashboard</a>
-  <a data-target="funil">Funil Precatórios</a>
-  <a data-target="crm">CRM Precatório</a>
-  <a data-target="funilgeral">Funil Geral</a>
-  <a data-target="ranking">Ranking</a>
-  <a data-target="sla">SLA</a>
-  <a data-target="processos">Processos</a>
-  <a data-target="distratos">Distratos</a>
-  <a data-target="pdi">PDI</a>
-</aside>
 
-<main>
-  <div class="filtros">
-    <select id="filtroMes">
-      <option value="Todos">Todos os Meses</option>
-      <option>Janeiro</option><option>Fevereiro</option><option>Março</option>
-      <option>Abril</option><option>Maio</option><option>Junho</option>
-      <option>Julho</option><option>Agosto</option><option>Setembro</option>
-      <option>Outubro</option><option>Novembro</option><option>Dezembro</option>
-    </select>
-    <select id="filtroArea">
-      <option value="Todas">Todas as Áreas</option>
-      <option>Precatório</option><option>Bancário</option><option>Trabalhista</option>
-      <option>Previdenciário</option>
-    </select>
-  </div>
+<div class="app">
 
-  <!-- ABA 1 -->
-  <section id="dashboard" class="active">
-    <h1>Dashboard Jurídico 2025</h1>
-    <div class="cards" id="cardsDashboard"></div>
-    <div class="chartBox"><h2>Status dos Processos</h2><canvas id="graficoStatus"></canvas></div>
-    <div class="chartBox"><h2>Evolução Anual</h2><canvas id="graficoLinha"></canvas></div>
-  </section>
 
-  <!-- ABA 2 -->
-  <section id="funil">
-    <h1>Funil Precatórios</h1>
-    <div class="cards" id="cardsFunil"></div>
-    <div class="chartBox"><h2>Top 5 Status x Motivos</h2><canvas id="graficoFunil"></canvas></div>
-  </section>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-  <!-- ABA 3 -->
-  <section id="crm">
-    <h1>CRM Precatório</h1>
-    <div class="cards" id="cardsCRM"></div>
-    <div class="chartBox"><h2>Produção Diária</h2><canvas id="graficoCRM"></canvas></div>
-  </section>
+    <header>
 
-  <!-- ABA 4 -->
-  <section id="funilgeral">
-    <h1>Funil Geral</h1>
-    <div class="cards" id="cardsGeral"></div>
-    <div class="chartBox"><h2>Conversão por Área</h2><canvas id="graficoGeral"></canvas></div>
-  </section>
+        <!--
+        QUANDO TIVER A LOGO:
+        salve como logo.png na mesma pasta
+        e remova display:none da classe .logo
+        -->
 
-  <!-- ABA 5 -->
-  <section id="ranking">
-    <h1>Ranking e Performance</h1>
-    <div class="cards" id="cardsRanking"></div>
-    <div class="chartBox"><h2>Ranking Mensal</h2><canvas id="graficoRanking"></canvas></div>
-  </section>
+        <img
+            src="logo.png"
+            class="logo"
+            alt="Espaço Taai Botelho"
+            onerror="this.style.display='none'"
+        >
 
-  <!-- ABA 6 -->
-  <section id="sla">
-    <h1>SLA — Contratos Assinados x Distribuídos</h1>
-    <div class="cards" id="cardsSLA"></div>
-    <div class="chartBox"><h2>Evolução Mensal</h2><canvas id="graficoSLA"></canvas></div>
-  </section>
+        <h1>ESPAÇO</h1>
 
-  <!-- ABA 7 -->
-  <section id="processos">
-    <h1>Controle de Processos</h1>
-    <div class="cards" id="cardsProc"></div>
-    <div class="chartBox"><h2>Resultado Geral</h2><canvas id="graficoProc"></canvas></div>
-  </section>
+        <h2>Taai Botelho</h2>
 
-  <!-- ABA 8 -->
-  <section id="distratos">
-    <h1>Distratos</h1>
-    <div class="cards" id="cardsDistr"></div>
-    <div class="chartBox"><h2>Percentual Mensal</h2><canvas id="graficoDistr"></canvas></div>
-  </section>
+        <p>
+            Beleza • Cuidado • Bem-estar
+        </p>
 
-  <!-- ABA 9 -->
-  <section id="pdi">
-    <h1>PDI - Resultado Mensal</h1>
-    <div class="cards" id="cardsPDI"></div>
-    <div class="chartBox"><h2>Desempenho por Colaborador</h2><canvas id="graficoPDI"></canvas></div>
-  </section>
-</main>
+    </header>
 
-<script>
-const SHEET_ID="1baSrMHddB1BeFEjhkBpR0ES4ZIF5EJ9MIWnK83NW9hc";
-const API_KEY="AIzaSyC4AuWdBjcwRoZnkQjhIPxBQKpvKhyjir0";
 
-// Navegação entre abas
-document.querySelectorAll("aside a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    document.querySelectorAll("aside a").forEach(l=>l.classList.remove("active"));
-    link.classList.add("active");
-    const alvo=link.getAttribute("data-target");
-    document.querySelectorAll("main section").forEach(sec=>sec.classList.remove("active"));
-    document.getElementById(alvo).classList.add("active");
-  });
-});
+    <div
+        id="connection"
+        class="connection"
+    >
+        Conectando ao banco...
+    </div>
 
-// Corrigido: agora busca a aba correta sem acento
-async function carregarDashboard(){
-  const range="FUNIL PRECATÓRIO_INICIO MARÇO25";
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-  const res=await fetch(url);
-  const data=await res.json();
-  const linhas=data.values;
-  if(!linhas||linhas.length<2)return;
-  const headers=linhas[1];
-  const registros=linhas.slice(2).map(l=>{
-    const obj={};headers.forEach((h,i)=>obj[h]=l[i]||"");return obj;
-  });
-  atualizarDashboard(registros);
-}
 
-function atualizarDashboard(registros){
-  const total=registros.length;
-  const prioridade={Alta:0,Média:0,Baixa:0};
-  const status={},linha={};
+    <!-- =====================================================
+         PRINCIPAL
+    ====================================================== -->
 
-  registros.forEach(r=>{
-    const p=(r["PRIORIDADE: ALTA,MÉDIA OU BAIXA"]||"").trim();
-    if(p) prioridade[p]=(prioridade[p]||0)+1;
-    const s=(r["STATUS"]||"").trim();
-    if(s) status[s]=(status[s]||0)+1;
-    const d=(r["DATA DO PRIMEIRO CONTATO COM O CLIENTE"]||"").slice(0,10);
-    if(d) linha[d]=(linha[d]||0)+1;
-  });
+    <main>
 
-  document.getElementById("cardsDashboard").innerHTML=`
-    <div class='card'><h3>Total de Leads</h3><p>${total}</p></div>
-    <div class='card'><h3>Alta</h3><p>${prioridade.Alta||0}</p></div>
-    <div class='card'><h3>Média</h3><p>${prioridade.Média||0}</p></div>
-    <div class='card'><h3>Baixa</h3><p>${prioridade.Baixa||0}</p></div>`;
 
-  new Chart(document.getElementById("graficoStatus"),{
-    type:"bar",
-    data:{labels:Object.keys(status),datasets:[{data:Object.values(status),backgroundColor:"#00b4d8",borderRadius:8}]},
-    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#fff"}},y:{ticks:{color:"#fff"}}}}
-  });
+        <div class="welcome">
 
-  const ordenado=Object.entries(linha).sort((a,b)=>new Date(a[0])-new Date(b[0]));
-  new Chart(document.getElementById("graficoLinha"),{
-    type:"line",
-    data:{labels:ordenado.map(e=>e[0]),datasets:[{data:ordenado.map(e=>e[1]),borderColor:"#00b4d8",backgroundColor:"rgba(0,180,216,.2)",fill:true,tension:.3}]},
-    options:{plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#fff"}},y:{ticks:{color:"#fff"}}}}
-  });
-}
+            <h3>
+                Olá ✨
+            </h3>
 
-carregarDashboard();
+            <p>
+                Gerencie seus horários,
+                clientes e serviços de forma simples.
+            </p>
+
+        </div>
+
+
+        <!-- MENU -->
+
+        <div class="menu">
+
+            <button onclick="newAppointment()">
+
+                <span class="menu-icon">
+                    📅
+                </span>
+
+                Novo Agendamento
+
+            </button>
+
+
+            <button onclick="showSection('agenda')">
+
+                <span class="menu-icon">
+                    📋
+                </span>
+
+                Agenda
+
+            </button>
+
+
+            <button onclick="showSection('servicos')">
+
+                <span class="menu-icon">
+                    💇‍♀️
+                </span>
+
+                Serviços
+
+            </button>
+
+
+            <button onclick="showSection('gerenciar')">
+
+                <span class="menu-icon">
+                    ⚙️
+                </span>
+
+                Gerenciar
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             INÍCIO
+        ================================================== -->
+
+        <section
+            id="inicio"
+            class="section active"
+        >
+
+            <div class="card">
+
+                <h3>
+                    Agenda de hoje
+                </h3>
+
+                <div id="todayAppointments">
+
+                    <div class="loading">
+                        Carregando agenda...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             NOVO / EDITAR AGENDAMENTO
+        ================================================== -->
+
+        <section
+            id="novo"
+            class="section"
+        >
+
+            <div class="card">
+
+
+                <h3 id="appointmentTitle">
+                    Novo Agendamento
+                </h3>
+
+
+                <input
+                    type="hidden"
+                    id="editAppointmentId"
+                >
+
+
+                <label>
+                    Nome da cliente
+                </label>
+
+                <input
+                    type="text"
+                    id="clientName"
+                    placeholder="Digite o nome"
+                    autocomplete="name"
+                >
+
+
+                <label>
+                    WhatsApp
+                </label>
+
+                <input
+                    type="tel"
+                    id="clientPhone"
+                    placeholder="(51) 99999-9999"
+                    inputmode="tel"
+                >
+
+
+                <label>
+                    Serviço
+                </label>
+
+                <select
+                    id="service"
+                    onchange="showSelectedServicePrice()"
+                >
+
+                    <option value="">
+                        Carregando...
+                    </option>
+
+                </select>
+
+
+                <div
+                    id="selectedServicePrice"
+                    class="selected-price"
+                ></div>
+
+
+                <label>
+                    Data
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                >
+
+
+                <label>
+                    Horário
+                </label>
+
+                <input
+                    type="time"
+                    id="time"
+                >
+
+
+                <label>
+                    Observação
+                </label>
+
+                <textarea
+                    id="notes"
+                    placeholder="Opcional"
+                ></textarea>
+
+
+                <button
+                    id="saveAppointmentButton"
+                    class="btn-primary"
+                    onclick="saveAppointment()"
+                >
+
+                    Salvar Agendamento
+
+                </button>
+
+
+                <button
+                    class="btn-secondary"
+                    onclick="showSection('inicio')"
+                >
+
+                    Voltar
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             AGENDA
+        ================================================== -->
+
+        <section
+            id="agenda"
+            class="section"
+        >
+
+            <div class="card">
+
+                <h3>
+                    Agenda
+                </h3>
+
+
+                <label>
+                    Filtrar por data
+                </label>
+
+
+                <input
+                    type="date"
+                    id="filterDate"
+                    onchange="renderAgenda()"
+                >
+
+
+                <div id="appointmentsList">
+
+                    <div class="loading">
+                        Carregando...
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SERVIÇOS
+        ================================================== -->
+
+        <section
+            id="servicos"
+            class="section"
+        >
+
+            <div class="card">
+
+                <h3>
+                    Serviços
+                </h3>
+
+                <div id="publicServices"></div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             GERENCIAR
+        ================================================== -->
+
+        <section
+            id="gerenciar"
+            class="section"
+        >
+
+            <div class="card">
+
+                <h3>
+                    Gerenciar
+                </h3>
+
+
+                <div
+                    class="manage-box"
+                    onclick="showSection('gerenciarServicos')"
+                >
+
+                    <h4>
+                        💇‍♀️ Serviços e valores
+                    </h4>
+
+                    <p>
+                        Adicionar, alterar valores,
+                        duração ou excluir serviços.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="manage-box"
+                    onclick="showSection('agenda')"
+                >
+
+                    <h4>
+                        📅 Agendamentos
+                    </h4>
+
+                    <p>
+                        Editar clientes,
+                        serviços, datas e horários.
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="btn-secondary"
+                    onclick="showSection('inicio')"
+                >
+
+                    Voltar ao início
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             GERENCIAR SERVIÇOS
+        ================================================== -->
+
+        <section
+            id="gerenciarServicos"
+            class="section"
+        >
+
+            <div class="card">
+
+
+                <h3>
+                    Gerenciar Serviços
+                </h3>
+
+
+                <button
+                    class="btn-primary"
+                    onclick="openNewService()"
+                >
+
+                    + Adicionar Serviço
+
+                </button>
+
+
+                <div
+                    id="manageServices"
+                    style="margin-top:20px;"
+                ></div>
+
+
+                <button
+                    class="btn-secondary"
+                    onclick="showSection('gerenciar')"
+                >
+
+                    Voltar
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FORMULÁRIO SERVIÇO
+        ================================================== -->
+
+        <section
+            id="formServico"
+            class="section"
+        >
+
+            <div class="card">
+
+
+                <h3 id="serviceFormTitle">
+                    Novo Serviço
+                </h3>
+
+
+                <input
+                    type="hidden"
+                    id="editServiceId"
+                >
+
+
+                <label>
+                    Nome do serviço
+                </label>
+
+                <input
+                    type="text"
+                    id="serviceName"
+                    placeholder="Ex: Escova"
+                >
+
+
+                <label>
+                    Valor
+                </label>
+
+                <input
+                    type="number"
+                    id="servicePrice"
+                    placeholder="Ex: 50"
+                    min="0"
+                    step="0.01"
+                    inputmode="decimal"
+                >
+
+
+                <label>
+                    Duração em minutos
+                </label>
+
+                <input
+                    type="number"
+                    id="serviceDuration"
+                    placeholder="Ex: 45"
+                    min="1"
+                    inputmode="numeric"
+                >
+
+
+                <button
+                    id="saveServiceButton"
+                    class="btn-primary"
+                    onclick="saveService()"
+                >
+
+                    Salvar Serviço
+
+                </button>
+
+
+                <button
+                    class="btn-secondary"
+                    onclick="showSection('gerenciarServicos')"
+                >
+
+                    Cancelar
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <footer>
+
+        Espaço Taai Botelho
+        <br>
+        Sistema de Agendamentos
+
+    </footer>
+
+
+</div>
+
+
+<div id="toast"></div>
+
+
+
+<!-- =========================================================
+     FIREBASE + SISTEMA
+========================================================= -->
+
+<script type="module">
+
+
+    /* =====================================================
+       IMPORTAÇÕES FIREBASE
+    ====================================================== */
+
+    import {
+        initializeApp
+    }
+    from
+    "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+
+    import {
+
+        getFirestore,
+
+        collection,
+
+        addDoc,
+
+        getDocs,
+
+        doc,
+
+        setDoc,
+
+        updateDoc,
+
+        deleteDoc,
+
+        onSnapshot,
+
+        serverTimestamp
+
+    }
+    from
+    "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+
+
+    /* =====================================================
+       CONFIGURAÇÃO FIREBASE
+    ====================================================== */
+
+    const firebaseConfig = {
+
+        apiKey:
+        "AIzaSyAbfoZCpgltNGqzC1SKtOXBJLIiABR1Uek",
+
+        authDomain:
+        "tainan-salao.firebaseapp.com",
+
+        projectId:
+        "tainan-salao",
+
+        storageBucket:
+        "tainan-salao.firebasestorage.app",
+
+        messagingSenderId:
+        "965996001179",
+
+        appId:
+        "1:965996001179:web:e805a9e1087aaa9306533e",
+
+        measurementId:
+        "G-E6EN58PXVB"
+
+    };
+
+
+
+    /* =====================================================
+       INICIALIZA FIREBASE
+    ====================================================== */
+
+    const app =
+        initializeApp(firebaseConfig);
+
+
+    const db =
+        getFirestore(app);
+
+
+
+    /* =====================================================
+       VARIÁVEIS
+    ====================================================== */
+
+    let services = [];
+
+    let appointments = [];
+
+
+
+    /* =====================================================
+       SERVIÇOS INICIAIS
+    ====================================================== */
+
+    const defaultServices = [
+
+        {
+            id: "corte",
+            name: "Corte",
+            price: 60,
+            duration: 40
+        },
+
+        {
+            id: "escova",
+            name: "Escova",
+            price: 50,
+            duration: 45
+        },
+
+        {
+            id: "coloracao",
+            name: "Coloração",
+            price: 150,
+            duration: 120
+        },
+
+        {
+            id: "manicure",
+            name: "Manicure",
+            price: 40,
+            duration: 45
+        },
+
+        {
+            id: "pedicure",
+            name: "Pedicure",
+            price: 45,
+            duration: 50
+        },
+
+        {
+            id: "sobrancelha",
+            name: "Sobrancelha",
+            price: 35,
+            duration: 30
+        }
+
+    ];
+
+
+
+    /* =====================================================
+       CRIA SERVIÇOS INICIAIS SOMENTE SE ESTIVER VAZIO
+    ====================================================== */
+
+    async function ensureDefaultServices() {
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "servicos"
+                    )
+                );
+
+
+            if (!snapshot.empty) {
+                return;
+            }
+
+
+            for (
+                const service
+                of
+                defaultServices
+            ) {
+
+                await setDoc(
+
+                    doc(
+                        db,
+                        "servicos",
+                        service.id
+                    ),
+
+                    {
+
+                        name:
+                        service.name,
+
+                        price:
+                        service.price,
+
+                        duration:
+                        service.duration,
+
+                        createdAt:
+                        serverTimestamp()
+
+                    }
+
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Erro ao criar serviços:",
+                error
+            );
+
+            showDatabaseError(error);
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       LISTENER SERVIÇOS
+    ====================================================== */
+
+    function listenServices() {
+
+        onSnapshot(
+
+            collection(
+                db,
+                "servicos"
+            ),
+
+            snapshot => {
+
+                services = [];
+
+
+                snapshot.forEach(
+                    documentSnapshot => {
+
+                        services.push({
+
+                            id:
+                            documentSnapshot.id,
+
+                            ...documentSnapshot.data()
+
+                        });
+
+                    }
+                );
+
+
+                services.sort(
+                    (a, b) =>
+                        String(a.name)
+                        .localeCompare(
+                            String(b.name),
+                            "pt-BR"
+                        )
+                );
+
+
+                loadServiceSelect();
+
+                renderPublicServices();
+
+                renderManageServices();
+
+                setConnected();
+
+            },
+
+            error => {
+
+                console.error(
+                    "Erro serviços:",
+                    error
+                );
+
+                showDatabaseError(error);
+
+            }
+
+        );
+
+    }
+
+
+
+    /* =====================================================
+       LISTENER AGENDAMENTOS
+    ====================================================== */
+
+    function listenAppointments() {
+
+        onSnapshot(
+
+            collection(
+                db,
+                "agendamentos"
+            ),
+
+            snapshot => {
+
+                appointments = [];
+
+
+                snapshot.forEach(
+                    documentSnapshot => {
+
+                        appointments.push({
+
+                            id:
+                            documentSnapshot.id,
+
+                            ...documentSnapshot.data()
+
+                        });
+
+                    }
+                );
+
+
+                renderToday();
+
+                renderAgenda();
+
+                setConnected();
+
+            },
+
+            error => {
+
+                console.error(
+                    "Erro agendamentos:",
+                    error
+                );
+
+                showDatabaseError(error);
+
+            }
+
+        );
+
+    }
+
+
+
+    /* =====================================================
+       NAVEGAÇÃO
+    ====================================================== */
+
+    function showSection(id) {
+
+        document
+        .querySelectorAll(
+            ".section"
+        )
+        .forEach(section => {
+
+            section
+            .classList
+            .remove("active");
+
+        });
+
+
+        const section =
+            document.getElementById(id);
+
+
+        if (section) {
+
+            section
+            .classList
+            .add("active");
+
+        }
+
+
+        if (
+            id === "inicio"
+        ) {
+
+            renderToday();
+
+        }
+
+
+        if (
+            id === "agenda"
+        ) {
+
+            renderAgenda();
+
+        }
+
+
+        if (
+            id === "servicos"
+        ) {
+
+            renderPublicServices();
+
+        }
+
+
+        if (
+            id === "gerenciarServicos"
+        ) {
+
+            renderManageServices();
+
+        }
+
+
+        window.scrollTo({
+
+            top: 0,
+
+            behavior:
+            "smooth"
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       SELECT SERVIÇOS
+    ====================================================== */
+
+    function loadServiceSelect() {
+
+        const select =
+            document.getElementById(
+                "service"
+            );
+
+
+        const selected =
+            select.value;
+
+
+        select.innerHTML =
+            `
+            <option value="">
+                Selecione um serviço
+            </option>
+            `;
+
+
+        services.forEach(
+            service => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    service.id;
+
+
+                option.textContent =
+                    `${service.name} - ${formatMoney(service.price)}`;
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        if (
+            services.some(
+                service =>
+                    service.id === selected
+            )
+        ) {
+
+            select.value =
+                selected;
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       MOSTRAR PREÇO
+    ====================================================== */
+
+    function showSelectedServicePrice() {
+
+        const serviceId =
+            document
+            .getElementById(
+                "service"
+            )
+            .value;
+
+
+        const service =
+            services.find(
+                item =>
+                    item.id === serviceId
+            );
+
+
+        const box =
+            document.getElementById(
+                "selectedServicePrice"
+            );
+
+
+        if (!service) {
+
+            box.style.display =
+                "none";
+
+            box.innerHTML =
+                "";
+
+            return;
+
+        }
+
+
+        box.innerHTML =
+            `
+            ${formatMoney(service.price)}
+            •
+            ${service.duration} minutos
+            `;
+
+
+        box.style.display =
+            "block";
+
+    }
+
+
+
+    /* =====================================================
+       NOVO AGENDAMENTO
+    ====================================================== */
+
+    function newAppointment() {
+
+        clearAppointmentForm();
+
+
+        document.getElementById(
+            "appointmentTitle"
+        ).textContent =
+            "Novo Agendamento";
+
+
+        showSection(
+            "novo"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SALVAR AGENDAMENTO
+    ====================================================== */
+
+    async function saveAppointment() {
+
+        const button =
+            document.getElementById(
+                "saveAppointmentButton"
+            );
+
+
+        const editId =
+            document.getElementById(
+                "editAppointmentId"
+            ).value;
+
+
+        const name =
+            document.getElementById(
+                "clientName"
+            ).value.trim();
+
+
+        const phone =
+            document.getElementById(
+                "clientPhone"
+            ).value.trim();
+
+
+        const serviceId =
+            document.getElementById(
+                "service"
+            ).value;
+
+
+        const date =
+            document.getElementById(
+                "date"
+            ).value;
+
+
+        const time =
+            document.getElementById(
+                "time"
+            ).value;
+
+
+        const notes =
+            document.getElementById(
+                "notes"
+            ).value.trim();
+
+
+
+        if (
+            !name ||
+            !phone ||
+            !serviceId ||
+            !date ||
+            !time
+        ) {
+
+            showToast(
+                "Preencha todos os campos obrigatórios."
+            );
+
+            return;
+
+        }
+
+
+
+        const service =
+            services.find(
+                item =>
+                    item.id === serviceId
+            );
+
+
+        if (!service) {
+
+            showToast(
+                "Serviço não encontrado."
+            );
+
+            return;
+
+        }
+
+
+
+        /* ---------------------------------------------
+           VERIFICA CONFLITO DE HORÁRIO
+        ---------------------------------------------- */
+
+        const conflict =
+            appointments.some(
+                appointment =>
+
+                    appointment.date === date &&
+
+                    appointment.time === time &&
+
+                    appointment.status !==
+                    "Cancelado" &&
+
+                    appointment.id !==
+                    editId
+
+            );
+
+
+        if (conflict) {
+
+            showToast(
+                "Esse horário já possui um agendamento."
+            );
+
+            return;
+
+        }
+
+
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "Salvando...";
+
+
+
+        const data = {
+
+            name,
+
+            phone,
+
+            serviceId,
+
+            serviceName:
+            service.name,
+
+            price:
+            Number(service.price),
+
+            duration:
+            Number(service.duration),
+
+            date,
+
+            time,
+
+            notes,
+
+            updatedAt:
+            serverTimestamp()
+
+        };
+
+
+
+        try {
+
+
+            /* EDITAR */
+
+            if (editId) {
+
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "agendamentos",
+                        editId
+                    ),
+
+                    data
+
+                );
+
+
+                showToast(
+                    "Agendamento atualizado com sucesso!"
+                );
+
+            }
+
+
+            /* NOVO */
+
+            else {
+
+
+                await addDoc(
+
+                    collection(
+                        db,
+                        "agendamentos"
+                    ),
+
+                    {
+
+                        ...data,
+
+                        status:
+                        "Agendado",
+
+                        createdAt:
+                        serverTimestamp()
+
+                    }
+
+                );
+
+
+                showToast(
+                    "Agendamento realizado com sucesso!"
+                );
+
+            }
+
+
+
+            clearAppointmentForm();
+
+
+            showSection(
+                "agenda"
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+        finally {
+
+            button.disabled =
+                false;
+
+
+            button.textContent =
+                "Salvar Agendamento";
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       EDITAR AGENDAMENTO
+    ====================================================== */
+
+    function editAppointment(id) {
+
+        const appointment =
+            appointments.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!appointment) {
+
+            showToast(
+                "Agendamento não encontrado."
+            );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "editAppointmentId"
+        ).value =
+            appointment.id;
+
+
+        document.getElementById(
+            "clientName"
+        ).value =
+            appointment.name || "";
+
+
+        document.getElementById(
+            "clientPhone"
+        ).value =
+            appointment.phone || "";
+
+
+        document.getElementById(
+            "service"
+        ).value =
+            appointment.serviceId || "";
+
+
+        document.getElementById(
+            "date"
+        ).value =
+            appointment.date || "";
+
+
+        document.getElementById(
+            "time"
+        ).value =
+            appointment.time || "";
+
+
+        document.getElementById(
+            "notes"
+        ).value =
+            appointment.notes || "";
+
+
+        document.getElementById(
+            "appointmentTitle"
+        ).textContent =
+            "Editar Agendamento";
+
+
+        showSelectedServicePrice();
+
+
+        showSection(
+            "novo"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       LIMPA FORMULÁRIO
+    ====================================================== */
+
+    function clearAppointmentForm() {
+
+        document.getElementById(
+            "editAppointmentId"
+        ).value = "";
+
+
+        document.getElementById(
+            "clientName"
+        ).value = "";
+
+
+        document.getElementById(
+            "clientPhone"
+        ).value = "";
+
+
+        document.getElementById(
+            "service"
+        ).value = "";
+
+
+        document.getElementById(
+            "date"
+        ).value = "";
+
+
+        document.getElementById(
+            "time"
+        ).value = "";
+
+
+        document.getElementById(
+            "notes"
+        ).value = "";
+
+
+        const priceBox =
+            document.getElementById(
+                "selectedServicePrice"
+            );
+
+
+        priceBox.innerHTML =
+            "";
+
+
+        priceBox.style.display =
+            "none";
+
+    }
+
+
+
+    /* =====================================================
+       CONFIRMAR AGENDAMENTO
+    ====================================================== */
+
+    async function confirmAppointment(id) {
+
+        try {
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "agendamentos",
+                    id
+                ),
+
+                {
+
+                    status:
+                    "Confirmado",
+
+                    updatedAt:
+                    serverTimestamp()
+
+                }
+
+            );
+
+
+            showToast(
+                "Agendamento confirmado!"
+            );
+
+        }
+
+        catch (error) {
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       CANCELAR AGENDAMENTO
+    ====================================================== */
+
+    async function cancelAppointment(id) {
+
+        const confirmation =
+            confirm(
+                "Deseja realmente cancelar este agendamento?"
+            );
+
+
+        if (!confirmation) {
+            return;
+        }
+
+
+        try {
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "agendamentos",
+                    id
+                ),
+
+                {
+
+                    status:
+                    "Cancelado",
+
+                    updatedAt:
+                    serverTimestamp()
+
+                }
+
+            );
+
+
+            showToast(
+                "Agendamento cancelado."
+            );
+
+        }
+
+        catch (error) {
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       RENDER AGENDA
+    ====================================================== */
+
+    function renderAgenda() {
+
+        const container =
+            document.getElementById(
+                "appointmentsList"
+            );
+
+
+        const filter =
+            document.getElementById(
+                "filterDate"
+            ).value;
+
+
+
+        let list =
+            [...appointments];
+
+
+
+        if (filter) {
+
+            list =
+                list.filter(
+                    appointment =>
+                        appointment.date === filter
+                );
+
+        }
+
+
+
+        list.sort(
+
+            (a, b) => {
+
+                const first =
+                    `${a.date || ""} ${a.time || ""}`;
+
+
+                const second =
+                    `${b.date || ""} ${b.time || ""}`;
+
+
+                return first.localeCompare(
+                    second
+                );
+
+            }
+
+        );
+
+
+
+        if (!list.length) {
+
+            container.innerHTML =
+                `
+                <div class="empty">
+                    📅
+                    <br><br>
+                    Nenhum agendamento encontrado.
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+
+        container.innerHTML =
+            list
+            .map(
+                appointment =>
+
+                createAppointmentHTML(
+                    appointment,
+                    true
+                )
+
+            )
+            .join("");
+
+    }
+
+
+
+    /* =====================================================
+       AGENDA DE HOJE
+    ====================================================== */
+
+    function renderToday() {
+
+        const container =
+            document.getElementById(
+                "todayAppointments"
+            );
+
+
+        const today =
+            getTodayString();
+
+
+
+        const list =
+            appointments
+            .filter(
+                appointment =>
+
+                    appointment.date === today &&
+
+                    appointment.status !==
+                    "Cancelado"
+            )
+            .sort(
+                (a, b) =>
+                    String(a.time)
+                    .localeCompare(
+                        String(b.time)
+                    )
+            );
+
+
+
+        if (!list.length) {
+
+            container.innerHTML =
+                `
+                <div class="empty">
+
+                    ✨
+                    <br><br>
+
+                    Nenhum horário marcado
+                    para hoje.
+
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+
+        container.innerHTML =
+            list
+            .map(
+                appointment =>
+
+                    createAppointmentHTML(
+                        appointment,
+                        false
+                    )
+
+            )
+            .join("");
+
+    }
+
+
+
+    /* =====================================================
+       HTML AGENDAMENTO
+    ====================================================== */
+
+    function createAppointmentHTML(
+        appointment,
+        showActions
+    ) {
+
+        const status =
+            appointment.status ||
+            "Agendado";
+
+
+        const statusClass =
+            status === "Confirmado"
+
+            ? "status-confirmado"
+
+            : status === "Cancelado"
+
+            ? "status-cancelado"
+
+            : "status-agendado";
+
+
+
+        return `
+
+            <div class="appointment">
+
+
+                <div class="appointment-top">
+
+                    <strong>
+                        ${escapeHTML(
+                            appointment.name || ""
+                        )}
+                    </strong>
+
+
+                    <span class="time">
+                        ${escapeHTML(
+                            appointment.time || ""
+                        )}
+                    </span>
+
+                </div>
+
+
+                <p>
+                    💇‍♀️
+                    ${escapeHTML(
+                        appointment.serviceName || ""
+                    )}
+                </p>
+
+
+                <p class="price">
+
+                    ${formatMoney(
+                        appointment.price || 0
+                    )}
+
+                </p>
+
+
+                <p>
+                    📅
+                    ${formatDate(
+                        appointment.date
+                    )}
+                </p>
+
+
+                <p>
+                    📱
+                    ${escapeHTML(
+                        appointment.phone || ""
+                    )}
+                </p>
+
+
+                ${
+                    appointment.notes
+
+                    ? `
+
+                    <p>
+                        📝
+                        ${escapeHTML(
+                            appointment.notes
+                        )}
+                    </p>
+
+                    `
+
+                    : ""
+                }
+
+
+                <span
+                    class="
+                        status
+                        ${statusClass}
+                    "
+                >
+
+                    ${escapeHTML(status)}
+
+                </span>
+
+
+                ${
+                    showActions
+
+                    ? `
+
+                    <div class="actions">
+
+
+                        ${
+                            status !==
+                            "Confirmado" &&
+                            status !==
+                            "Cancelado"
+
+                            ? `
+
+                            <button
+                                class="confirm-btn"
+                                onclick="
+                                    confirmAppointment(
+                                        '${appointment.id}'
+                                    )
+                                "
+                            >
+                                Confirmar
+                            </button>
+
+                            `
+
+                            : ""
+                        }
+
+
+                        <button
+                            class="edit-btn"
+                            onclick="
+                                editAppointment(
+                                    '${appointment.id}'
+                                )
+                            "
+                        >
+                            Editar
+                        </button>
+
+
+                        ${
+                            status !==
+                            "Cancelado"
+
+                            ? `
+
+                            <button
+                                class="cancel-btn"
+                                onclick="
+                                    cancelAppointment(
+                                        '${appointment.id}'
+                                    )
+                                "
+                            >
+                                Cancelar
+                            </button>
+
+                            `
+
+                            : ""
+                        }
+
+
+                    </div>
+
+                    `
+
+                    : ""
+                }
+
+
+            </div>
+
+        `;
+
+    }
+
+
+
+    /* =====================================================
+       SERVIÇOS VISÍVEIS
+    ====================================================== */
+
+    function renderPublicServices() {
+
+        const container =
+            document.getElementById(
+                "publicServices"
+            );
+
+
+        if (!services.length) {
+
+            container.innerHTML =
+                `
+                <div class="empty">
+                    Nenhum serviço cadastrado.
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            services
+            .map(
+                service => `
+
+                <div class="service-row">
+
+                    <div class="service-info">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    service.name
+                                )}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                ${Number(
+                                    service.duration
+                                )}
+                                minutos
+                            </small>
+
+                        </div>
+
+
+                        <strong
+                            class="service-price"
+                        >
+
+                            ${formatMoney(
+                                service.price
+                            )}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                `
+            )
+            .join("");
+
+    }
+
+
+
+    /* =====================================================
+       GERENCIAR SERVIÇOS
+    ====================================================== */
+
+    function renderManageServices() {
+
+        const container =
+            document.getElementById(
+                "manageServices"
+            );
+
+
+        if (!services.length) {
+
+            container.innerHTML =
+                `
+                <div class="empty">
+                    Nenhum serviço cadastrado.
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            services
+            .map(
+                service => `
+
+                <div class="service-row">
+
+
+                    <div class="service-info">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    service.name
+                                )}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                ${Number(
+                                    service.duration
+                                )}
+                                minutos
+                            </small>
+
+                        </div>
+
+
+                        <strong
+                            class="service-price"
+                        >
+
+                            ${formatMoney(
+                                service.price
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="service-actions">
+
+                        <button
+                            class="edit-btn"
+                            onclick="
+                                editService(
+                                    '${service.id}'
+                                )
+                            "
+                        >
+                            Editar
+                        </button>
+
+
+                        <button
+                            class="delete-btn"
+                            onclick="
+                                deleteService(
+                                    '${service.id}'
+                                )
+                            "
+                        >
+                            Excluir
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+                `
+            )
+            .join("");
+
+    }
+
+
+
+    /* =====================================================
+       NOVO SERVIÇO
+    ====================================================== */
+
+    function openNewService() {
+
+        document.getElementById(
+            "editServiceId"
+        ).value = "";
+
+
+        document.getElementById(
+            "serviceName"
+        ).value = "";
+
+
+        document.getElementById(
+            "servicePrice"
+        ).value = "";
+
+
+        document.getElementById(
+            "serviceDuration"
+        ).value = "";
+
+
+        document.getElementById(
+            "serviceFormTitle"
+        ).textContent =
+            "Novo Serviço";
+
+
+        showSection(
+            "formServico"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       EDITAR SERVIÇO
+    ====================================================== */
+
+    function editService(id) {
+
+        const service =
+            services.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!service) {
+
+            showToast(
+                "Serviço não encontrado."
+            );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "editServiceId"
+        ).value =
+            service.id;
+
+
+        document.getElementById(
+            "serviceName"
+        ).value =
+            service.name || "";
+
+
+        document.getElementById(
+            "servicePrice"
+        ).value =
+            service.price || "";
+
+
+        document.getElementById(
+            "serviceDuration"
+        ).value =
+            service.duration || "";
+
+
+        document.getElementById(
+            "serviceFormTitle"
+        ).textContent =
+            "Editar Serviço";
+
+
+        showSection(
+            "formServico"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       SALVAR SERVIÇO
+    ====================================================== */
+
+    async function saveService() {
+
+        const button =
+            document.getElementById(
+                "saveServiceButton"
+            );
+
+
+        const editId =
+            document.getElementById(
+                "editServiceId"
+            ).value;
+
+
+        const name =
+            document.getElementById(
+                "serviceName"
+            ).value.trim();
+
+
+        const price =
+            Number(
+                document.getElementById(
+                    "servicePrice"
+                ).value
+            );
+
+
+        const duration =
+            Number(
+                document.getElementById(
+                    "serviceDuration"
+                ).value
+            );
+
+
+
+        if (
+            !name ||
+            Number.isNaN(price) ||
+            price < 0 ||
+            !duration ||
+            duration <= 0
+        ) {
+
+            showToast(
+                "Preencha corretamente os dados do serviço."
+            );
+
+            return;
+
+        }
+
+
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "Salvando...";
+
+
+
+        try {
+
+
+            /* EDITAR */
+
+            if (editId) {
+
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "servicos",
+                        editId
+                    ),
+
+                    {
+
+                        name,
+
+                        price,
+
+                        duration,
+
+                        updatedAt:
+                        serverTimestamp()
+
+                    }
+
+                );
+
+
+                showToast(
+                    "Serviço atualizado!"
+                );
+
+            }
+
+
+            /* NOVO */
+
+            else {
+
+
+                await addDoc(
+
+                    collection(
+                        db,
+                        "servicos"
+                    ),
+
+                    {
+
+                        name,
+
+                        price,
+
+                        duration,
+
+                        createdAt:
+                        serverTimestamp(),
+
+                        updatedAt:
+                        serverTimestamp()
+
+                    }
+
+                );
+
+
+                showToast(
+                    "Serviço cadastrado!"
+                );
+
+            }
+
+
+
+            showSection(
+                "gerenciarServicos"
+            );
+
+        }
+
+        catch (error) {
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+        finally {
+
+            button.disabled =
+                false;
+
+
+            button.textContent =
+                "Salvar Serviço";
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       EXCLUIR SERVIÇO
+    ====================================================== */
+
+    async function deleteService(id) {
+
+        const service =
+            services.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!service) {
+            return;
+        }
+
+
+        const confirmation =
+            confirm(
+                `Deseja excluir "${service.name}"?`
+            );
+
+
+        if (!confirmation) {
+            return;
+        }
+
+
+        try {
+
+            await deleteDoc(
+
+                doc(
+                    db,
+                    "servicos",
+                    id
+                )
+
+            );
+
+
+            showToast(
+                "Serviço excluído."
+            );
+
+        }
+
+        catch (error) {
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       DATA ATUAL
+    ====================================================== */
+
+    function getTodayString() {
+
+        const today =
+            new Date();
+
+
+        const year =
+            today.getFullYear();
+
+
+        const month =
+            String(
+                today.getMonth() + 1
+            )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+        const day =
+            String(
+                today.getDate()
+            )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+        return `${year}-${month}-${day}`;
+
+    }
+
+
+
+    /* =====================================================
+       FORMATA DATA
+    ====================================================== */
+
+    function formatDate(date) {
+
+        if (!date) {
+            return "";
+        }
+
+
+        const parts =
+            date.split("-");
+
+
+        if (
+            parts.length !== 3
+        ) {
+
+            return date;
+
+        }
+
+
+        return (
+            parts[2] +
+            "/" +
+            parts[1] +
+            "/" +
+            parts[0]
+        );
+
+    }
+
+
+
+    /* =====================================================
+       FORMATA DINHEIRO
+    ====================================================== */
+
+    function formatMoney(value) {
+
+        return Number(
+            value || 0
+        )
+        .toLocaleString(
+
+            "pt-BR",
+
+            {
+
+                style:
+                "currency",
+
+                currency:
+                "BRL"
+
+            }
+
+        );
+
+    }
+
+
+
+    /* =====================================================
+       PROTEÇÃO HTML
+    ====================================================== */
+
+    function escapeHTML(value) {
+
+        return String(
+            value ?? ""
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       TOAST
+    ====================================================== */
+
+    let toastTimer;
+
+
+    function showToast(message) {
+
+        const toast =
+            document.getElementById(
+                "toast"
+            );
+
+
+        toast.textContent =
+            message;
+
+
+        toast.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            toastTimer
+        );
+
+
+        toastTimer =
+            setTimeout(
+                () => {
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                },
+
+                3000
+            );
+
+    }
+
+
+
+    /* =====================================================
+       CONEXÃO
+    ====================================================== */
+
+    function setConnected() {
+
+        const connection =
+            document.getElementById(
+                "connection"
+            );
+
+
+        connection.textContent =
+            "● Banco de dados conectado";
+
+
+        connection.className =
+            "connection connected";
+
+    }
+
+
+
+    function showDatabaseError(error) {
+
+        console.error(
+            "Firebase:",
+            error
+        );
+
+
+        const connection =
+            document.getElementById(
+                "connection"
+            );
+
+
+        connection.textContent =
+            "Erro ao conectar com o banco";
+
+
+        connection.className =
+            "connection error";
+
+
+        if (
+            error?.code ===
+            "permission-denied"
+        ) {
+
+            showToast(
+                "O Firestore bloqueou o acesso. Verifique as regras do banco."
+            );
+
+        }
+
+        else {
+
+            showToast(
+                "Erro ao acessar o banco de dados."
+            );
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       DISPONIBILIZA FUNÇÕES PARA HTML onclick
+    ====================================================== */
+
+    window.showSection =
+        showSection;
+
+
+    window.newAppointment =
+        newAppointment;
+
+
+    window.showSelectedServicePrice =
+        showSelectedServicePrice;
+
+
+    window.saveAppointment =
+        saveAppointment;
+
+
+    window.editAppointment =
+        editAppointment;
+
+
+    window.confirmAppointment =
+        confirmAppointment;
+
+
+    window.cancelAppointment =
+        cancelAppointment;
+
+
+    window.openNewService =
+        openNewService;
+
+
+    window.editService =
+        editService;
+
+
+    window.saveService =
+        saveService;
+
+
+    window.deleteService =
+        deleteService;
+
+
+
+    /* =====================================================
+       INICIALIZAÇÃO
+    ====================================================== */
+
+    async function startApp() {
+
+        try {
+
+            await ensureDefaultServices();
+
+
+            listenServices();
+
+
+            listenAppointments();
+
+
+            document.getElementById(
+                "date"
+            ).min =
+                getTodayString();
+
+
+            document.getElementById(
+                "filterDate"
+            ).value =
+                getTodayString();
+
+        }
+
+        catch (error) {
+
+            showDatabaseError(
+                error
+            );
+
+        }
+
+    }
+
+
+    startApp();
+
+
 </script>
+
+
 </body>
+
 </html>
