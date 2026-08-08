@@ -68,7 +68,7 @@
         ========================================================= */
         header {
             text-align: center;
-            padding: 24px 20px 20px;
+            padding: 24px 20px 16px;
             border-bottom: 1px solid var(--border);
             background: var(--bg-card);
         }
@@ -97,9 +97,35 @@
         }
 
         header p {
-            margin-top: 4px;
+            margin-top: 2px;
             color: var(--text-muted);
             font-size: 13px;
+        }
+
+        /* PAINEL DE DATA E RELÓGIO */
+        .datetime-card {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            border-radius: var(--radius-btn);
+            padding: 10px 14px;
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .datetime-card .time-display {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .datetime-card .date-display {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: capitalize;
         }
 
         .connection {
@@ -134,13 +160,13 @@
             background: linear-gradient(135deg, #fffdf8 0%, #f8efd9 100%);
             border: 1px solid var(--primary-border);
             border-radius: var(--radius-main);
-            padding: 20px;
+            padding: 16px 20px;
             margin-bottom: 20px;
         }
 
         .welcome h3 {
-            font-size: 20px;
-            margin-bottom: 4px;
+            font-size: 18px;
+            margin-bottom: 2px;
             color: var(--text-main);
         }
 
@@ -149,6 +175,7 @@
             color: var(--text-muted);
         }
 
+        /* MENU GRID 5 ITENS */
         .menu {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -157,11 +184,11 @@
         }
 
         .menu button {
-            min-height: 100px;
+            min-height: 90px;
             border: 1px solid var(--primary-border);
             background: var(--bg-card);
             border-radius: var(--radius-main);
-            padding: 16px 10px;
+            padding: 12px 8px;
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
@@ -170,7 +197,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
+        }
+
+        .menu button.full-width {
+            grid-column: span 2;
+            min-height: 70px;
+            flex-direction: row;
+            gap: 10px;
         }
 
         .menu button:active {
@@ -179,7 +213,7 @@
         }
 
         .menu-icon {
-            font-size: 26px;
+            font-size: 24px;
         }
 
         /* =========================================================
@@ -248,6 +282,7 @@
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
+            outline: none;
         }
 
         textarea {
@@ -291,33 +326,46 @@
         }
 
         /* =========================================================
-           CARDS DE AGENDAMENTO & STATUS
+           CARDS DE AGENDAMENTO (COM DESTAQUE DADOS CLIENTE)
         ========================================================= */
         .appointment {
-            border: 1px solid var(--border);
+            border: 1px solid var(--primary-border);
             border-radius: var(--radius-main);
             padding: 16px;
-            margin-bottom: 12px;
-            background: var(--bg-card);
+            margin-bottom: 14px;
+            background: #ffffff;
             box-shadow: var(--shadow-sm);
         }
 
-        .appointment-top {
+        .appointment-hero {
+            background: var(--primary-light);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .appointment-hero .hero-time {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-dark);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            gap: 6px;
         }
 
-        .appointment-top strong {
-            font-size: 16px;
-            color: var(--text-main);
-        }
-
-        .time {
-            color: var(--primary);
+        .appointment-hero .hero-client {
+            font-size: 17px;
             font-weight: 700;
-            font-size: 15px;
+            color: var(--text-main);
+            margin-top: 4px;
+        }
+
+        .appointment-hero .hero-service {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 2px;
         }
 
         .appointment p {
@@ -330,21 +378,23 @@
         }
 
         .price {
-            font-size: 15px !important;
-            color: var(--primary) !important;
+            font-size: 14px !important;
+            color: var(--primary-dark) !important;
             font-weight: 700;
-
         }
 
         .whatsapp-link {
             color: #25D366;
             text-decoration: none;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .status {
             display: inline-block;
-            margin-top: 10px;
+            margin-top: 8px;
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 11px;
@@ -373,6 +423,56 @@
         .confirm-btn { background: #edf8ef; color: #25752c; }
         .edit-btn { background: #f4f4f4; color: #555; }
         .cancel-btn { background: #fff0f0; color: #ae3030; }
+
+        /* =========================================================
+           LISTA DE CLIENTES
+        ========================================================= */
+        .client-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-main);
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .client-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .client-card h4 {
+            font-size: 16px;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .client-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .client-actions button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-schedule-quick {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid var(--primary-border);
+        }
 
         /* =========================================================
            LISTA DE SERVIÇOS & GERENCIAR
@@ -491,6 +591,12 @@
         <h1>Espaço</h1>
         <h2>Taai Botelho</h2>
         <p>Beleza • Cuidado • Bem-estar</p>
+
+        <!-- PAINEL DE RELÓGIO E DATA -->
+        <div class="datetime-card">
+            <span class="date-display" id="liveDate">Carregando data...</span>
+            <span class="time-display" id="liveClock">00:00:00</span>
+        </div>
     </header>
 
     <div id="connection" class="connection">Conectando ao banco...</div>
@@ -499,10 +605,10 @@
     <main>
         <div class="welcome">
             <h3>Olá ✨</h3>
-            <p>Gerencie seus horários, clientes e serviços de forma simples.</p>
+            <p>Gerencie horários, clientes e serviços de forma simples.</p>
         </div>
 
-        <!-- MENU PRINCIPAL -->
+        <!-- MENU PRINCIPAL COM CLIENTES -->
         <div class="menu">
             <button onclick="newAppointment()">
                 <span class="menu-icon">📅</span>
@@ -512,13 +618,17 @@
                 <span class="menu-icon">📋</span>
                 Agenda
             </button>
+            <button onclick="showSection('clientes')">
+                <span class="menu-icon">👥</span>
+                Clientes
+            </button>
             <button onclick="showSection('servicos')">
                 <span class="menu-icon">💇‍♀️</span>
                 Serviços
             </button>
-            <button onclick="showSection('gerenciar')">
+            <button class="full-width" onclick="showSection('gerenciar')">
                 <span class="menu-icon">⚙️</span>
-                Gerenciar
+                Gerenciar Configurações
             </button>
         </div>
 
@@ -577,6 +687,40 @@
             </div>
         </section>
 
+        <!-- LISTA DE CLIENTES -->
+        <section id="clientes" class="section">
+            <div class="card">
+                <h3>Agenda de Clientes</h3>
+                <button class="btn-primary" onclick="openNewClient()" style="margin-bottom: 14px;">+ Cadastrar Cliente</button>
+                
+                <input type="text" id="searchClient" placeholder="🔍 Buscar cliente por nome ou fone..." oninput="renderClients()">
+
+                <div id="clientsList">
+                    <div class="loading">Carregando clientes...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORMULÁRIO CADASTRO/EDIÇÃO DE CLIENTE -->
+        <section id="formCliente" class="section">
+            <div class="card">
+                <h3 id="clientFormTitle">Novo Cliente</h3>
+                <input type="hidden" id="editClientId">
+
+                <label for="clientFormName">Nome Completo</label>
+                <input type="text" id="clientFormName" placeholder="Digite o nome da cliente">
+
+                <label for="clientFormPhone">WhatsApp / Telefone</label>
+                <input type="tel" id="clientFormPhone" placeholder="(51) 99999-9999" inputmode="tel" oninput="applyPhoneMask(this)">
+
+                <label for="clientFormNotes">Observações sobre a cliente</label>
+                <textarea id="clientFormNotes" placeholder="Ex: Preferências, alergias, tipo de cabelo..."></textarea>
+
+                <button id="saveClientButton" class="btn-primary" onclick="saveClient()">Salvar Cliente</button>
+                <button class="btn-secondary" onclick="showSection('clientes')">Cancelar</button>
+            </div>
+        </section>
+
         <!-- LISTA DE SERVIÇOS (PÚBLICA) -->
         <section id="servicos" class="section">
             <div class="card">
@@ -588,10 +732,14 @@
         <!-- PAINEL GERENCIAR -->
         <section id="gerenciar" class="section">
             <div class="card">
-                <h3>Gerenciar</h3>
+                <h3>Gerenciar Configurações</h3>
                 <div class="manage-box" onclick="showSection('gerenciarServicos')">
                     <h4>💇‍♀️ Serviços e Valores</h4>
                     <p>Adicionar, alterar valores, duração ou excluir serviços.</p>
+                </div>
+                <div class="manage-box" onclick="showSection('clientes')">
+                    <h4>👥 Cadastro de Clientes</h4>
+                    <p>Gerenciar lista de contatos e informações das clientes.</p>
                 </div>
                 <div class="manage-box" onclick="showSection('agenda')">
                     <h4>📅 Agendamentos</h4>
@@ -667,6 +815,7 @@
 
     let services = [];
     let appointments = [];
+    let clients = [];
 
     const defaultServices = [
         { id: "corte", name: "Corte", price: 60, duration: 40 },
@@ -676,6 +825,24 @@
         { id: "pedicure", name: "Pedicure", price: 45, duration: 50 },
         { id: "sobrancelha", name: "Sobrancelha", price: 35, duration: 30 }
     ];
+
+    /* RELÓGIO E DATA */
+    function startClock() {
+        function update() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString("pt-BR");
+            const dateStr = now.toLocaleDateString("pt-BR", {
+                weekday: "short",
+                day: "2-digit",
+                month: "short"
+            });
+            
+            document.getElementById("liveClock").textContent = timeStr;
+            document.getElementById("liveDate").textContent = dateStr;
+        }
+        update();
+        setInterval(update, 1000);
+    }
 
     async function ensureDefaultServices() {
         try {
@@ -691,7 +858,6 @@
                 });
             }
         } catch (error) {
-            console.error("Erro ao popular serviços default:", error);
             showDatabaseError(error);
         }
     }
@@ -717,6 +883,15 @@
         }, error => showDatabaseError(error));
     }
 
+    function listenClients() {
+        onSnapshot(collection(db, "clientes"), snapshot => {
+            clients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            clients.sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
+            renderClients();
+            setConnected();
+        }, error => showDatabaseError(error));
+    }
+
     function showSection(id) {
         document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
         const target = document.getElementById(id);
@@ -724,6 +899,7 @@
 
         if (id === "inicio") renderToday();
         if (id === "agenda") renderAgenda();
+        if (id === "clientes") renderClients();
         if (id === "servicos") renderPublicServices();
         if (id === "gerenciarServicos") renderManageServices();
 
@@ -761,9 +937,13 @@
         box.style.display = "block";
     }
 
-    function newAppointment() {
+    function newAppointment(initialName = "", initialPhone = "") {
         clearAppointmentForm();
         document.getElementById("appointmentTitle").textContent = "Novo Agendamento";
+        
+        if (initialName) document.getElementById("clientName").value = initialName;
+        if (initialPhone) document.getElementById("clientPhone").value = initialPhone;
+
         showSection("novo");
     }
 
@@ -825,6 +1005,9 @@
                 showToast("Agendamento realizado!");
             }
 
+            // Auto cadastra cliente se não existir
+            autoSaveClient(name, phone);
+
             clearAppointmentForm();
             showSection("agenda");
         } catch (error) {
@@ -832,6 +1015,21 @@
         } finally {
             btn.disabled = false;
             btn.textContent = "Salvar Agendamento";
+        }
+    }
+
+    async function autoSaveClient(name, phone) {
+        const cleanP = phone.replace(/\D/g, "");
+        const exists = clients.some(c => (c.phone || "").replace(/\D/g, "") === cleanP);
+        if (!exists && name && phone) {
+            try {
+                await addDoc(collection(db, "clientes"), {
+                    name, phone, notes: "Cadastrado via Agendamento",
+                    createdAt: serverTimestamp()
+                });
+            } catch (e) {
+                console.error("Erro no auto-cadastro de cliente:", e);
+            }
         }
     }
 
@@ -920,6 +1118,7 @@
         container.innerHTML = list.map(a => createAppointmentHTML(a, false)).join("");
     }
 
+    /* CARD DE AGENDAMENTO COM DESTAQUE DADOS CLIENTE + SERVIÇO + HORÁRIO */
     function createAppointmentHTML(item, showActions) {
         const status = item.status || "Agendado";
         const statusClass = status === "Confirmado" ? "status-confirmado" :
@@ -930,18 +1129,20 @@
 
         return `
             <div class="appointment">
-                <div class="appointment-top">
-                    <strong>${escapeHTML(item.name)}</strong>
-                    <span class="time">${escapeHTML(item.time)}</span>
+                <!-- HERO BOX DE DESTAQUE: HORÁRIO, NOME E SERVIÇO -->
+                <div class="appointment-hero">
+                    <div class="hero-time">⏰ ${escapeHTML(item.time)}</div>
+                    <div class="hero-client">👤 ${escapeHTML(item.name)}</div>
+                    <div class="hero-service">💇‍♀️ ${escapeHTML(item.serviceName)}</div>
                 </div>
-                <p>💇‍♀️ ${escapeHTML(item.serviceName)}</p>
-                <p class="price">${formatMoney(item.price)}</p>
-                <p>📅 ${formatDate(item.date)}</p>
+
+                <p class="price">💰 ${formatMoney(item.price)}</p>
+                <p>📅 Data: ${formatDate(item.date)}</p>
                 <p>
                     📱 ${escapeHTML(item.phone)} 
-                    ${waLink ? `<a href="${waLink}" target="_blank" class="whatsapp-link">(Conversar)</a>` : ''}
+                    ${waLink ? `<a href="${waLink}" target="_blank" class="whatsapp-link">(WhatsApp)</a>` : ''}
                 </p>
-                ${item.notes ? `<p>📝 ${escapeHTML(item.notes)}</p>` : ''}
+                ${item.notes ? `<p>📝 Obs: ${escapeHTML(item.notes)}</p>` : ''}
                 
                 <span class="status ${statusClass}">${escapeHTML(status)}</span>
 
@@ -960,6 +1161,121 @@
         `;
     }
 
+    /* =========================================================
+       GERENCIAMENTO DE CLIENTES
+    ========================================================= */
+    function renderClients() {
+        const container = document.getElementById("clientsList");
+        const query = (document.getElementById("searchClient").value || "").toLowerCase().trim();
+
+        let list = [...clients];
+        if (query) {
+            list = list.filter(c => 
+                (c.name || "").toLowerCase().includes(query) || 
+                (c.phone || "").includes(query)
+            );
+        }
+
+        if (!list.length) {
+            container.innerHTML = '<div class="empty">Nenhum cliente encontrado.</div>';
+            return;
+        }
+
+        container.innerHTML = list.map(c => {
+            const cleanPhone = (c.phone || "").replace(/\D/g, "");
+            const waLink = cleanPhone ? `https://wa.me/55${cleanPhone}` : null;
+
+            return `
+                <div class="client-card">
+                    <div class="client-card-top">
+                        <div>
+                            <h4>${escapeHTML(c.name)}</h4>
+                            <p>📱 ${escapeHTML(c.phone)} ${waLink ? `<a href="${waLink}" target="_blank" class="whatsapp-link">(WhatsApp)</a>` : ''}</p>
+                            ${c.notes ? `<p style="font-size:12px; color:#666;">📝 ${escapeHTML(c.notes)}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="client-actions">
+                        <button class="btn-schedule-quick" onclick="newAppointment('${escapeHTML(c.name)}', '${escapeHTML(c.phone)}')">📅 Agendar</button>
+                        <button class="edit-btn" onclick="editClient('${c.id}')">Editar</button>
+                        <button class="delete-btn" onclick="deleteClient('${c.id}')">Excluir</button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function openNewClient() {
+        document.getElementById("editClientId").value = "";
+        document.getElementById("clientFormName").value = "";
+        document.getElementById("clientFormPhone").value = "";
+        document.getElementById("clientFormNotes").value = "";
+        document.getElementById("clientFormTitle").textContent = "Novo Cliente";
+        showSection("formCliente");
+    }
+
+    function editClient(id) {
+        const c = clients.find(item => item.id === id);
+        if (!c) return showToast("Cliente não encontrado.");
+
+        document.getElementById("editClientId").value = c.id;
+        document.getElementById("clientFormName").value = c.name || "";
+        document.getElementById("clientFormPhone").value = c.phone || "";
+        document.getElementById("clientFormNotes").value = c.notes || "";
+        document.getElementById("clientFormTitle").textContent = "Editar Cliente";
+        showSection("formCliente");
+    }
+
+    async function saveClient() {
+        const btn = document.getElementById("saveClientButton");
+        const editId = document.getElementById("editClientId").value;
+        const name = document.getElementById("clientFormName").value.trim();
+        const phone = document.getElementById("clientFormPhone").value.trim();
+        const notes = document.getElementById("clientFormNotes").value.trim();
+
+        if (!name || !phone) {
+            showToast("Preencha o nome e o telefone do cliente.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
+
+        try {
+            if (editId) {
+                await updateDoc(doc(db, "clientes", editId), {
+                    name, phone, notes,
+                    updatedAt: serverTimestamp()
+                });
+                showToast("Cliente atualizado!");
+            } else {
+                await addDoc(collection(db, "clientes"), {
+                    name, phone, notes,
+                    createdAt: serverTimestamp()
+                });
+                showToast("Cliente cadastrado com sucesso!");
+            }
+            showSection("clientes");
+        } catch (error) {
+            showDatabaseError(error);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Salvar Cliente";
+        }
+    }
+
+    async function deleteClient(id) {
+        const c = clients.find(item => item.id === id);
+        if (!c || !confirm(`Deseja realmente excluir a cliente "${c.name}"?`)) return;
+
+        try {
+            await deleteDoc(doc(db, "clientes", id));
+            showToast("Cliente excluído.");
+        } catch (error) {
+            showDatabaseError(error);
+        }
+    }
+
+    /* SERVIÇOS */
     function renderPublicServices() {
         const container = document.getElementById("publicServices");
         if (!services.length) {
@@ -1144,7 +1460,7 @@
         showToast(msg);
     }
 
-    /* GLOBAL BINDINGS */
+    /* BINDINGS GLOBAIS PARA EVENTOS ONCLICK */
     window.showSection = showSection;
     window.newAppointment = newAppointment;
     window.showSelectedServicePrice = showSelectedServicePrice;
@@ -1152,6 +1468,11 @@
     window.editAppointment = editAppointment;
     window.confirmAppointment = confirmAppointment;
     window.cancelAppointment = cancelAppointment;
+    window.renderClients = renderClients;
+    window.openNewClient = openNewClient;
+    window.editClient = editClient;
+    window.saveClient = saveClient;
+    window.deleteClient = deleteClient;
     window.openNewService = openNewService;
     window.editService = editService;
     window.saveService = saveService;
@@ -1161,9 +1482,11 @@
     /* INICIALIZAÇÃO */
     async function startApp() {
         try {
+            startClock();
             await ensureDefaultServices();
             listenServices();
             listenAppointments();
+            listenClients();
 
             const today = getTodayString();
             document.getElementById("date").min = today;
